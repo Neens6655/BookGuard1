@@ -260,7 +260,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-2xl">
-                        {result.recommended_minimum_age?.split('-')[0] || result.recommended_minimum_age?.replace(/[^0-9]/g, '') || '6'}+
+                        {(result.recommended_minimum_age?.split('-')[0]?.replace(/\+/g, '') || result.recommended_minimum_age?.replace(/[^0-9]/g, '') || '6')}+
                       </span>
                     </div>
                     <div className="flex-1">
