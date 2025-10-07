@@ -451,14 +451,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
 
                           {/* Evidence/Quote from Book */}
                           {result.domain_evidence?.[domain as keyof typeof result.domain_evidence] && (
-                            <div className="mt-3 bg-white rounded-lg p-4 border-l-4 border-blue-500">
-                              <div className="flex items-start gap-2 mb-2">
+                            <div className="mt-3 bg-white dark:bg-gray-50 rounded-lg p-5 border-l-4 border-blue-500 shadow-sm">
+                              <div className="flex items-start gap-2 mb-3">
                                 <MessageCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                                 <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
                                   Text Evidence from Book:
                                 </span>
                               </div>
-                              <blockquote className="text-sm text-foreground italic leading-relaxed pl-4 border-l-2 border-gray-300">
+                              <blockquote className="text-base text-foreground italic leading-loose pl-4 border-l-2 border-gray-300 whitespace-pre-line">
                                 "{result.domain_evidence[domain as keyof typeof result.domain_evidence]}"
                               </blockquote>
                             </div>
