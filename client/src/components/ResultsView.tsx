@@ -117,12 +117,6 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             </div>
             <div className="flex items-center gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-orange-500" data-testid="safety-score-header">
-                  {result.whitelist_score}/100
-                </div>
-                <div className="text-xs text-muted-foreground">Safety Score</div>
-              </div>
-              <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-500" data-testid="rating-header">
                   {rating}★
                 </div>
