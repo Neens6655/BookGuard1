@@ -29,10 +29,13 @@ Preferred communication style: Simple, everyday language.
 **Typography**: Inter for Latin text, Noto Sans Arabic for Arabic script support
 
 **Key Design Decisions**:
-- Single-page application with view state management (upload → processing → results)
+- Library-first interface showing all analyzed books as interactive cards
+- View state management: library → upload → processing → results → library
 - Real-time progress tracking via polling for long-running book evaluations
 - File upload with drag-and-drop support limited to 50MB
 - Multi-step progress indicators for user feedback during processing
+- Book cards display title, executive summary, safety score, age recommendation, and verdict
+- Click-through navigation from cards to full analysis details
 
 ### Backend Architecture
 
@@ -47,9 +50,10 @@ Preferred communication style: Simple, everyday language.
 
 **File Processing Pipeline**:
 1. Multer middleware for multipart file uploads (stored in `uploads/` directory)
-2. Text extraction service (currently supports TXT, with placeholders for PDF/Word)
+2. Text extraction service supporting PDF (pdf-parse), Word documents (mammoth), and TXT files
 3. OpenAI API integration for content analysis
 4. Asynchronous processing with progress updates
+5. Automatic cleanup of uploaded files after processing
 
 **Key Design Decisions**:
 - Asynchronous file processing to prevent request timeouts
@@ -104,10 +108,11 @@ evaluations table:
 - Connection via `DATABASE_URL` environment variable
 - Drizzle migrations stored in `./migrations` directory
 
-**File Processing Libraries** (Planned):
-- PDF parsing: Not yet implemented (placeholder in code)
-- Word document parsing: Not yet implemented (placeholder in code)
-- Current: TXT file reading via Node.js fs module
+**File Processing Libraries**:
+- PDF parsing: pdf-parse library for extracting text from PDF documents
+- Word document parsing: mammoth library for .doc and .docx files
+- TXT file reading: Node.js fs module for plain text files
+- All file types support up to 18,000 characters of extracted text for analysis
 
 **Development Tools**:
 - Vite plugins for Replit integration (cartographer, dev banner, runtime error overlay)
