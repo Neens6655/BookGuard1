@@ -19,7 +19,22 @@ interface ResultsViewProps {
 export function ResultsView({ result, filename, coverImage, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
-  const isApproved = result.whitelist_score >= 70;
+  // Map score to risk level label
+  const getRiskLevel = (score: number): { label: string; level: 'none' | 'low' | 'medium' | 'high' } => {
+    if (score === 0) return { label: 'No Concern', level: 'none' };
+    if (score <= 2) return { label: 'Low', level: 'low' };
+    if (score === 3) return { label: 'Medium', level: 'medium' };
+    return { label: 'High', level: 'high' };
+  };
+
+  // Count high-risk domains
+  const highRiskCount = Object.entries(result.domain_scores || {}).filter(([_, score]) => {
+    const risk = getRiskLevel(score);
+    return risk.level === 'high';
+  }).length;
+
+  // Approval based on high-risk count: more than 2 highs = not approved
+  const isApproved = highRiskCount <= 2;
   const rating = 4.6; // Mock rating based on score
   
   // Extract genre/themes from key_drivers
@@ -123,10 +138,16 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 <div className="text-xs text-muted-foreground">Rating</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle className="w-7 h-7 text-green-600" />
+                <div className={`w-12 h-12 rounded-full ${isApproved ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center`}>
+                  {isApproved ? (
+                    <CheckCircle className="w-7 h-7 text-green-600" />
+                  ) : (
+                    <XCircle className="w-7 h-7 text-red-600" />
+                  )}
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">Approved</div>
+                <div className={`text-xs mt-1 font-medium ${isApproved ? 'text-green-600' : 'text-red-600'}`}>
+                  {isApproved ? 'Approved' : 'Not Approved'}
+                </div>
               </div>
             </div>
           </div>
@@ -334,12 +355,21 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
               </div>
 
               {/* Approval Badge */}
-              <div className="bg-green-50 rounded-lg p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="w-10 h-10 text-green-600" />
+              <div className={`${isApproved ? 'bg-green-50' : 'bg-red-50'} rounded-lg p-6 text-center`}>
+                <div className={`w-16 h-16 rounded-full ${isApproved ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center mx-auto mb-3`}>
+                  {isApproved ? (
+                    <CheckCircle className="w-10 h-10 text-green-600" />
+                  ) : (
+                    <XCircle className="w-10 h-10 text-red-600" />
+                  )}
                 </div>
-                <div className="text-xl font-bold text-green-700 mb-1">APPROVED</div>
-                <div className="text-sm text-green-600">For UAE Families</div>
+                <div className={`text-xl font-bold ${isApproved ? 'text-green-700' : 'text-red-700'} mb-1`}>
+                  {isApproved ? 'APPROVED' : 'NOT APPROVED'}
+                </div>
+                <div className={`text-sm ${isApproved ? 'text-green-600' : 'text-red-600'}`}>
+                  For UAE Families
+                  {!isApproved && <span className="block mt-1 text-xs">({highRiskCount} high-risk domains found)</span>}
+                </div>
               </div>
             </TabsContent>
 
@@ -395,6 +425,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
 
                     const Icon = domainConfig.icon;
                     const score = result.domain_scores?.[domain] || 0;
+                    const riskLevel = getRiskLevel(score);
                     
                     // Determine severity level
                     const getSeverityInfo = (assessment: string, score: number) => {
@@ -427,12 +458,9 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                                 </Badge>
                               </div>
                             </div>
-                            {score > 0 && (
-                              <div className={`text-right ${severity.bgColor} rounded-lg px-3 py-1`}>
-                                <div className={`text-2xl font-bold ${severity.textColor}`}>{score}</div>
-                                <div className="text-xs text-muted-foreground">/ 5</div>
-                              </div>
-                            )}
+                            <div className={`text-right ${severity.bgColor} rounded-lg px-4 py-2`}>
+                              <div className={`text-lg font-bold ${severity.textColor}`}>{riskLevel.label}</div>
+                            </div>
                           </div>
 
                           {/* Assessment Details */}
@@ -511,28 +539,13 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             </TabsContent>
 
             <TabsContent value="discussion" className="mt-6">
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold text-lg mb-3">Before Reading</h4>
-                  <ul className="space-y-2">
-                    {result.parent_discussion_guide.before_reading.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <MessageCircle className="w-4 h-4 text-primary mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-lg mb-3">After Reading</h4>
-                  <ul className="space-y-2">
-                    {result.parent_discussion_guide.after_reading.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <MessageCircle className="w-4 h-4 text-primary mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+              <div className="space-y-4">
+                <h4 className="font-semibold text-lg">Discussion Topics</h4>
+                <p className="text-muted-foreground">Engage with the book's key themes and messages through thoughtful conversation.</p>
+                <div className="bg-blue-50 rounded-lg p-4 mt-4">
+                  <p className="text-sm text-blue-800">
+                    Use the discussion questions in the "For Parents" tab to guide meaningful conversations with your children.
+                  </p>
                 </div>
               </div>
             </TabsContent>
@@ -540,23 +553,42 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             <TabsContent value="parents" className="mt-6">
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-lg mb-3">Age Recommendations</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {Object.entries(result.age_verdicts).map(([age, verdict]) => (
-                      <Card key={age}>
-                        <CardContent className="p-4 text-center">
-                          <div className="font-semibold text-foreground mb-2">{age}</div>
-                          <div className="text-sm text-muted-foreground">{verdict}</div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <h4 className="font-semibold text-lg mb-3">Parent Discussion Guide</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Use these questions to engage your children in meaningful conversations about the book
+                  </p>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-5 border border-blue-100">
+                      <h5 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <MessageCircle className="w-5 h-5 text-blue-600" />
+                        Before Reading
+                      </h5>
+                      <ul className="space-y-2">
+                        {result.parent_discussion_guide.before_reading.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-muted-foreground">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-5 border border-purple-100">
+                      <h5 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <MessageCircle className="w-5 h-5 text-purple-600" />
+                        After Reading
+                      </h5>
+                      <ul className="space-y-2">
+                        {result.parent_discussion_guide.after_reading.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-muted-foreground">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-lg mb-3">Recommended Age</h4>
-                  <Badge variant="outline" className="text-lg px-4 py-2">
-                    {result.recommended_minimum_age}+
-                  </Badge>
                 </div>
               </div>
             </TabsContent>
