@@ -40,10 +40,11 @@ async function extractFromTxt(filePath: string): Promise<string> {
 }
 
 async function extractFromPdf(filePath: string): Promise<string> {
-  // @ts-ignore - pdf-parse uses CommonJS and doesn't have proper ESM types
-  const pdfParse = (await import('pdf-parse')).default || (await import('pdf-parse'));
+  const pdfParse = await import('pdf-parse');
   const dataBuffer = await fs.readFile(filePath);
-  const data = await pdfParse(dataBuffer);
+  // @ts-ignore - pdf-parse module structure
+  const parseFunction = pdfParse.default || pdfParse;
+  const data = await parseFunction(dataBuffer);
   return smartExtract(data.text);
 }
 
