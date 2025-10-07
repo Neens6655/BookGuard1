@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Enhanced Evidence Quotes for Safety Analysis (October 2025)**:
+- Upgraded domain evidence extraction from 1-2 lines to 3-5 lines or short paragraph
+- OpenAI now provides fuller context and more substantial proof for safety concerns
+- Enhanced UI typography and spacing for better readability of longer evidence quotes:
+  - Increased font size (text-sm → text-base) for improved legibility
+  - Enhanced line height (leading-relaxed → leading-loose) for multi-line quotes
+  - Added whitespace-pre-line to preserve formatting and line breaks
+  - Increased padding and added subtle shadow for better visual hierarchy
+- Evidence quotes appear in blue-bordered blockquote sections on Safety Score tab
+- Maintains backward compatibility with existing evaluations
+
 **Cover Image Extraction (October 2025)**:
 - Added cover image extraction for PDF, EPUB, and Word documents
 - Integrated pdfjs-dist + canvas for PDF first-page rendering
