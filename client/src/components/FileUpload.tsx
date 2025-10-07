@@ -14,10 +14,13 @@ const ACCEPTED_TYPES = {
   'application/pdf': ['.pdf'],
   'application/msword': ['.doc'],
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-  'text/plain': ['.txt']
+  'text/plain': ['.txt'],
+  'application/epub+zip': ['.epub'],
+  'application/rtf': ['.rtf'],
+  'text/rtf': ['.rtf']
 };
 
-const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_SIZE = 100 * 1024 * 1024; // 100MB
 
 export function FileUpload({ onFileUpload, className }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null);
@@ -28,9 +31,9 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
     if (rejectedFiles.length > 0) {
       const rejection = rejectedFiles[0];
       if (rejection.errors?.some((e: any) => e.code === 'file-too-large')) {
-        setError('File size must be less than 50MB');
+        setError('File size must be less than 100MB');
       } else if (rejection.errors?.some((e: any) => e.code === 'file-invalid-type')) {
-        setError('Only PDF, Word, and TXT files are supported');
+        setError('Only PDF, Word, TXT, EPUB, and RTF files are supported');
       } else {
         setError('Invalid file. Please try again.');
       }
@@ -89,8 +92,16 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
               <FileText className="w-3 h-3" />
               TXT
             </span>
+            <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm flex items-center gap-1">
+              <File className="w-3 h-3" />
+              EPUB
+            </span>
+            <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm flex items-center gap-1">
+              <FileText className="w-3 h-3" />
+              RTF
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground">Maximum file size: 50MB</p>
+          <p className="text-xs text-muted-foreground">Maximum file size: 100MB</p>
         </div>
       </div>
 
