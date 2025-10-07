@@ -10,6 +10,7 @@ export const evaluations = pgTable("evaluations", {
   status: text("status", { enum: ["processing", "completed", "failed"] }).notNull().default("processing"),
   progress: integer("progress").notNull().default(0),
   result: jsonb("result"),
+  coverImage: text("cover_image"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });

@@ -51,9 +51,18 @@ export function BookCard({ book, onClick }: BookCardProps) {
     >
       {/* Book Cover */}
       <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-200 via-yellow-100 to-orange-100">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <BookOpen className="w-16 h-16 text-orange-400/50" />
-        </div>
+        {book.coverImage ? (
+          <img 
+            src={book.coverImage} 
+            alt={result.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            data-testid={`img-book-cover-${book.id}`}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <BookOpen className="w-16 h-16 text-orange-400/50" />
+          </div>
+        )}
         
         {/* Rating Badge */}
         <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">

@@ -634,6 +634,7 @@ export default function Home() {
           <ResultsView
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
+            coverImage={evaluation.coverImage}
             onNewAssessment={() => setCurrentView('upload')}
             onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}

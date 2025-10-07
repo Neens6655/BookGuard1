@@ -23,6 +23,7 @@ export class MemStorage implements IStorage {
       progress: insertEvaluation.progress ?? 0,
       status: insertEvaluation.status ?? "processing",
       result: insertEvaluation.result ?? null,
+      coverImage: insertEvaluation.coverImage ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

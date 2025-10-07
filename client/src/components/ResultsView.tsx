@@ -10,12 +10,13 @@ import { type EvaluationResult } from '@/types/evaluation';
 interface ResultsViewProps {
   result: EvaluationResult;
   filename: string;
+  coverImage?: string | null;
   onNewAssessment: () => void;
   onBackToLibrary?: () => void;
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, coverImage, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   const isApproved = result.whitelist_score >= 70;
@@ -36,8 +37,19 @@ export function ResultsView({ result, filename, onNewAssessment, onBackToLibrary
           <div className="grid md:grid-cols-3 gap-8 items-start">
             {/* Book Cover */}
             <div className="md:col-span-1">
-              <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl shadow-2xl w-full aspect-[3/4] flex items-center justify-center">
-                <BookOpen className="w-24 h-24 text-orange-400" />
+              <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl shadow-2xl w-full aspect-[3/4] overflow-hidden relative">
+                {coverImage ? (
+                  <img 
+                    src={coverImage} 
+                    alt={result.title}
+                    className="w-full h-full object-cover"
+                    data-testid="img-book-cover-detail"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookOpen className="w-24 h-24 text-orange-400" />
+                  </div>
+                )}
               </div>
             </div>
             

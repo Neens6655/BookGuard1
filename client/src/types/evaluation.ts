@@ -47,6 +47,7 @@ export interface Evaluation {
   status: "processing" | "completed" | "failed";
   progress: number;
   result: EvaluationResult | null;
+  coverImage: string | null;
   createdAt: string;
   updatedAt: string;
 }

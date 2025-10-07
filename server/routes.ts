@@ -6,7 +6,7 @@ import { promises as fs } from "fs";
 import { storage } from "./storage";
 import { insertEvaluationSchema } from "@shared/schema";
 import { evaluateBook } from "./services/openai";
-import { extractTextFromFile } from "./services/fileProcessor";
+import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 
 const upload = multer({
   dest: "uploads/",
@@ -135,6 +135,9 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     
     const bookText = await extractTextFromFile(filePath, filename);
     
+    // Extract cover image
+    const coverImage = await extractCoverImage(filePath, filename);
+    
     // Update progress: Language Detection
     await storage.updateEvaluation(evaluationId, { progress: 30 });
     
@@ -167,7 +170,8 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     await storage.updateEvaluation(evaluationId, { 
       progress: 100, 
       status: "completed",
-      result: result 
+      result: result,
+      coverImage: coverImage 
     });
 
     // Cleanup uploaded file

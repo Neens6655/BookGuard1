@@ -8,6 +8,16 @@ This is a full-stack web application that evaluates children's and family books 
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**Cover Image Extraction (October 2025)**:
+- Added cover image extraction for PDF, EPUB, and Word documents
+- Integrated pdfjs-dist + canvas for PDF first-page rendering
+- EPUB cover extraction from metadata using epub package
+- Word document image extraction from media folder
+- Cover images stored as base64 data URLs in evaluation records
+- UI displays covers on book cards and detail pages with elegant fallbacks
+
 ## System Architecture
 
 ### Frontend Architecture
