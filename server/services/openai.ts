@@ -13,6 +13,11 @@ You will evaluate a children's or family book based on its content, complexity, 
 Return a detailed JSON with these fields:
 {
   "title": "Book Title",
+  "arabic_title": "العنوان بالعربية (if book is Arabic or has Arabic translation, otherwise null)",
+  "author": "Author name or 'Regional author' if unknown",
+  "publisher": "Publisher name (e.g., 'Kalimat (UAE)' or 'Dar Al Salwa (Jordan)') or null if unknown",
+  "language": "Arabic | English | Bilingual",
+  "rating": 4.6,
   "executive_summary": "Concise overview of the story, its themes, and tone.",
   "language_complexity": "Low / Moderate / High based on vocabulary, sentence structure, and readability.",
   "domains": {
@@ -38,8 +43,24 @@ Return a detailed JSON with these fields:
     "21+": ""
   },
   "recommended_minimum_age": "One group only (e.g., '6-9')",
-  "key_drivers": ["List of reasons behind the classification"]
+  "key_drivers": ["List of reasons behind the classification"],
+  "genres": ["Select from: Islamic, UAE Culture, Culture, Heritage, Adventure, Fantasy, Mystery, Science, STEM, Educational, Bedtime, Interactive, Nature, Friendship, Emotions, Philosophy, Humor, Gaming, Social Learning, Traditional"],
+  "themes": ["List 2-3 main themes from the book (e.g., 'Nature / Resilience', 'Friendship / Diversity', 'Hope / Future')"],
+  "domain_scores": {
+    "gambling": 0-5,
+    "language": 0-5,
+    "violence_terror": 0-5,
+    "alcohol_drugs_smoking": 0-5,
+    "sex_nudity": 0-5,
+    "islamic_arab_uae_cultural_ethics": 0-5
+  }
 }
+
+Guidelines:
+- For rating: Generate a realistic rating between 4.0 and 5.0 based on content quality
+- For domain_scores: 0 = perfect, 1-2 = minor concerns, 3-4 = moderate concerns, 5 = severe concerns
+- For genres: Select 1-3 most relevant genres from the list
+- For themes: Extract 2-3 main themes separated by ' / '
 
 Now, perform the evaluation carefully in both English and Arabic books.
 Adjust the age recommendations based on:

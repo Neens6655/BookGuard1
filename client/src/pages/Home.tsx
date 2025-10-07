@@ -4,6 +4,7 @@ import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
 import { BookCard } from '@/components/BookCard';
+import { FilterSidebar } from '@/components/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,9 @@ export default function Home() {
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -162,12 +166,60 @@ export default function Home() {
     refetch();
   };
 
+  const handleAgeGroupToggle = (ageGroup: string) => {
+    setSelectedAgeGroups(prev => 
+      prev.includes(ageGroup) 
+        ? prev.filter(a => a !== ageGroup)
+        : [...prev, ageGroup]
+    );
+  };
+
+  const handleLanguageToggle = (language: string) => {
+    setSelectedLanguages(prev => 
+      prev.includes(language) 
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
+  };
+
+  const handleGenreToggle = (genre: string) => {
+    setSelectedGenres(prev => 
+      prev.includes(genre) 
+        ? prev.filter(g => g !== genre)
+        : [...prev, genre]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setSelectedAgeGroups([]);
+    setSelectedLanguages([]);
+    setSelectedGenres([]);
+  };
+
   const filteredBooks = completedBooks.filter(book => {
+    const result = book.result;
+    if (!result) return false;
+
     const matchesSearch = searchQuery === '' || 
-      book.result?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.result?.executive_summary.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    return matchesSearch;
+      result.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      result.executive_summary.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesAgeGroup = selectedAgeGroups.length === 0 || 
+      selectedAgeGroups.some(age => {
+        const recAge = result.recommended_minimum_age;
+        return recAge.includes(age) || age.includes(recAge);
+      });
+
+    const matchesLanguage = selectedLanguages.length === 0 || 
+      selectedLanguages.includes(result.language || 'English');
+
+    const matchesGenre = selectedGenres.length === 0 || 
+      selectedGenres.some(genre => {
+        const bookGenres = result.genres || result.key_drivers || [];
+        return bookGenres.some(bg => bg.toLowerCase().includes(genre.toLowerCase()));
+      });
+
+    return matchesSearch && matchesAgeGroup && matchesLanguage && matchesGenre;
   });
 
   return (
@@ -344,6 +396,109 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
+              </div>
+            </section>
+
+            {/* Book Library Section */}
+            <section className="py-16 bg-white">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="book-library-title">
+                    Book Library
+                  </h3>
+                  <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Discover 1,000+ approved children's books with comprehensive ratings and academic review
+                  </p>
+                </div>
+
+                {isLoading ? (
+                  <div className="flex gap-6">
+                    <div className="w-64 shrink-0">
+                      <div className="bg-card rounded-lg border border-border p-6 animate-pulse">
+                        <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
+                        <div className="h-4 bg-muted rounded w-full mb-2"></div>
+                      </div>
+                    </div>
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-card rounded-lg border border-border p-6 animate-pulse">
+                          <div className="h-48 bg-muted rounded w-full mb-4"></div>
+                          <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                          <div className="h-4 bg-muted rounded w-full"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : completedBooks.length > 0 ? (
+                  <div className="flex gap-6">
+                    {/* Filter Sidebar */}
+                    <div className="w-64 shrink-0">
+                      <FilterSidebar
+                        selectedAgeGroups={selectedAgeGroups}
+                        selectedLanguages={selectedLanguages}
+                        selectedGenres={selectedGenres}
+                        onAgeGroupChange={handleAgeGroupToggle}
+                        onLanguageChange={handleLanguageToggle}
+                        onGenreChange={handleGenreToggle}
+                        onClearFilters={handleClearFilters}
+                      />
+                    </div>
+
+                    {/* Books Grid */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-6">
+                        <p className="text-sm text-muted-foreground">
+                          Showing <span className="font-semibold">{filteredBooks.length} books</span> 
+                          {completedBooks.length > 0 && ` (of ${completedBooks.length} total)`}
+                        </p>
+                        <select className="text-sm border border-border rounded-md px-3 py-1.5 bg-background">
+                          <option>Newest</option>
+                          <option>Highest Rated</option>
+                          <option>Most Popular</option>
+                        </select>
+                      </div>
+
+                      {filteredBooks.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {filteredBooks.map((book) => (
+                            <BookCard
+                              key={book.id}
+                              book={book}
+                              onClick={() => handleViewBook(book)}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-16">
+                          <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-xl font-semibold text-foreground mb-2">
+                            No books found
+                          </h3>
+                          <p className="text-muted-foreground mb-6">
+                            Try adjusting your filters or search criteria
+                          </p>
+                          <Button onClick={handleClearFilters} data-testid="button-clear-filters-empty">
+                            Clear Filters
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-16">
+                    <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      No books analyzed yet
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Upload your first book to get started with our AI-powered analysis
+                    </p>
+                    <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload-home">
+                      <BookPlus className="w-4 h-4 mr-2" />
+                      Upload Book
+                    </Button>
+                  </div>
+                )}
               </div>
             </section>
           </>

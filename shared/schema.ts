@@ -26,6 +26,11 @@ export type Evaluation = typeof evaluations.$inferSelect;
 // Evaluation result types
 export const evaluationResultSchema = z.object({
   title: z.string(),
+  arabic_title: z.string().optional(),
+  author: z.string().optional(),
+  publisher: z.string().optional(),
+  language: z.enum(["Arabic", "English", "Bilingual"]).optional(),
+  rating: z.number().optional(),
   executive_summary: z.string(),
   language_complexity: z.enum(["Low", "Moderate", "High"]),
   domains: z.object({
@@ -52,8 +57,11 @@ export const evaluationResultSchema = z.object({
   }),
   recommended_minimum_age: z.string(),
   key_drivers: z.array(z.string()),
+  genres: z.array(z.string()).optional(),
+  themes: z.array(z.string()).optional(),
   whitelist_score: z.number(),
   whitelist_verdict: z.string(),
+  domain_scores: z.record(z.number()).optional(),
 });
 
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;

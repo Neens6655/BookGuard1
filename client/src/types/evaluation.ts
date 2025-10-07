@@ -1,5 +1,10 @@
 export interface EvaluationResult {
   title: string;
+  arabic_title?: string;
+  author?: string;
+  publisher?: string;
+  language?: "Arabic" | "English" | "Bilingual";
+  rating?: number;
   executive_summary: string;
   language_complexity: "Low" | "Moderate" | "High";
   domains: {
@@ -26,8 +31,13 @@ export interface EvaluationResult {
   };
   recommended_minimum_age: string;
   key_drivers: string[];
+  genres?: string[];
+  themes?: string[];
   whitelist_score: number;
   whitelist_verdict: string;
+  domain_scores?: {
+    [key: string]: number;
+  };
 }
 
 export interface Evaluation {
