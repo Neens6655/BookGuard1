@@ -11,16 +11,16 @@ import { extractTextFromFile } from "./services/fileProcessor";
 const upload = multer({
   dest: "uploads/",
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: 100 * 1024 * 1024, // 100MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+    const allowedTypes = ['.pdf', '.doc', '.docx', '.txt', '.epub', '.rtf'];
     const ext = path.extname(file.originalname).toLowerCase();
     
     if (allowedTypes.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF, Word, and TXT files are allowed'));
+      cb(new Error('Only PDF, Word, TXT, EPUB, and RTF files are allowed'));
     }
   },
 });
