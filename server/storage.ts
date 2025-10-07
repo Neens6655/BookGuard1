@@ -20,6 +20,9 @@ export class MemStorage implements IStorage {
     const evaluation: Evaluation = {
       ...insertEvaluation,
       id,
+      progress: insertEvaluation.progress ?? 0,
+      status: insertEvaluation.status ?? "processing",
+      result: insertEvaluation.result ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
