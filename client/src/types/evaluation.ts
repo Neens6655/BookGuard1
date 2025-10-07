@@ -15,6 +15,14 @@ export interface EvaluationResult {
     sex_nudity: string;
     islamic_arab_uae_cultural_ethics: string;
   };
+  domain_evidence?: {
+    gambling?: string | null;
+    language?: string | null;
+    violence_terror?: string | null;
+    alcohol_drugs_smoking?: string | null;
+    sex_nudity?: string | null;
+    islamic_arab_uae_cultural_ethics?: string | null;
+  };
   lessons_learned: string;
   parent_discussion_guide: {
     before_reading: string[];

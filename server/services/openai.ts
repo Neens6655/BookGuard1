@@ -28,6 +28,14 @@ Return a detailed JSON with these fields:
     "sex_nudity": "...",
     "islamic_arab_uae_cultural_ethics": "..."
   },
+  "domain_evidence": {
+    "gambling": "Exact quote from book (max 1-2 lines) or null if not present",
+    "language": "Exact quote from book (max 1-2 lines) or null if not present",
+    "violence_terror": "Exact quote from book (max 1-2 lines) or null if not present",
+    "alcohol_drugs_smoking": "Exact quote from book (max 1-2 lines) or null if not present",
+    "sex_nudity": "Exact quote from book (max 1-2 lines) or null if not present",
+    "islamic_arab_uae_cultural_ethics": "Exact quote from book (max 1-2 lines) or null if not present"
+  },
   "lessons_learned": "List the moral or educational takeaways for children or families.",
   "parent_discussion_guide": {
     "before_reading": ["Question 1", "Question 2", "Question 3"],
@@ -61,6 +69,7 @@ Guidelines:
 - For domain_scores: 0 = perfect, 1-2 = minor concerns, 3-4 = moderate concerns, 5 = severe concerns
 - For genres: Select 1-3 most relevant genres from the list
 - For themes: Extract 2-3 main themes separated by ' / '
+- For domain_evidence: Extract EXACT quotes from the book text (max 1-2 lines) as proof when content is found. Use null if no concerning content exists in that domain.
 
 Now, perform the evaluation carefully in both English and Arabic books.
 Adjust the age recommendations based on:

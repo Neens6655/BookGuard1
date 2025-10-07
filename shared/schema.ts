@@ -42,6 +42,14 @@ export const evaluationResultSchema = z.object({
     sex_nudity: z.string(),
     islamic_arab_uae_cultural_ethics: z.string(),
   }),
+  domain_evidence: z.object({
+    gambling: z.string().nullable().optional(),
+    language: z.string().nullable().optional(),
+    violence_terror: z.string().nullable().optional(),
+    alcohol_drugs_smoking: z.string().nullable().optional(),
+    sex_nudity: z.string().nullable().optional(),
+    islamic_arab_uae_cultural_ethics: z.string().nullable().optional(),
+  }).optional(),
   lessons_learned: z.string(),
   parent_discussion_guide: z.object({
     before_reading: z.array(z.string()),

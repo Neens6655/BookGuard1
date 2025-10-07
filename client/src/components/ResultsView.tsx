@@ -449,8 +449,25 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                             </p>
                           </div>
 
-                          {/* Show example indicator if content was found */}
-                          {!assessment.toLowerCase().includes('not present') && !assessment.toLowerCase().includes('absent') && (
+                          {/* Evidence/Quote from Book */}
+                          {result.domain_evidence?.[domain as keyof typeof result.domain_evidence] && (
+                            <div className="mt-3 bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                              <div className="flex items-start gap-2 mb-2">
+                                <MessageCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">
+                                  Text Evidence from Book:
+                                </span>
+                              </div>
+                              <blockquote className="text-sm text-foreground italic leading-relaxed pl-4 border-l-2 border-gray-300">
+                                "{result.domain_evidence[domain as keyof typeof result.domain_evidence]}"
+                              </blockquote>
+                            </div>
+                          )}
+
+                          {/* Show example indicator if content was found but no quote available */}
+                          {!assessment.toLowerCase().includes('not present') && 
+                           !assessment.toLowerCase().includes('absent') && 
+                           !result.domain_evidence?.[domain as keyof typeof result.domain_evidence] && (
                             <div className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
                               <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
                               <span className="italic">
