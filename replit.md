@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Database Persistence Implementation (October 2025)**:
+- Implemented PostgreSQL database storage for permanent evaluation persistence
+- Book evaluations now persist across server restarts and sessions
+- Created DbStorage class with full CRUD operations using Drizzle ORM
+- Automatic fallback to in-memory storage when database is unavailable
+- Explicit timestamp handling (createdAt/updatedAt) for consistency
+- Comprehensive error handling and logging for database operations
+- Database schema migrated with UUID primary keys and JSONB result storage
+
 **Enhanced Evidence Quotes for Safety Analysis (October 2025)**:
 - Upgraded domain evidence extraction from 1-2 lines to 3-5 lines or short paragraph
 - OpenAI now provides fuller context and more substantial proof for safety concerns
@@ -87,28 +96,34 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage Solutions
 
-**Current Implementation**: In-memory storage using a Map-based implementation (`MemStorage`)
+**Current Implementation**: PostgreSQL database using Neon serverless with automatic fallback to in-memory storage
+- Primary: `DbStorage` class using Drizzle ORM with PostgreSQL (`@neondatabase/serverless`)
+- Fallback: `MemStorage` class using Map-based in-memory storage
 - Evaluations stored with UUID primary keys
 - Timestamps for creation and updates tracked automatically
+- Cover images stored as base64 data URLs in database
 
-**Database Schema** (Drizzle ORM defined, PostgreSQL ready):
+**Database Schema** (PostgreSQL via Drizzle ORM):
 ```typescript
 evaluations table:
-  - id: UUID (primary key)
+  - id: UUID (primary key, default: gen_random_uuid())
   - filename: text
   - fileSize: integer
   - status: enum (processing, completed, failed)
   - progress: integer (0-100)
   - result: jsonb (structured evaluation results)
+  - coverImage: text (base64 data URL)
   - createdAt: timestamp
   - updatedAt: timestamp
 ```
 
 **Key Design Decisions**:
-- Storage interface (`IStorage`) allows swapping between in-memory and database implementations
-- PostgreSQL schema defined via Drizzle ORM but not yet connected
-- JSONB column for flexible evaluation result storage
+- Storage interface (`IStorage`) allows swapping between database and in-memory implementations
+- Automatic storage selection: Uses PostgreSQL if DATABASE_URL available, otherwise falls back to MemStorage
+- DbStorage explicitly sets timestamps (createdAt/updatedAt) to ensure consistency
+- JSONB column for flexible evaluation result storage with structured AI analysis
 - Zod schemas for runtime validation matching database schema
+- Comprehensive error handling with database operation logging
 
 ### Authentication and Authorization
 
@@ -125,10 +140,11 @@ evaluations table:
 - Output: Structured JSON evaluation with domains, age verdicts, recommendations
 - API key required via `OPENAI_API_KEY` environment variable
 
-**Neon Database** (Configured but not active):
+**Neon Database** (Active):
 - Serverless PostgreSQL provider (`@neondatabase/serverless`)
 - Connection via `DATABASE_URL` environment variable
-- Drizzle migrations stored in `./migrations` directory
+- Used for permanent storage of book evaluations
+- Drizzle ORM for type-safe database operations
 
 **File Processing Libraries**:
 - PDF parsing: pdf-parse library for extracting text from PDF documents
