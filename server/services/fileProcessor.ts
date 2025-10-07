@@ -189,8 +189,11 @@ async function extractCoverFromPdf(filePath: string): Promise<string | null> {
   try {
     const dataBuffer = await fs.readFile(filePath);
     
+    // Convert Buffer to Uint8Array for pdfjs-dist
+    const uint8Array = new Uint8Array(dataBuffer);
+    
     // Load PDF document
-    const loadingTask = pdfjsLib.getDocument({ data: dataBuffer });
+    const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
     const pdfDocument = await loadingTask.promise;
     
     // Get first page

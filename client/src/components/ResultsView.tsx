@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle } from 'lucide-react';
+import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -350,18 +350,138 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             </TabsContent>
 
             <TabsContent value="safety" className="mt-6">
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg">Domain Analysis</h4>
-                {Object.entries(result.domains).map(([domain, assessment]) => (
-                  <Card key={domain}>
-                    <CardContent className="p-4">
-                      <h5 className="font-medium text-foreground mb-2 capitalize">
-                        {domain.replace(/_/g, ' ')}
-                      </h5>
-                      <p className="text-sm text-muted-foreground">{assessment}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="space-y-6">
+                {/* Domain Analysis Header */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-bold text-foreground text-lg">Content Safety Analysis</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Detailed evaluation across key content domains with specific findings from the book
+                  </p>
+                </div>
+
+                {/* Domain Cards */}
+                <div className="space-y-4">
+                  {Object.entries(result.domains).map(([domain, assessment]) => {
+                    // Get domain icon and colors
+                    const domainConfig = {
+                      gambling: { 
+                        icon: Sparkles, 
+                        color: 'orange',
+                        label: 'Gambling & Gaming'
+                      },
+                      language: { 
+                        icon: MessageCircle, 
+                        color: 'blue',
+                        label: 'Language & Profanity'
+                      },
+                      violence_terror: { 
+                        icon: AlertTriangle, 
+                        color: 'red',
+                        label: 'Violence & Terror'
+                      },
+                      alcohol_drugs_smoking: { 
+                        icon: XCircle, 
+                        color: 'purple',
+                        label: 'Alcohol, Drugs & Smoking'
+                      },
+                      sex_nudity: { 
+                        icon: Info, 
+                        color: 'pink',
+                        label: 'Sexual Content & Nudity'
+                      },
+                      islamic_arab_uae_cultural_ethics: { 
+                        icon: Globe, 
+                        color: 'green',
+                        label: 'Islamic, Arab & UAE Cultural Ethics'
+                      }
+                    }[domain] || { icon: Shield, color: 'gray', label: domain.replace(/_/g, ' ') };
+
+                    const Icon = domainConfig.icon;
+                    const score = result.domain_scores?.[domain] || 0;
+                    
+                    // Determine severity level
+                    const getSeverityInfo = (assessment: string, score: number) => {
+                      const lowerAssessment = assessment.toLowerCase();
+                      if (lowerAssessment.includes('not present') || lowerAssessment.includes('absent') || score === 0) {
+                        return { level: 'safe', label: 'Safe', color: 'green', bgColor: 'bg-green-50', borderColor: 'border-green-200', textColor: 'text-green-700' };
+                      } else if (lowerAssessment.includes('minor') || lowerAssessment.includes('mild') || score <= 2) {
+                        return { level: 'low', label: 'Low Concern', color: 'yellow', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-200', textColor: 'text-yellow-700' };
+                      } else if (lowerAssessment.includes('moderate') || lowerAssessment.includes('present') || score <= 3) {
+                        return { level: 'moderate', label: 'Moderate', color: 'orange', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', textColor: 'text-orange-700' };
+                      } else {
+                        return { level: 'high', label: 'High Concern', color: 'red', bgColor: 'bg-red-50', borderColor: 'border-red-200', textColor: 'text-red-700' };
+                      }
+                    };
+
+                    const severity = getSeverityInfo(assessment, score);
+
+                    return (
+                      <Card key={domain} className={`${severity.borderColor} border-2`}>
+                        <CardContent className="p-5">
+                          <div className="flex items-start justify-between gap-4 mb-3">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className={`p-2 rounded-lg ${severity.bgColor}`}>
+                                <Icon className={`w-5 h-5 ${severity.textColor}`} />
+                              </div>
+                              <div>
+                                <h5 className="font-semibold text-foreground">{domainConfig.label}</h5>
+                                <Badge variant="outline" className={`mt-1 ${severity.textColor} border-current`}>
+                                  {severity.label}
+                                </Badge>
+                              </div>
+                            </div>
+                            {score > 0 && (
+                              <div className={`text-right ${severity.bgColor} rounded-lg px-3 py-1`}>
+                                <div className={`text-2xl font-bold ${severity.textColor}`}>{score}</div>
+                                <div className="text-xs text-muted-foreground">/ 5</div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Assessment Details */}
+                          <div className={`${severity.bgColor} rounded-lg p-4 border ${severity.borderColor}`}>
+                            <h6 className="font-medium text-foreground text-sm mb-2">Assessment:</h6>
+                            <p className="text-sm text-foreground leading-relaxed">
+                              {assessment}
+                            </p>
+                          </div>
+
+                          {/* Show example indicator if content was found */}
+                          {!assessment.toLowerCase().includes('not present') && !assessment.toLowerCase().includes('absent') && (
+                            <div className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
+                              <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                              <span className="italic">
+                                Analysis based on content examination and context within the book
+                              </span>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Overall Safety Summary */}
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-100">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-foreground">Overall Safety Verdict</h5>
+                      <p className="text-sm text-muted-foreground">{result.whitelist_verdict}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <Progress value={result.whitelist_score} className="h-3" />
+                    </div>
+                    <div className="text-2xl font-bold text-purple-600">{result.whitelist_score}%</div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
