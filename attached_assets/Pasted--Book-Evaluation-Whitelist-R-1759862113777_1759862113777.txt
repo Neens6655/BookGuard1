@@ -1,0 +1,423 @@
+# ============================================================
+
+# 📚 Book Evaluation & Whitelist Report Generator (Auto File Detect)
+
+# Works for English + Arabic | All-in-one Colab cell
+
+# ============================================================
+
+ 
+
+from openai import OpenAI
+
+from google.colab import userdata
+
+import json, os, glob
+
+from PyPDF2 import PdfReader
+
+ 
+
+# ============================================================
+
+# ✅ STEP 1 — Setup OpenAI Client
+
+# ============================================================
+
+ 
+
+api_key = userdata.get("OPENAI_API_KEY")
+
+if not api_key:
+
+    raise ValueError("❌ Please add your OpenAI API key to Colab secrets as OPENAI_API_KEY")
+
+ 
+
+client = OpenAI(api_key=api_key)
+
+print("🔑 OpenAI client initialized successfully.\n")
+
+ 
+
+# ============================================================
+
+# ✅ STEP 2 — Auto-Detect and Load Book File
+
+# ============================================================
+
+ 
+
+def auto_find_book():
+
+    """Automatically detect a .pdf or .txt file uploaded in Colab."""
+
+    files = glob.glob("*.pdf") + glob.glob("*.txt")
+
+    if not files:
+
+        raise FileNotFoundError(
+
+            "❌ No .pdf or .txt file found.\nPlease upload a book file using the Files tab on the left."
+
+        )
+
+    print(f"📘 Auto-detected book file: {files[0]}")
+
+    return files[0]
+
+ 
+
+def load_book(file_path):
+
+    """Load book text from PDF or TXT file."""
+
+    if file_path.lower().endswith(".pdf"):
+
+        reader = PdfReader(file_path)
+
+        text = ""
+
+        for page in reader.pages:
+
+            text += page.extract_text() or ""
+
+    else:
+
+        with open(file_path, "r", encoding="utf-8") as f:
+
+            text = f.read()
+
+    print(f"✅ Loaded book successfully ({len(text)} characters)\n")
+
+    return text[:18000]  # Safety limit for large books
+
+ 
+
+# Auto-detect the file
+
+book_path = auto_find_book()
+
+book_text = load_book(book_path)
+
+ 
+
+# ============================================================
+
+# ✅ STEP 3 — Build Evaluation Prompt
+
+# ============================================================
+
+ 
+
+evaluation_prompt = """
+
+You are a content and literacy evaluator for the UAE Ministry of Education.
+
+You will evaluate a children's or family book based on its content, complexity, and cultural ethics.
+
+ 
+
+Return a detailed JSON with these fields:
+
+{
+
+  "title": "Book Title",
+
+  "executive_summary": "Concise overview of the story, its themes, and tone.",
+
+  "language_complexity": "Low / Moderate / High based on vocabulary, sentence structure, and readability.",
+
+  "domains": {
+
+    "gambling": "...",
+
+    "language": "...",
+
+    "violence_&_terror": "...",
+
+    "alcohol_drugs_smoking": "...",
+
+    "sex_&_nudity": "...",
+
+    "islamic_arab_uae_cultural_ethics": "..."
+
+  },
+
+  "lessons_learned": "List the moral or educational takeaways for children or families.",
+
+  "parent_discussion_guide": {
+
+    "before_reading": ["Question 1", "Question 2", "Question 3"],
+
+    "after_reading": ["Question 1", "Question 2", "Question 3", "Question 4"]
+
+  },
+
+  "age_verdicts": {
+
+    "0-3": "",
+
+    "3-5": "",
+
+    "6-9": "",
+
+    "10-12": "",
+
+    "13-16": "",
+
+    "17+": "",
+
+    "21+": ""
+
+  },
+
+  "recommended_minimum_age": "One group only (e.g., '6-9')",
+
+  "key_drivers": ["List of reasons behind the classification"]
+
+}
+
+ 
+
+Now, perform the evaluation carefully in both English and Arabic books.
+
+Adjust the age recommendations based on:
+
+- Plot and theme complexity
+
+- Vocabulary difficulty
+
+- Reading comprehension expected
+
+- Sensitivity to violence or ethics
+
+Return complete JSON output only.
+
+"""
+
+ 
+
+# ============================================================
+
+# ✅ STEP 4 — Run OpenAI Evaluation
+
+# ============================================================
+
+ 
+
+print("🧩 Running evaluation... this may take a few minutes...\n")
+
+ 
+
+response = client.responses.create(
+
+    model="gpt-4.1",
+
+    input=evaluation_prompt + "\n\nBOOK TEXT:\n" + book_text,
+
+    temperature=0.3
+
+)
+
+ 
+
+output = response.output[0].content[0].text
+
+ 
+
+# Parse JSON safely
+
+try:
+
+    results = json.loads(output)
+
+except:
+
+    start = output.find("{")
+
+    end = output.rfind("}") + 1
+
+    results = json.loads(output[start:end])
+
+ 
+
+print("✅ Evaluation complete!\n")
+
+ 
+
+# ============================================================
+
+# ✅ STEP 5 — Compute Whitelist Score & Verdict
+
+# ============================================================
+
+ 
+
+whitelist_score = 100
+
+domains = results.get("domains", {})
+
+ 
+
+def penalty(domain_value):
+
+    text = str(domain_value).lower()
+
+    if "moderate" in text: return 15
+
+    if "high" in text or "severe" in text: return 30
+
+    return 0
+
+ 
+
+for v in domains.values():
+
+    whitelist_score -= penalty(v)
+
+ 
+
+language_complexity = results.get("language_complexity", "").lower()
+
+if "high" in language_complexity:
+
+    whitelist_score -= 15
+
+elif "moderate" in language_complexity:
+
+    whitelist_score -= 5
+
+ 
+
+whitelist_verdict = (
+
+    "✅ Whitelisted – Safe for general use" if whitelist_score >= 70
+
+    else "🚫 Not Whitelisted – Requires Review"
+
+)
+
+ 
+
+results["whitelist_score"] = whitelist_score
+
+results["whitelist_verdict"] = whitelist_verdict
+
+ 
+
+# ============================================================
+
+# ✅ STEP 6 — Generate Human-Readable Report
+
+# ============================================================
+
+ 
+
+report = f"""
+
+📚 Book Title: {results.get('title', 'Unknown')}
+
+ 
+
+📊 Whitelist Score: {results.get('whitelist_score', 'N/A')} / 100
+
+Verdict: {results.get('whitelist_verdict', 'N/A')}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 Executive Summary
+
+{results.get('executive_summary', 'No summary available.')}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎓 Language Complexity
+
+{results.get('language_complexity', 'N/A')}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 Lessons Learned
+
+{results.get('lessons_learned', 'No lessons found.')}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👨‍👩‍👧 Parent Discussion Guide
+
+ 
+
+Before Reading:
+
+- {chr(10).join('- ' + q for q in results['parent_discussion_guide'].get('before_reading', []))}
+
+ 
+
+After Reading:
+
+- {chr(10).join('- ' + q for q in results['parent_discussion_guide'].get('after_reading', []))}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Age Recommendations
+
+Recommended Minimum Age: {results.get('recommended_minimum_age', 'N/A')}
+
+ 
+
+{chr(10).join([f"{age}: {verdict}" for age, verdict in results['age_verdicts'].items()])}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔑 Key Drivers
+
+{chr(10).join('- ' + d for d in results.get('key_drivers', []))}
+
+ 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+"""
+
+ 
+
+# ============================================================
+
+# ✅ STEP 7 — Save Outputs & Display
+
+# ============================================================
+
+ 
+
+print(report)
+
+ 
+
+with open("evaluation_result.json", "w", encoding="utf-8") as f:
+
+    json.dump(results, f, ensure_ascii=False, indent=2)
+
+ 
+
+with open("executive_report.txt", "w", encoding="utf-8") as f:
+
+    f.write(report)
+
+ 
+
+print("✅ Files saved: evaluation_result.json and executive_report.txt")
+
+print(f"\n📊 Final Whitelist Verdict: {results['whitelist_verdict']} (Score: {results['whitelist_score']})")
