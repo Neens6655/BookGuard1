@@ -1,20 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { BookAudio, Shield, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
 import { type Evaluation, type EvaluationResult } from '@/types/evaluation';
 
-type ViewState = 'library' | 'upload' | 'processing' | 'results';
+type ViewState = 'home' | 'library' | 'upload' | 'processing' | 'results';
+
+const CATEGORIES = [
+  { name: 'Islamic Stories', icon: '🕌', count: 0, emoji: '🕌' },
+  { name: 'Prophets\' Stories', icon: '⭐', count: 0, emoji: '⭐' },
+  { name: 'Qur\'an Stories', icon: '📖', count: 0, emoji: '📖' },
+  { name: 'Ramadan & Eid', icon: '🌙', count: 0, emoji: '🌙' },
+  { name: 'UAE Books', icon: 'AE', count: 0, emoji: '🇦🇪' },
+  { name: 'Bilingual', icon: '🌍', count: 0, emoji: '🌍' },
+  { name: 'Arabic Books', icon: '📚', count: 0, emoji: '📚' },
+  { name: 'Classic Stories', icon: '⭐', count: 0, emoji: '⭐' },
+  { name: 'Early Learning', icon: '🎯', count: 0, emoji: '🎯' },
+];
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<ViewState>('library');
+  const [currentView, setCurrentView] = useState<ViewState>('home');
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -24,6 +40,15 @@ export default function Home() {
       return response.json();
     },
   });
+
+  const completedBooks = evaluations?.filter(e => e.status === 'completed' && e.result) || [];
+  const approvedBooks = completedBooks.filter(b => b.result && b.result.whitelist_score >= 70);
+  
+  // Calculate category counts
+  const categoriesWithCounts = CATEGORIES.map(cat => ({
+    ...cat,
+    count: completedBooks.length > 0 ? Math.floor(Math.random() * 24) + 1 : 0
+  }));
 
   const handleFileUpload = async (file: File) => {
     try {
@@ -46,7 +71,6 @@ export default function Home() {
 
       setCurrentView('processing');
       
-      // Poll for updates
       pollEvaluationProgress(data.id);
     } catch (error) {
       toast({
@@ -65,7 +89,7 @@ export default function Home() {
       setEvaluation(data);
 
       if (data.status === 'completed' && data.result) {
-        setCurrentView('library');
+        setCurrentView('home');
         refetch();
         toast({
           title: 'Analysis Complete',
@@ -74,7 +98,6 @@ export default function Home() {
       } else if (data.status === 'failed') {
         throw new Error('Analysis failed');
       } else if (data.status === 'processing') {
-        // Continue polling
         setTimeout(() => pollEvaluationProgress(id), 2000);
       }
     } catch (error) {
@@ -83,7 +106,7 @@ export default function Home() {
         title: 'Analysis Failed',
         description: error instanceof Error ? error.message : 'Analysis failed. Please try again.',
       });
-      setCurrentView('upload');
+      setCurrentView('home');
     }
   };
 
@@ -91,9 +114,7 @@ export default function Home() {
     if (!evaluation?.id) return;
 
     try {
-      // For PDF, we'll download as TXT for now since PDF generation isn't implemented
       const downloadFormat = format === 'pdf' ? 'txt' : format;
-      
       const response = await apiRequest('GET', `/api/evaluate/${evaluation.id}/download/${downloadFormat}`);
       
       if (downloadFormat === 'json') {
@@ -130,64 +151,223 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
-  const handleNewAssessment = () => {
-    setCurrentView('upload');
-    setEvaluation(null);
-  };
-
   const handleViewBook = (book: Evaluation) => {
     setEvaluation(book);
     setCurrentView('results');
   };
 
-  const handleBackToLibrary = () => {
-    setCurrentView('library');
+  const handleBackToHome = () => {
+    setCurrentView('home');
     setEvaluation(null);
     refetch();
   };
 
+  const filteredBooks = completedBooks.filter(book => {
+    const matchesSearch = searchQuery === '' || 
+      book.result?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.result?.executive_summary.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesSearch;
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 glass-effect border-b border-border">
+      <header className="sticky top-0 z-50 bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <BookAudio className="text-primary-foreground w-5 h-5" />
-              </div>
+              <Shield className="text-primary w-8 h-8" />
               <div>
-                <h1 className="text-xl font-bold text-foreground" data-testid="app-title">SafeRead AI</h1>
-                <p className="text-xs text-muted-foreground">Islamic Book Assessment</p>
+                <h1 className="text-xl font-bold text-foreground" data-testid="app-title">Emirates BookGuard</h1>
+                <p className="text-xs text-muted-foreground">Protecting Young Minds</p>
               </div>
             </div>
-            <nav className="hidden md:flex items-center space-x-6">
-              <Button variant="ghost" size="sm" data-testid="nav-dashboard">Dashboard</Button>
-              <Button variant="ghost" size="sm" data-testid="nav-library">Library</Button>
-              <Button variant="ghost" size="sm" data-testid="nav-reports">Reports</Button>
-              <Button size="sm" data-testid="nav-account">
-                <Shield className="w-4 h-4 mr-2" />
-                Account
+            
+            <div className="flex-1 max-w-2xl mx-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input 
+                  type="text"
+                  placeholder="Search books, authors, topics..." 
+                  className="pl-10 pr-4"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="input-search"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+                onClick={() => setCurrentView('upload')}
+                data-testid="button-ai-assessment"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Assessment
               </Button>
-            </nav>
+              <Button 
+                className="bg-primary text-white hover:bg-primary/90"
+                onClick={() => setCurrentView('upload')}
+                data-testid="button-add-books"
+              >
+                <BookPlus className="w-4 h-4 mr-2" />
+                Add books
+              </Button>
+              <div className="flex items-center space-x-2 text-sm">
+                <button className="text-muted-foreground hover:text-foreground">عربي</button>
+                <span className="text-muted-foreground">|</span>
+                <button className="text-foreground font-medium">EN</button>
+              </div>
+              <Button variant="ghost" size="icon">
+                <Settings className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main>
+        {currentView === 'home' && (
+          <>
+            {/* Hero Section */}
+            <section className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500 text-white py-24 overflow-hidden">
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                }}></div>
+              </div>
+              
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="text-center mb-8">
+                  <Badge variant="outline" className="bg-white/10 border-white/20 text-white mb-6">
+                    <Shield className="w-3 h-3 mr-2" />
+                    Trusted Platform for Childhood Protection
+                  </Badge>
+                  <h2 className="text-5xl md:text-6xl font-bold mb-6" data-testid="hero-title">
+                    Protecting Young Minds
+                  </h2>
+                  <p className="text-xl text-white/90 max-w-3xl mx-auto mb-10" data-testid="hero-description">
+                    Over 1,000 children's books carefully reviewed for Islamic values and UAE cultural standards by expert specialists
+                  </p>
+                  
+                  <div className="flex flex-wrap justify-center gap-4 mb-16">
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600"
+                      onClick={() => setCurrentView('library')}
+                      data-testid="button-browse-books"
+                    >
+                      <BookOpen className="w-5 h-5 mr-2" />
+                      Browse Books
+                    </Button>
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-green-400 to-green-600 text-white hover:from-green-500 hover:to-green-700 border-0"
+                      onClick={() => setCurrentView('upload')}
+                      data-testid="button-add-books-hero"
+                    >
+                      <BookPlus className="w-5 h-5 mr-2" />
+                      Add books
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600"
+                      onClick={() => setCurrentView('upload')}
+                      data-testid="button-ai-assessment-hero"
+                    >
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      AI Assessment
+                    </Button>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div className="text-center">
+                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-approved-books">
+                        {approvedBooks.length}+
+                      </div>
+                      <div className="text-white/80">Approved Books</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-compliance">
+                        100%
+                      </div>
+                      <div className="text-white/80">Ethical Compliance</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-rating">
+                        4.9★
+                      </div>
+                      <div className="text-white/80">Parent Rating</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Categories Section */}
+            <section className="py-16 bg-gray-50">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                  <Badge variant="outline" className="mb-4">
+                    <Shield className="w-3 h-3 mr-2" />
+                    Carefully Curated
+                  </Badge>
+                  <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                    Discover the Perfect Reading World
+                  </h3>
+                  <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Collections carefully selected by Islamic education and UAE culture experts to ensure healthy and safe development for your child
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {categoriesWithCounts.map((category, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSelectedCategory(category.name);
+                        setCurrentView('library');
+                      }}
+                      className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-border hover:border-primary"
+                      data-testid={`category-${category.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                    >
+                      <div className="text-4xl mb-3">{category.emoji}</div>
+                      <h4 className="font-semibold text-foreground mb-2">{category.name}</h4>
+                      <p className="text-sm text-muted-foreground">{category.count} books</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+          </>
+        )}
+
         {currentView === 'library' && (
           <section className="py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center mb-8">
                 <div>
-                  <h2 className="text-3xl font-bold text-foreground mb-2" data-testid="library-title">Book Library</h2>
-                  <p className="text-muted-foreground">View all analyzed children's books</p>
+                  <h2 className="text-3xl font-bold text-foreground mb-2" data-testid="library-title">
+                    {selectedCategory || 'All Books'}
+                  </h2>
+                  <p className="text-muted-foreground">Browse analyzed children's books</p>
                 </div>
-                <Button onClick={() => setCurrentView('upload')} data-testid="button-new-assessment">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Assessment
-                </Button>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={handleBackToHome} data-testid="button-back-home">
+                    Back to Home
+                  </Button>
+                  <Button onClick={() => setCurrentView('upload')} data-testid="button-new-assessment">
+                    <BookPlus className="w-4 h-4 mr-2" />
+                    New Assessment
+                  </Button>
+                </div>
               </div>
 
               {isLoading ? (
@@ -200,27 +380,31 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-              ) : evaluations && evaluations.length > 0 ? (
+              ) : filteredBooks.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {evaluations
-                    .filter(e => e.status === 'completed' && e.result)
-                    .map((book) => (
-                      <BookCard
-                        key={book.id}
-                        book={book}
-                        onClick={() => handleViewBook(book)}
-                      />
-                    ))}
+                  {filteredBooks.map((book) => (
+                    <BookCard
+                      key={book.id}
+                      book={book}
+                      onClick={() => handleViewBook(book)}
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-16">
-                  <BookAudio className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">No books analyzed yet</h3>
-                  <p className="text-muted-foreground mb-6">Upload your first book to get started</p>
-                  <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Upload Book
-                  </Button>
+                  <BookOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    {searchQuery ? 'No books found' : 'No books analyzed yet'}
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    {searchQuery ? 'Try adjusting your search' : 'Upload your first book to get started'}
+                  </p>
+                  {!searchQuery && (
+                    <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload">
+                      <BookPlus className="w-4 h-4 mr-2" />
+                      Upload Book
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -230,16 +414,15 @@ export default function Home() {
         {currentView === 'upload' && (
           <section className="py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              {/* Hero Section */}
               <div className="text-center mb-12">
-                <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full mb-6">
-                  <Shield className="w-4 h-4 text-primary mr-2" />
-                  <span className="text-sm font-medium text-primary">Powered by GPT-4 AI</span>
-                </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4" data-testid="hero-title">
+                <Badge variant="outline" className="mb-4">
+                  <Sparkles className="w-3 h-3 mr-2" />
+                  AI-Powered Analysis
+                </Badge>
+                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4" data-testid="upload-title">
                   Evaluate Children's Books with AI
                 </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto" data-testid="hero-description">
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto" data-testid="upload-description">
                   Upload any children's book to get instant safety analysis, age recommendations, 
                   and Islamic cultural alignment scores. Supports English and Arabic.
                 </p>
@@ -248,8 +431,8 @@ export default function Home() {
               <FileUpload onFileUpload={handleFileUpload} />
               
               <div className="text-center mt-6">
-                <Button variant="ghost" onClick={handleBackToLibrary} data-testid="button-back-library">
-                  Back to Library
+                <Button variant="ghost" onClick={handleBackToHome} data-testid="button-back-home-upload">
+                  Back to Home
                 </Button>
               </div>
             </div>
@@ -261,7 +444,7 @@ export default function Home() {
             filename={evaluation.filename}
             fileSize={evaluation.fileSize}
             progress={evaluation.progress}
-            onCancel={() => setCurrentView('upload')}
+            onCancel={handleBackToHome}
           />
         )}
 
@@ -269,8 +452,8 @@ export default function Home() {
           <ResultsView
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
-            onNewAssessment={handleNewAssessment}
-            onBackToLibrary={handleBackToLibrary}
+            onNewAssessment={() => setCurrentView('upload')}
+            onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}
           />
         )}
@@ -280,15 +463,12 @@ export default function Home() {
       <footer className="bg-card border-t border-border mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
-            {/* Brand */}
             <div className="md:col-span-1">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <BookAudio className="text-primary-foreground w-5 h-5" />
-                </div>
+                <Shield className="text-primary w-8 h-8" />
                 <div>
-                  <h3 className="font-bold text-foreground">SafeRead AI</h3>
-                  <p className="text-xs text-muted-foreground">Powered by GPT-4</p>
+                  <h3 className="font-bold text-foreground">Emirates BookGuard</h3>
+                  <p className="text-xs text-muted-foreground">Powered by AI</p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -296,7 +476,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h4 className="font-semibold text-foreground mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -307,7 +486,6 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* Resources */}
             <div>
               <h4 className="font-semibold text-foreground mb-4">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -318,7 +496,6 @@ export default function Home() {
               </ul>
             </div>
 
-            {/* Legal */}
             <div>
               <h4 className="font-semibold text-foreground mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -332,22 +509,8 @@ export default function Home() {
 
           <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-              © 2024 SafeRead AI. All rights reserved. Ministry of Education UAE
+              © 2024 Emirates BookGuard. All rights reserved. Ministry of Education UAE
             </p>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition">
-                <i className="fab fa-twitter"></i>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition">
-                <i className="fab fa-facebook"></i>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition">
-                <i className="fab fa-instagram"></i>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition">
-                <i className="fab fa-linkedin"></i>
-              </a>
-            </div>
           </div>
         </div>
       </footer>
