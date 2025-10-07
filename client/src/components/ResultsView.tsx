@@ -221,6 +221,72 @@ export function ResultsView({ result, filename, onNewAssessment, onBackToLibrary
                 </p>
               </div>
 
+              {/* Age Recommendations - Prominent Section */}
+              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-blue-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <GraduationCap className="w-6 h-6 text-blue-600" />
+                  <h4 className="font-bold text-foreground text-xl">Age Recommendations</h4>
+                </div>
+                
+                {/* Primary Recommendation */}
+                <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-2xl">
+                        {result.recommended_minimum_age?.split('-')[0] || result.recommended_minimum_age?.replace(/[^0-9]/g, '') || '6'}+
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-600 mb-1">Recommended Minimum Age</p>
+                      <p className="text-2xl font-bold text-foreground">{result.recommended_minimum_age}</p>
+                      <p className="text-sm text-muted-foreground mt-1">Best suited for this age group and above</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Age Verdicts Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Object.entries(result.age_verdicts || {}).map(([age, verdict]) => {
+                    // Robust normalization for age strings to handle various formats
+                    const normalizeAge = (ageStr: string) => {
+                      return ageStr
+                        .toLowerCase()
+                        .replace(/\s+to\s+/g, '-')        // "6 to 9" → "6-9"
+                        .replace(/[–—]/g, '-')            // en-dash, em-dash → hyphen
+                        .replace(/\+/g, '')               // "17+" → "17"
+                        .replace(/[^0-9-]/g, '')          // remove all except digits and hyphen
+                        .trim();
+                    };
+                    
+                    const isRecommended = normalizeAge(age) === normalizeAge(result.recommended_minimum_age || '');
+                    
+                    return (
+                      <div 
+                        key={age}
+                        className={`rounded-lg p-3 border-2 transition-all ${
+                          isRecommended 
+                            ? 'bg-blue-100 border-blue-400' 
+                            : 'bg-white border-gray-200'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className={`font-bold text-sm mb-1 ${isRecommended ? 'text-blue-700' : 'text-foreground'}`}>
+                            {age}
+                          </div>
+                          <div className={`text-xs ${isRecommended ? 'text-blue-600' : 'text-muted-foreground'}`}>
+                            {verdict === '✓' || verdict === 'Yes' || verdict?.toLowerCase().includes('appropriate') 
+                              ? '✓ Suitable' 
+                              : verdict === '✗' || verdict === 'No' 
+                                ? '✗ Not suitable' 
+                                : verdict}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Genre & Themes */}
               <div>
                 <div className="flex items-center gap-2 mb-4">

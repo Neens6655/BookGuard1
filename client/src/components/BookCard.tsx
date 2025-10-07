@@ -67,7 +67,7 @@ export function BookCard({ book, onClick }: BookCardProps) {
         </Badge>
       </div>
 
-      <CardContent className="p-4 space-y-2">
+      <CardContent className="p-4 space-y-3">
         {/* Title */}
         <h3 className="font-bold text-base line-clamp-2" data-testid={`text-book-title-${book.id}`}>
           {result.title}
@@ -79,6 +79,21 @@ export function BookCard({ book, onClick }: BookCardProps) {
             {result.arabic_title}
           </p>
         )}
+        
+        {/* Age Recommendation - Prominent */}
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-blue-600 mb-1">Recommended Age</p>
+              <p className="text-lg font-bold text-blue-700">
+                {result.recommended_minimum_age}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+            </div>
+          </div>
+        </div>
         
         {/* Author & Publisher */}
         <div className="space-y-0.5">
