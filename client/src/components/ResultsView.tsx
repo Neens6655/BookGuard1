@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Star, Shield, Award, BookOpen, Lightbulb, Users, MessageCircle, GraduationCap } from 'lucide-react';
+import { Download, Share2, Star, Shield, Award, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,10 +11,11 @@ interface ResultsViewProps {
   result: EvaluationResult;
   filename: string;
   onNewAssessment: () => void;
+  onBackToLibrary?: () => void;
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, onNewAssessment, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   const getStatusBadgeVariant = () => {
@@ -433,8 +434,20 @@ export function ResultsView({ result, filename, onNewAssessment, onDownload }: R
           </CardContent>
         </Card>
 
-        {/* New Assessment Button */}
-        <div className="mt-8 text-center">
+        {/* Action Buttons */}
+        <div className="mt-8 text-center flex flex-wrap gap-4 justify-center">
+          {onBackToLibrary && (
+            <Button 
+              size="lg"
+              variant="outline"
+              className="px-8 py-4 text-lg font-semibold"
+              onClick={onBackToLibrary}
+              data-testid="button-back-to-library"
+            >
+              <BookAudio className="w-5 h-5 mr-2" />
+              Back to Library
+            </Button>
+          )}
           <Button 
             size="lg"
             className="gradient-bg text-white hover:shadow-lg transition-all px-8 py-4 text-lg font-semibold"

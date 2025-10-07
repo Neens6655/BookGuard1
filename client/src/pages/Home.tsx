@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
-import { BookAudio, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookAudio, Shield, Plus } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
+import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 import { type Evaluation, type EvaluationResult } from '@/types/evaluation';
 
-type ViewState = 'upload' | 'processing' | 'results';
+type ViewState = 'library' | 'upload' | 'processing' | 'results';
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<ViewState>('upload');
+  const [currentView, setCurrentView] = useState<ViewState>('library');
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const { toast } = useToast();
+  
+  const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
+    queryKey: ['/api/evaluations'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/evaluations');
+      return response.json();
+    },
+  });
 
   const handleFileUpload = async (file: File) => {
     try {
@@ -55,7 +65,8 @@ export default function Home() {
       setEvaluation(data);
 
       if (data.status === 'completed' && data.result) {
-        setCurrentView('results');
+        setCurrentView('library');
+        refetch();
         toast({
           title: 'Analysis Complete',
           description: 'Your book has been successfully evaluated!',
@@ -124,6 +135,17 @@ export default function Home() {
     setEvaluation(null);
   };
 
+  const handleViewBook = (book: Evaluation) => {
+    setEvaluation(book);
+    setCurrentView('results');
+  };
+
+  const handleBackToLibrary = () => {
+    setCurrentView('library');
+    setEvaluation(null);
+    refetch();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -154,6 +176,57 @@ export default function Home() {
 
       {/* Main Content */}
       <main>
+        {currentView === 'library' && (
+          <section className="py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground mb-2" data-testid="library-title">Book Library</h2>
+                  <p className="text-muted-foreground">View all analyzed children's books</p>
+                </div>
+                <Button onClick={() => setCurrentView('upload')} data-testid="button-new-assessment">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Assessment
+                </Button>
+              </div>
+
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="bg-card rounded-lg border border-border p-6 animate-pulse">
+                      <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
+                      <div className="h-4 bg-muted rounded w-full mb-2"></div>
+                      <div className="h-4 bg-muted rounded w-5/6"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : evaluations && evaluations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {evaluations
+                    .filter(e => e.status === 'completed' && e.result)
+                    .map((book) => (
+                      <BookCard
+                        key={book.id}
+                        book={book}
+                        onClick={() => handleViewBook(book)}
+                      />
+                    ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <BookAudio className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">No books analyzed yet</h3>
+                  <p className="text-muted-foreground mb-6">Upload your first book to get started</p>
+                  <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Upload Book
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         {currentView === 'upload' && (
           <section className="py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -173,6 +246,12 @@ export default function Home() {
               </div>
 
               <FileUpload onFileUpload={handleFileUpload} />
+              
+              <div className="text-center mt-6">
+                <Button variant="ghost" onClick={handleBackToLibrary} data-testid="button-back-library">
+                  Back to Library
+                </Button>
+              </div>
             </div>
           </section>
         )}
@@ -191,6 +270,7 @@ export default function Home() {
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
             onNewAssessment={handleNewAssessment}
+            onBackToLibrary={handleBackToLibrary}
             onDownload={handleDownload}
           />
         )}
