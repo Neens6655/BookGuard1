@@ -93,8 +93,14 @@ async function extractFromRtf(filePath: string): Promise<string> {
     const dataBuffer = await fs.readFile(filePath);
     const rtfContent = dataBuffer.toString('utf-8');
     
-    // Parse RTF to plain text
-    const doc = await rtfParse.parseString(rtfContent);
+    // Parse RTF to plain text using callback-based API
+    const doc = await new Promise<any>((resolve, reject) => {
+      rtfParse.string(rtfContent, (err: any, doc: any) => {
+        if (err) reject(err);
+        else resolve(doc);
+      });
+    });
+    
     let fullText = '';
     
     // Extract text content from RTF document

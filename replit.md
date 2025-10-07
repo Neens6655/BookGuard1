@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack web application that evaluates children's and family books for content appropriateness, cultural alignment, and age suitability. The system processes uploaded books (PDF, Word, TXT formats), analyzes them using OpenAI's GPT API, and generates comprehensive evaluation reports including domain-specific content assessments, age recommendations, and parent discussion guides. The application is designed for the UAE Ministry of Education context, evaluating content against Islamic, Arab, and UAE cultural ethics.
+This is a full-stack web application that evaluates children's and family books for content appropriateness, cultural alignment, and age suitability. The system processes uploaded books (PDF, Word, TXT, EPUB, RTF formats), analyzes them using OpenAI's GPT API, and generates comprehensive evaluation reports including domain-specific content assessments, age recommendations, and parent discussion guides. The application is designed for the UAE Ministry of Education context, evaluating content against Islamic, Arab, and UAE cultural ethics.
 
 ## User Preferences
 
@@ -32,7 +32,7 @@ Preferred communication style: Simple, everyday language.
 - Library-first interface showing all analyzed books as interactive cards
 - View state management: library → upload → processing → results → library
 - Real-time progress tracking via polling for long-running book evaluations
-- File upload with drag-and-drop support limited to 50MB
+- File upload with drag-and-drop support, 100MB maximum file size
 - Multi-step progress indicators for user feedback during processing
 - Book cards display title, executive summary, safety score, age recommendation, and verdict
 - Click-through navigation from cards to full analysis details
@@ -50,16 +50,17 @@ Preferred communication style: Simple, everyday language.
 
 **File Processing Pipeline**:
 1. Multer middleware for multipart file uploads (stored in `uploads/` directory)
-2. Text extraction service supporting PDF (pdf-parse), Word documents (mammoth), and TXT files
-3. OpenAI API integration for content analysis
-4. Asynchronous processing with progress updates
-5. Automatic cleanup of uploaded files after processing
+2. Text extraction service supporting PDF (pdf-parse), Word documents (mammoth), TXT files, EPUB (epub-parser), and RTF (rtf-parser)
+3. Smart text extraction strategy: For books over 50,000 characters, extracts from beginning, middle, and end sections
+4. OpenAI API integration for content analysis
+5. Asynchronous processing with progress updates
+6. Automatic cleanup of uploaded files after processing
 
 **Key Design Decisions**:
 - Asynchronous file processing to prevent request timeouts
 - Progress tracking system (0-100) with status states: processing, completed, failed
-- File size limit of 50MB for uploaded documents
-- Text truncation to 18,000 characters for API token management
+- File size limit of 100MB for uploaded documents
+- Smart text extraction up to 50,000 characters with strategic sampling for longer books
 - Request/response logging middleware for API endpoints
 - Raw body preservation for potential webhook integrations
 
@@ -97,9 +98,9 @@ evaluations table:
 ### External Dependencies
 
 **OpenAI API**:
-- Model: GPT-5 (explicitly configured as newest model)
+- Model: GPT-4o (configured for structured outputs)
 - Purpose: Book content analysis and evaluation
-- Input: Extracted book text (max 18,000 characters)
+- Input: Extracted book text (max 50,000 characters with smart sampling)
 - Output: Structured JSON evaluation with domains, age verdicts, recommendations
 - API key required via `OPENAI_API_KEY` environment variable
 
@@ -112,7 +113,9 @@ evaluations table:
 - PDF parsing: pdf-parse library for extracting text from PDF documents
 - Word document parsing: mammoth library for .doc and .docx files
 - TXT file reading: Node.js fs module for plain text files
-- All file types support up to 18,000 characters of extracted text for analysis
+- EPUB parsing: epub-parser library for eBook files with HTML content extraction
+- RTF parsing: rtf-parser library for Rich Text Format documents
+- Smart extraction strategy: Up to 50,000 characters total; longer books are sampled from beginning, middle, and end sections
 
 **Development Tools**:
 - Vite plugins for Replit integration (cartographer, dev banner, runtime error overlay)
