@@ -1,10 +1,15 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { createRequire } from 'module';
 import mammoth from 'mammoth';
 // @ts-ignore - epub-parser doesn't have TypeScript types
 import EPub from 'epub-parser';
 // @ts-ignore - rtf-parser doesn't have TypeScript types
 import rtfParse from 'rtf-parser';
+
+// Use require for CommonJS modules
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
 
 // Increased text limit for better book coverage
 const MAX_CHARS = 50000;
@@ -40,11 +45,8 @@ async function extractFromTxt(filePath: string): Promise<string> {
 }
 
 async function extractFromPdf(filePath: string): Promise<string> {
-  const pdfParse = await import('pdf-parse');
   const dataBuffer = await fs.readFile(filePath);
-  // @ts-ignore - pdf-parse module structure
-  const parseFunction = pdfParse.default || pdfParse;
-  const data = await parseFunction(dataBuffer);
+  const data = await pdfParse(dataBuffer);
   return smartExtract(data.text);
 }
 
