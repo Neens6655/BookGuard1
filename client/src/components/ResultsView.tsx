@@ -273,7 +273,18 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
 
                 {/* Age Verdicts Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {Object.entries(result.age_verdicts || {}).map(([age, verdict]) => {
+                  {Object.entries(result.age_verdicts || {})
+                    .sort(([ageA], [ageB]) => {
+                      // Sort age bands chronologically: 0-3, 3-5, 6-9, 10-12, 13-16, 17+, 21+
+                      const getAgeValue = (age: string) => {
+                        if (age === '21+') return 21;
+                        if (age === '17+') return 17;
+                        const match = age.match(/^(\d+)/);
+                        return match ? parseInt(match[1]) : 0;
+                      };
+                      return getAgeValue(ageA) - getAgeValue(ageB);
+                    })
+                    .map(([age, verdict]) => {
                     // Robust normalization for age strings to handle various formats
                     const normalizeAge = (ageStr: string) => {
                       return ageStr

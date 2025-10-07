@@ -14,16 +14,13 @@ interface FilterSidebarProps {
 }
 
 const AGE_GROUPS = [
-  { value: '0-2', label: '0-2' },
-  { value: '1-3', label: '1-3' },
-  { value: '2-4', label: '2-4' },
+  { value: '0-3', label: '0-3' },
   { value: '3-5', label: '3-5' },
-  { value: '4-6', label: '4-6' },
-  { value: '5-7', label: '5-7' },
-  { value: '6-8', label: '6-8' },
-  { value: '7-9', label: '7-9' },
-  { value: '8-10', label: '8-10' },
-  { value: '8-12', label: '8-12' },
+  { value: '6-9', label: '6-9' },
+  { value: '10-12', label: '10-12' },
+  { value: '13-16', label: '13-16' },
+  { value: '17+', label: '17+' },
+  { value: '21+', label: '21+' },
 ];
 
 const LANGUAGES = [
