@@ -196,6 +196,33 @@ export default function Home() {
     setSelectedGenres([]);
   };
 
+  const parseAgeRange = (ageStr: string): { min: number; max: number } => {
+    // Extract all numbers from the string using regex
+    const numbers = ageStr.match(/\d+/g);
+    
+    if (!numbers || numbers.length === 0) {
+      // Default fallback if no numbers found
+      return { min: 0, max: 99 };
+    }
+    
+    const nums = numbers.map(n => parseInt(n));
+    
+    if (nums.length >= 2) {
+      // Range like "6-9" or "Ages 6-9"
+      return { min: Math.min(...nums), max: Math.max(...nums) };
+    } else {
+      // Single number like "6" or "6+"
+      const age = nums[0];
+      return { min: age, max: age + 2 };
+    }
+  };
+
+  const ageRangesOverlap = (range1: string, range2: string): boolean => {
+    const r1 = parseAgeRange(range1);
+    const r2 = parseAgeRange(range2);
+    return r1.min <= r2.max && r2.min <= r1.max;
+  };
+
   const filteredBooks = completedBooks.filter(book => {
     const result = book.result;
     if (!result) return false;
@@ -205,9 +232,9 @@ export default function Home() {
       result.executive_summary.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesAgeGroup = selectedAgeGroups.length === 0 || 
-      selectedAgeGroups.some(age => {
+      selectedAgeGroups.some(selectedAge => {
         const recAge = result.recommended_minimum_age;
-        return recAge.includes(age) || age.includes(recAge);
+        return ageRangesOverlap(selectedAge, recAge);
       });
 
     const matchesLanguage = selectedLanguages.length === 0 || 
