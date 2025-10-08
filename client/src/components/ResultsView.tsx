@@ -144,15 +144,27 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 <div className="text-xs text-muted-foreground">Age</div>
               </div>
               <div className="text-center">
-                <div className={`w-12 h-12 rounded-full ${isApproved ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center`}>
-                  {isApproved ? (
-                    <CheckCircle className="w-7 h-7 text-green-600" />
-                  ) : (
-                    <XCircle className="w-7 h-7 text-red-600" />
-                  )}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  result.final_verdict === "Approved" ? 'bg-green-100' :
+                  result.final_verdict === "Whitelisted" ? 'bg-green-100' :
+                  result.final_verdict === "Parent Guidance" ? 'bg-yellow-100' :
+                  'bg-red-100'
+                }`}>
+                  <span className="text-2xl">
+                    {result.final_verdict === "Approved" ? "🟢" :
+                     result.final_verdict === "Whitelisted" ? "✅" :
+                     result.final_verdict === "Parent Guidance" ? "🟡" :
+                     result.final_verdict === "Not Whitelisted" ? "🚫" :
+                     isApproved ? "✅" : "🚫"}
+                  </span>
                 </div>
-                <div className={`text-xs mt-1 font-medium ${isApproved ? 'text-green-600' : 'text-red-600'}`}>
-                  {isApproved ? 'Approved' : 'Not Approved'}
+                <div className={`text-xs mt-1 font-medium ${
+                  result.final_verdict === "Approved" || result.final_verdict === "Whitelisted" ? 'text-green-600' :
+                  result.final_verdict === "Parent Guidance" ? 'text-yellow-600' :
+                  result.final_verdict === "Not Whitelisted" ? 'text-red-600' :
+                  isApproved ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {result.final_verdict || (isApproved ? 'Approved' : 'Not Approved')}
                 </div>
               </div>
             </div>
