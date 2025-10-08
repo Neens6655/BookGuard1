@@ -10,23 +10,30 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**AI Deep Assessment Page (October 2025)**:
-- Built dedicated AI Deep Assessment page (`/ai-assessment`) for advanced book analysis
-- Comprehensive technical and educational analysis including:
-  - **Narrative Structure**: Plot complexity, character development, pacing analysis
-  - **Language Metrics**: Vocabulary level, sentence complexity, reading ease score, unique word count
-  - **Cultural Assessment**: Islamic values, UAE cultural elements, universal themes, potential concerns
-  - **Educational Insights**: Learning objectives, skill development areas, discussion topics
-  - **Safety Analysis**: Content warnings, age appropriateness, parental guidance areas, positive messages
-  - **AI Recommendations**: Best-for audience, teaching strategies, complementary books
+**AI Deep Assessment Page with Evidence-Based Analysis (October 2025)**:
+- Built dedicated AI Deep Assessment page (`/ai-assessment`) for advanced book analysis with comprehensive evidence extraction
+- **Evidence-Based Analysis Framework**:
+  - **Narrative Structure**: Plot complexity, character development, pacing with 3-5 line textual quotes as evidence, pivotal moments with page references
+  - **Language Metrics**: Vocabulary level with advanced word examples, sentence complexity with example sentences, reading ease score, unique word count, linguistic features
+  - **Cultural Assessment**: Islamic values with textual evidence and page references, UAE cultural elements with quotes and context, universal themes, potential concerns with severity ratings and evidence
+  - **Educational Insights**: Learning objectives with evidence quotes, skill development with implementation details, discussion topics with guiding questions, pedagogical value assessment
+  - **Safety Analysis**: Content warnings with context, evidence quotes, and page references; age appropriateness with rationale and developmental considerations; parental guidance areas with discussion points; positive messages with supporting evidence; risk assessment with level and factors
+  - **AI Recommendations**: Best-for audience, teaching strategies with implementation guides, usage contexts, complementary books
+- **Data-Driven & Structured Presentation**:
+  - All claims backed by direct textual quotes (3-5 lines)
+  - Page references (Early/Mid/Late sections) for evidence attribution
+  - Color-coded evidence boxes with proper formatting (blockquotes, italics, line spacing)
+  - Severity badges for concerns (Low/Moderate/High)
+  - Structured cards with clear sections for analysis vs. evidence
 - Fresh Garden theme UI with glassmorphism effects and gradient backgrounds
 - Interactive analysis cards with hover effects and organized sections
 - Real-time progress tracking during analysis
-- Download analysis as JSON report
+- Download comprehensive analysis as JSON report
 - Reset functionality to analyze multiple books without page refresh
 - Accessible from main header "AI Deep Analysis" button
-- Backend endpoint `/api/deep-analyze` uses enhanced OpenAI GPT-4o prompts for detailed literary and educational analysis
+- Backend endpoint `/api/deep-analyze` uses enhanced OpenAI GPT-4o prompts requesting explicit evidence extraction
 - Synchronous processing with robust error handling and file cleanup
+- Defensive array handling with safety checks for all optional fields
 - Test IDs added for automated testing coverage
 
 **4-System Evaluation Framework (October 2025)**:

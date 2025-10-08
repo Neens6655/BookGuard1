@@ -211,49 +211,68 @@ export interface DeepAnalysisResult {
   
   narrative_structure: {
     plot_complexity: string;
+    plot_evidence: string;
     character_development: string;
+    character_evidence: string;
     pacing: string;
+    pacing_evidence: string;
     themes: string[];
+    key_moments: Array<{ page: string; quote: string; significance: string }>;
   };
   
   language_metrics: {
     vocabulary_level: string;
+    vocabulary_examples: string[];
     sentence_complexity: string;
+    complexity_examples: string[];
     reading_ease_score: number;
     unique_word_count: number;
+    linguistic_features: string[];
   };
   
   cultural_assessment: {
-    islamic_values: string[];
-    uae_cultural_elements: string[];
+    islamic_values: Array<{ value: string; evidence: string; page: string }>;
+    uae_cultural_elements: Array<{ element: string; context: string; quote: string }>;
     universal_themes: string[];
-    potential_concerns: string[];
+    potential_concerns: Array<{ concern: string; evidence: string; severity: string }>;
   };
   
   educational_insights: {
-    learning_objectives: string[];
-    skill_development: string[];
-    discussion_topics: string[];
+    learning_objectives: Array<{ objective: string; evidence: string }>;
+    skill_development: Array<{ skill: string; how_developed: string }>;
+    discussion_topics: Array<{ topic: string; guiding_questions: string[] }>;
+    pedagogical_value: string;
   };
   
   safety_analysis: {
-    content_warnings: string[];
-    age_appropriateness: string;
-    parental_guidance_areas: string[];
-    positive_messages: string[];
+    content_warnings: Array<{ warning: string; context: string; evidence: string; page: string }>;
+    age_appropriateness: {
+      recommended_age: string;
+      rationale: string;
+      developmental_considerations: string[];
+    };
+    parental_guidance_areas: Array<{ area: string; reason: string; discussion_points: string[] }>;
+    positive_messages: Array<{ message: string; evidence: string }>;
+    risk_assessment: {
+      level: string;
+      factors: string[];
+    };
   };
   
   recommendations: {
     best_for: string;
-    teaching_strategies: string[];
+    teaching_strategies: Array<{ strategy: string; implementation: string }>;
     complementary_books: string[];
+    usage_contexts: string[];
   };
 }
 
 export async function deepAnalyzeBook(bookText: string): Promise<DeepAnalysisResult> {
   const deepAnalysisPrompt = `
 You are an expert literary analyst and educational specialist for the UAE Ministry of Education.
-Provide an in-depth, technical analysis of this children's/family book with actionable insights.
+Provide a COMPREHENSIVE, EVIDENCE-BASED analysis with SPECIFIC QUOTES and PAGE REFERENCES from the text.
+
+CRITICAL: Every analysis point MUST be supported by direct evidence from the book.
 
 Return detailed JSON with these fields:
 {
@@ -261,53 +280,101 @@ Return detailed JSON with these fields:
   "author": "Author name or null if unknown",
   
   "narrative_structure": {
-    "plot_complexity": "Detailed analysis of plot structure, narrative arc, and story development",
-    "character_development": "Analysis of character arcs, growth, and psychological depth",
-    "pacing": "Evaluation of narrative rhythm, tension, and flow",
-    "themes": ["List 4-6 key themes explored in the book"]
+    "plot_complexity": "Technical analysis of plot structure and narrative arc",
+    "plot_evidence": "Quote 3-5 lines showing plot complexity",
+    "character_development": "Analysis of character arcs and psychological depth",
+    "character_evidence": "Quote 3-5 lines showing character growth",
+    "pacing": "Evaluation of narrative rhythm and tension",
+    "pacing_evidence": "Quote showing pacing style",
+    "themes": ["4-6 key themes"],
+    "key_moments": [
+      {"page": "Early/Mid/Late section", "quote": "2-3 line quote", "significance": "Why this moment matters"},
+      {"page": "Early/Mid/Late section", "quote": "2-3 line quote", "significance": "Why this moment matters"}
+    ]
   },
   
   "language_metrics": {
-    "vocabulary_level": "Reading level (e.g., 'Grade 3-5 (Ages 8-10)')",
-    "sentence_complexity": "Analysis of sentence structure and syntax patterns",
-    "reading_ease_score": 72 (0-100 scale, higher = easier),
-    "unique_word_count": 1250 (estimated based on book length)
+    "vocabulary_level": "Grade level (e.g., 'Grade 4-6 (Ages 9-11)')",
+    "vocabulary_examples": ["advanced word 1", "advanced word 2", "advanced word 3"],
+    "sentence_complexity": "Technical analysis of syntax",
+    "complexity_examples": ["Example sentence showing complexity", "Another example"],
+    "reading_ease_score": 72,
+    "unique_word_count": 1250,
+    "linguistic_features": ["Feature 1 (e.g., 'Metaphorical language')", "Feature 2", "Feature 3"]
   },
   
   "cultural_assessment": {
-    "islamic_values": ["List specific Islamic values present (e.g., 'Honesty (Sidq)', 'Patience (Sabr)')"],
-    "uae_cultural_elements": ["List UAE/Arab cultural elements (e.g., 'Desert landscape', 'Traditional values')"],
-    "universal_themes": ["List universal themes (e.g., 'Coming of age', 'Overcoming obstacles')"],
-    "potential_concerns": ["List any cultural considerations or concerns, or empty array if none"]
+    "islamic_values": [
+      {"value": "Honesty (Sidq)", "evidence": "3-5 line quote showing this value", "page": "Early/Mid/Late"},
+      {"value": "Patience (Sabr)", "evidence": "3-5 line quote", "page": "Early/Mid/Late"}
+    ],
+    "uae_cultural_elements": [
+      {"element": "Desert landscape", "context": "How it's portrayed", "quote": "2-3 line quote"},
+      {"element": "Traditional values", "context": "Context", "quote": "2-3 line quote"}
+    ],
+    "universal_themes": ["Theme 1", "Theme 2", "Theme 3"],
+    "potential_concerns": [
+      {"concern": "Specific concern", "evidence": "3-5 line quote showing concern", "severity": "Low/Moderate/High"}
+    ]
   },
   
   "educational_insights": {
-    "learning_objectives": ["3-5 key learning objectives this book achieves"],
-    "skill_development": ["List cognitive, emotional, or social skills developed"],
-    "discussion_topics": ["3-5 questions or topics for meaningful discussions"]
+    "learning_objectives": [
+      {"objective": "Understanding X", "evidence": "Quote showing how book teaches this"},
+      {"objective": "Developing Y", "evidence": "Quote showing skill development"}
+    ],
+    "skill_development": [
+      {"skill": "Critical thinking", "how_developed": "Specific way the book develops this"},
+      {"skill": "Empathy", "how_developed": "How the narrative builds empathy"}
+    ],
+    "discussion_topics": [
+      {"topic": "Main discussion topic", "guiding_questions": ["Question 1?", "Question 2?", "Question 3?"]},
+      {"topic": "Second topic", "guiding_questions": ["Question 1?", "Question 2?"]}
+    ],
+    "pedagogical_value": "Overall educational value assessment"
   },
   
   "safety_analysis": {
-    "content_warnings": ["List specific warnings or empty array if none"],
-    "age_appropriateness": "Detailed age recommendation with reasoning",
-    "parental_guidance_areas": ["Topics requiring parental support or discussion"],
-    "positive_messages": ["List positive values and messages conveyed"]
+    "content_warnings": [
+      {"warning": "Violence", "context": "Nature and extent", "evidence": "3-5 line quote", "page": "Mid section"},
+      {"warning": "Scary themes", "context": "Type of content", "evidence": "3-5 line quote", "page": "Late section"}
+    ],
+    "age_appropriateness": {
+      "recommended_age": "Ages 9-12",
+      "rationale": "Detailed reasoning based on content analysis",
+      "developmental_considerations": ["Consideration 1", "Consideration 2", "Consideration 3"]
+    },
+    "parental_guidance_areas": [
+      {"area": "Death/Loss", "reason": "Why guidance needed", "discussion_points": ["Point 1", "Point 2"]},
+      {"area": "Conflict", "reason": "Context", "discussion_points": ["Point 1", "Point 2"]}
+    ],
+    "positive_messages": [
+      {"message": "Resilience", "evidence": "3-5 line quote showing positive message"},
+      {"message": "Friendship", "evidence": "Quote demonstrating value"}
+    ],
+    "risk_assessment": {
+      "level": "Low/Moderate/High",
+      "factors": ["Risk factor 1 with evidence", "Risk factor 2 with evidence"]
+    }
   },
   
   "recommendations": {
-    "best_for": "Detailed description of ideal audience and context",
-    "teaching_strategies": ["3-5 practical teaching/reading strategies"],
-    "complementary_books": ["Similar or related books/genres that pair well"]
+    "best_for": "Detailed audience description with reasoning",
+    "teaching_strategies": [
+      {"strategy": "Strategy name", "implementation": "How to implement in classroom"},
+      {"strategy": "Another strategy", "implementation": "Practical steps"}
+    ],
+    "complementary_books": ["Book/Genre 1", "Book/Genre 2", "Book/Genre 3"],
+    "usage_contexts": ["Context 1 (e.g., 'Family reading time')", "Context 2", "Context 3"]
   }
 }
 
-Analysis Guidelines:
-- Be specific and technical in your assessments
-- Provide actionable insights for educators and parents
-- Include concrete examples from the text when possible
-- Consider UAE educational context and cultural values
-- Focus on both literary merit and educational value
-- Estimate reading metrics based on text complexity
+EVIDENCE REQUIREMENTS:
+- Extract EXACT quotes (3-5 lines) for ALL evidence fields
+- Include page references (Early/Mid/Late sections since we don't have page numbers)
+- Every claim must be supported by textual evidence
+- Quotes must be verbatim from the book text
+- For safety warnings, provide specific textual evidence
 
 Return complete JSON output only.
 `;
