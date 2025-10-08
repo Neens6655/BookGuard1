@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 
 interface DeepAnalysis {
   title: string;
@@ -229,15 +229,10 @@ export default function AIAssessment() {
       <header className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation('/')}
-              className="gap-2"
-              data-testid="button-back-home"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Library
-            </Button>
+            <Link href="/" data-testid="button-back-to-home" className="group inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 backdrop-blur-md border border-green-500/30 rounded-full text-green-700 hover:bg-green-500/20 hover:scale-105 transition-all duration-300 hover:shadow-lg">
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
+              <span className="font-medium">Back</span>
+            </Link>
             <div className="flex items-center gap-2">
               <Brain className="w-6 h-6 text-green-600" />
               <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-cyan-600 bg-clip-text text-transparent">
