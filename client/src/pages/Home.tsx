@@ -69,6 +69,7 @@ export default function Home() {
         status: 'processing',
         progress: 0,
         result: null,
+        coverImage: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
@@ -492,6 +493,7 @@ export default function Home() {
                               key={book.id}
                               book={book}
                               onClick={() => handleViewBook(book)}
+                              onUpdate={refetch}
                             />
                           ))}
                         </div>
@@ -569,6 +571,7 @@ export default function Home() {
                       key={book.id}
                       book={book}
                       onClick={() => handleViewBook(book)}
+                      onUpdate={refetch}
                     />
                   ))}
                 </div>

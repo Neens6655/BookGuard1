@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Star, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Star, CheckCircle, Settings } from 'lucide-react';
 import { type Evaluation } from '@/types/evaluation';
+import { EditBookDialog } from './EditBookDialog';
 
 interface BookCardProps {
   book: Evaluation;
   onClick: () => void;
+  onUpdate?: () => void;
 }
 
-export function BookCard({ book, onClick }: BookCardProps) {
+export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const result = book.result;
   
   if (!result) return null;
@@ -43,40 +48,63 @@ export function BookCard({ book, onClick }: BookCardProps) {
     return genreColors[genre] || genreColors['default'];
   };
 
-  return (
-    <Card 
-      className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50 overflow-hidden"
-      onClick={onClick}
-      data-testid={`card-book-${book.id}`}
-    >
-      {/* Book Cover */}
-      <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-200 via-yellow-100 to-orange-100">
-        {book.coverImage ? (
-          <img 
-            src={book.coverImage} 
-            alt={result.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            data-testid={`img-book-cover-${book.id}`}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <BookOpen className="w-16 h-16 text-orange-400/50" />
-          </div>
-        )}
-        
-        {/* Rating Badge */}
-        <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
-          <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-          {rating.toFixed(1)}
-        </Badge>
-        
-        {/* Age Badge */}
-        <Badge className="absolute bottom-3 left-3 bg-yellow-100 text-yellow-800 hover:bg-yellow-100 font-semibold">
-          Ages {result.recommended_minimum_age}
-        </Badge>
-      </div>
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditDialogOpen(true);
+  };
 
-      <CardContent className="p-4 space-y-3">
+  const handleEditSuccess = () => {
+    if (onUpdate) {
+      onUpdate();
+    }
+  };
+
+  return (
+    <>
+      <Card 
+        className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50 overflow-hidden"
+        onClick={onClick}
+        data-testid={`card-book-${book.id}`}
+      >
+        {/* Book Cover */}
+        <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-200 via-yellow-100 to-orange-100">
+          {book.coverImage ? (
+            <img 
+              src={book.coverImage} 
+              alt={result.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              data-testid={`img-book-cover-${book.id}`}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <BookOpen className="w-16 h-16 text-orange-400/50" />
+            </div>
+          )}
+          
+          {/* Edit Button */}
+          <Button
+            size="icon"
+            variant="secondary"
+            className="absolute top-3 left-3 bg-white/90 hover:bg-white shadow-md h-8 w-8"
+            onClick={handleEditClick}
+            data-testid={`button-edit-book-${book.id}`}
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+          
+          {/* Rating Badge */}
+          <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
+            <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+            {rating.toFixed(1)}
+          </Badge>
+          
+          {/* Age Badge */}
+          <Badge className="absolute bottom-3 left-3 bg-yellow-100 text-yellow-800 hover:bg-yellow-100 font-semibold">
+            Ages {result.recommended_minimum_age}
+          </Badge>
+        </div>
+
+        <CardContent className="p-4 space-y-3">
         {/* Title */}
         <h3 className="font-bold text-base line-clamp-2" data-testid={`text-book-title-${book.id}`}>
           {result.title}
@@ -151,5 +179,13 @@ export function BookCard({ book, onClick }: BookCardProps) {
         </div>
       </CardContent>
     </Card>
+
+    <EditBookDialog
+      open={isEditDialogOpen}
+      onOpenChange={setIsEditDialogOpen}
+      book={book}
+      onSuccess={handleEditSuccess}
+    />
+    </>
   );
 }
