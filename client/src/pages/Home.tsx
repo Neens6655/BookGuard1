@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart } from 'lucide-react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, AlertTriangle, XCircle } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
