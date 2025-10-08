@@ -1,7 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Filter, CheckCircle, Globe, Calendar, BookOpen } from 'lucide-react';
 
 interface FilterSidebarProps {
   selectedAgeGroups: string[];
@@ -32,33 +30,21 @@ const LANGUAGES = [
 ];
 
 const VERDICTS = [
-  { value: 'Approved', label: 'Approved', emoji: '🟢', color: 'text-green-600' },
-  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', color: 'text-green-600' },
-  { value: 'Parent Guidance', label: 'Parent Guidance', emoji: '🟡', color: 'text-yellow-600' },
-  { value: 'Not Whitelisted', label: 'Not Whitelisted', emoji: '🚫', color: 'text-red-600' },
+  { value: 'Approved', label: 'Approved', emoji: '🟢', bgColor: 'bg-green-500/10 hover:bg-green-500/20', borderColor: 'border-green-500/30', textColor: 'text-green-700' },
+  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', bgColor: 'bg-emerald-500/10 hover:bg-emerald-500/20', borderColor: 'border-emerald-500/30', textColor: 'text-emerald-700' },
+  { value: 'Parent Guidance', label: 'Parent Guidance', emoji: '🟡', bgColor: 'bg-yellow-500/10 hover:bg-yellow-500/20', borderColor: 'border-yellow-500/30', textColor: 'text-yellow-700' },
+  { value: 'Not Whitelisted', label: 'Not Whitelisted', emoji: '🚫', bgColor: 'bg-red-500/10 hover:bg-red-500/20', borderColor: 'border-red-500/30', textColor: 'text-red-700' },
 ];
 
 const GENRES = [
-  { value: 'Islamic', label: 'Islamic' },
-  { value: 'UAE Culture', label: 'UAE Culture' },
-  { value: 'Culture', label: 'Culture' },
-  { value: 'Heritage', label: 'Heritage' },
-  { value: 'Adventure', label: 'Adventure' },
-  { value: 'Fantasy', label: 'Fantasy' },
-  { value: 'Mystery', label: 'Mystery' },
-  { value: 'Science', label: 'Science' },
-  { value: 'STEM', label: 'STEM' },
-  { value: 'Educational', label: 'Educational' },
-  { value: 'Bedtime', label: 'Bedtime' },
-  { value: 'Interactive', label: 'Interactive' },
-  { value: 'Nature', label: 'Nature' },
-  { value: 'Friendship', label: 'Friendship' },
-  { value: 'Emotions', label: 'Emotions' },
-  { value: 'Philosophy', label: 'Philosophy' },
-  { value: 'Humor', label: 'Humor' },
-  { value: 'Gaming', label: 'Gaming' },
-  { value: 'Social Learning', label: 'Social Learning' },
-  { value: 'Traditional', label: 'Traditional' },
+  { value: 'Islamic', label: 'Islamic', icon: '🕌' },
+  { value: 'UAE Culture', label: 'UAE', icon: '🇦🇪' },
+  { value: 'Adventure', label: 'Adventure', icon: '🗺️' },
+  { value: 'Educational', label: 'Educational', icon: '📚' },
+  { value: 'Bedtime', label: 'Bedtime', icon: '🌙' },
+  { value: 'STEM', label: 'STEM', icon: '🔬' },
+  { value: 'Emotions', label: 'Emotions', icon: '💝' },
+  { value: 'Interactive', label: 'Interactive', icon: '🎮' },
 ];
 
 export function FilterSidebar({
@@ -75,113 +61,118 @@ export function FilterSidebar({
   const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0;
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader>
+    <Card className="sticky top-4 bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-bold">Filter Results</CardTitle>
+          <CardTitle className="text-base font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Filters
+          </CardTitle>
           {hasActiveFilters && (
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={onClearFilters}
-              className="text-orange-600 hover:text-orange-700 h-auto p-0"
+              className="text-purple-600 hover:text-purple-700 hover:bg-purple-100 h-7 px-2 text-xs font-medium"
               data-testid="button-clear-filters"
             >
-              Clear
+              Clear All
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Verdict/Status Filter */}
-        <div className="pb-6 border-b">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-sm">Status</h3>
-          </div>
-          <div className="space-y-2">
+      <CardContent className="space-y-4 pt-0">
+        {/* Verdict/Status Filter - Pill Style */}
+        <div>
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-purple-700 mb-2">Status</h3>
+          <div className="flex flex-wrap gap-1.5">
             {VERDICTS.map((verdict) => (
-              <label
+              <button
                 key={verdict.value}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                onClick={() => onVerdictChange(verdict.value)}
+                className={`
+                  inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                  transition-all border
+                  ${selectedVerdicts.includes(verdict.value) 
+                    ? `${verdict.bgColor} ${verdict.borderColor} ${verdict.textColor} shadow-sm` 
+                    : 'bg-white/60 border-gray-200 text-gray-600 hover:bg-white hover:border-gray-300'
+                  }
+                `}
+                data-testid={`checkbox-verdict-${verdict.value.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <Checkbox
-                  checked={selectedVerdicts.includes(verdict.value)}
-                  onCheckedChange={() => onVerdictChange(verdict.value)}
-                  data-testid={`checkbox-verdict-${verdict.value.toLowerCase().replace(/\s+/g, '-')}`}
-                />
-                <span className="text-xl">{verdict.emoji}</span>
-                <span className={`text-sm font-medium ${verdict.color}`}>{verdict.label}</span>
-              </label>
+                <span className="text-sm">{verdict.emoji}</span>
+                <span className="whitespace-nowrap">{verdict.label}</span>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Age Group Filter */}
+        {/* Age Group Filter - Compact Pills */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <h3 className="font-semibold text-sm">Age Group</h3>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-purple-700 mb-2">Age</h3>
+          <div className="flex flex-wrap gap-1.5">
             {AGE_GROUPS.map((age) => (
-              <label
+              <button
                 key={age.value}
-                className="flex items-center space-x-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors"
+                onClick={() => onAgeGroupChange(age.value)}
+                className={`
+                  px-2.5 py-1 rounded-full text-xs font-medium transition-all
+                  ${selectedAgeGroups.includes(age.value) 
+                    ? 'bg-blue-500 text-white shadow-sm' 
+                    : 'bg-white/60 text-gray-700 hover:bg-white hover:shadow-sm'
+                  }
+                `}
+                data-testid={`checkbox-age-${age.value}`}
               >
-                <Checkbox
-                  checked={selectedAgeGroups.includes(age.value)}
-                  onCheckedChange={() => onAgeGroupChange(age.value)}
-                  data-testid={`checkbox-age-${age.value}`}
-                />
-                <span className="text-sm">{age.label}</span>
-              </label>
+                {age.label}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Language Filter */}
+        {/* Language Filter - Compact Pills */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Globe className="w-4 h-4 text-purple-600" />
-            <h3 className="font-semibold text-sm">Language</h3>
-          </div>
-          <div className="space-y-2">
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-purple-700 mb-2">Language</h3>
+          <div className="flex flex-wrap gap-1.5">
             {LANGUAGES.map((lang) => (
-              <label
+              <button
                 key={lang.value}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                onClick={() => onLanguageChange(lang.value)}
+                className={`
+                  px-3 py-1 rounded-full text-xs font-medium transition-all
+                  ${selectedLanguages.includes(lang.value) 
+                    ? 'bg-purple-500 text-white shadow-sm' 
+                    : 'bg-white/60 text-gray-700 hover:bg-white hover:shadow-sm'
+                  }
+                `}
+                data-testid={`checkbox-language-${lang.value.toLowerCase()}`}
               >
-                <Checkbox
-                  checked={selectedLanguages.includes(lang.value)}
-                  onCheckedChange={() => onLanguageChange(lang.value)}
-                  data-testid={`checkbox-language-${lang.value.toLowerCase()}`}
-                />
-                <span className="text-sm">{lang.label}</span>
-              </label>
+                {lang.label}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Genre Filter */}
+        {/* Genre Filter - Icon Pills */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <BookOpen className="w-4 h-4 text-orange-600" />
-            <h3 className="font-semibold text-sm">Genre</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-purple-700 mb-2">Genre</h3>
+          <div className="flex flex-wrap gap-1.5">
             {GENRES.map((genre) => (
-              <label
+              <button
                 key={genre.value}
-                className="flex items-center space-x-1 cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors"
+                onClick={() => onGenreChange(genre.value)}
+                className={`
+                  inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                  transition-all
+                  ${selectedGenres.includes(genre.value) 
+                    ? 'bg-orange-500 text-white shadow-sm' 
+                    : 'bg-white/60 text-gray-700 hover:bg-white hover:shadow-sm'
+                  }
+                `}
+                data-testid={`checkbox-genre-${genre.value.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <Checkbox
-                  checked={selectedGenres.includes(genre.value)}
-                  onCheckedChange={() => onGenreChange(genre.value)}
-                  data-testid={`checkbox-genre-${genre.value.toLowerCase().replace(/\s+/g, '-')}`}
-                />
-                <span className="text-sm truncate">{genre.label}</span>
-              </label>
+                <span>{genre.icon}</span>
+                <span>{genre.label}</span>
+              </button>
             ))}
           </div>
         </div>
