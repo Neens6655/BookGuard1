@@ -44,94 +44,108 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
   }));
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 bg-gradient-to-br from-green-50 via-cyan-50 to-sky-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Book Header */}
-        <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-2xl p-8 md:p-12 mb-8 text-white">
-          <div className="grid md:grid-cols-3 gap-8 items-start">
+        {/* Book Header - Fresh Garden Theme */}
+        <div className="relative bg-gradient-to-br from-green-500 to-cyan-400 rounded-3xl p-10 md:p-14 mb-8 overflow-hidden shadow-2xl">
+          {/* Glassmorphism overlay */}
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+          
+          {/* Decorative gradient orbs */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-300/30 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-cyan-300/30 rounded-full blur-3xl"></div>
+          
+          <div className="relative grid md:grid-cols-3 gap-10 items-start">
             {/* Book Cover */}
             <div className="md:col-span-1">
-              <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl shadow-2xl w-full aspect-[3/4] overflow-hidden relative">
-                {coverImage ? (
-                  <img 
-                    src={coverImage} 
-                    alt={result.title}
-                    className="w-full h-full object-cover"
-                    data-testid="img-book-cover-detail"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="w-24 h-24 text-orange-400" />
-                  </div>
-                )}
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-3 transform hover:scale-105 transition-transform duration-300">
+                <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl w-full aspect-[3/4] overflow-hidden relative">
+                  {coverImage ? (
+                    <img 
+                      src={coverImage} 
+                      alt={result.title}
+                      className="w-full h-full object-cover"
+                      data-testid="img-book-cover-detail"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <BookOpen className="w-24 h-24 text-orange-400" />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             
             {/* Book Info */}
-            <div className="md:col-span-2">
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge className="bg-green-500 text-white hover:bg-green-600" data-testid="badge-islamic-approved">
-                  <Shield className="w-3 h-3 mr-1" />
-                  Islamic Approved
-                </Badge>
-                <Badge className="bg-blue-500 text-white hover:bg-blue-600" data-testid="badge-age-range">
-                  Ages {result.recommended_minimum_age}
-                </Badge>
-                <Badge className="bg-orange-500 text-white hover:bg-orange-600">
-                  Arabic
-                </Badge>
+            <div className="md:col-span-2 text-white">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 shadow-lg" data-testid="badge-islamic-approved">
+                  <Shield className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Islamic Approved</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-400/40 backdrop-blur-md border border-white/30 shadow-lg" data-testid="badge-age-range">
+                  <span className="text-sm font-semibold">Ages {result.recommended_minimum_age}</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-300/40 backdrop-blur-md border border-white/30 shadow-lg">
+                  <span className="text-sm font-semibold">Arabic</span>
+                </div>
               </div>
               
-              <h2 className="text-3xl md:text-4xl font-bold mb-2" data-testid="book-title">
+              {/* Title with better spacing */}
+              <h2 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight leading-tight" data-testid="book-title">
                 {result.title}
               </h2>
-              <p className="text-lg opacity-90 mb-1" dir="rtl">مغامرات في الصحراء</p>
-              <p className="text-base opacity-90 mb-4">by Regional author</p>
+              <p className="text-xl opacity-95 mb-2" dir="rtl">مغامرات في الصحراء</p>
+              <p className="text-lg opacity-90 mb-6">by Regional author</p>
               
-              <div className="flex items-center space-x-1 mb-6">
+              {/* Rating */}
+              <div className="flex items-center space-x-1 mb-8">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-5 h-5 ${i < Math.floor(rating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-300 text-gray-300'}`} />
+                  <Star key={i} className={`w-6 h-6 ${i < Math.floor(rating) ? 'fill-yellow-300 text-yellow-300' : 'fill-white/30 text-white/30'}`} />
                 ))}
-                <span className="ml-2 font-semibold text-lg">{rating}</span>
-                <span className="ml-1 opacity-75 text-sm">/5</span>
+                <span className="ml-3 font-bold text-xl">{rating}</span>
+                <span className="ml-1 opacity-80 text-base">/5</span>
               </div>
               
-              <p className="text-base opacity-90 leading-relaxed mb-6" data-testid="book-description">
+              {/* Description */}
+              <p className="text-lg opacity-95 leading-relaxed mb-8" data-testid="book-description">
                 {result.executive_summary}
               </p>
               
-              {/* Key Features */}
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
+              {/* Key Features - Card Style */}
+              <div className="mb-8 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                <div className="flex items-center gap-2 mb-4">
                   <Star className="w-5 h-5 text-yellow-300" />
-                  <h4 className="font-semibold text-white text-base">Key Features</h4>
+                  <h4 className="font-bold text-white text-lg">Key Features</h4>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {result.key_drivers.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-300 mt-0.5" />
-                      <span className="text-white/90 text-sm">{feature}</span>
+                    <div key={idx} className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-emerald-300 mt-0.5 flex-shrink-0" />
+                      <span className="text-white/95 text-base">{feature}</span>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="flex flex-wrap gap-3">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4">
                 <Button 
-                  className="bg-white text-purple-600 hover:bg-white/90"
+                  className="bg-white text-green-600 hover:bg-white/90 font-semibold shadow-lg px-6 py-6 text-base"
                   onClick={() => onDownload('txt')}
                   data-testid="button-download-summary"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-5 h-5 mr-2" />
                   Download Summary
                 </Button>
                 <Button 
                   variant="outline"
-                  className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
+                  className="bg-white/20 backdrop-blur-md text-white border-2 border-white/40 hover:bg-white/30 font-semibold shadow-lg px-6 py-6 text-base"
                   data-testid="button-share"
                 >
-                  <Share2 className="w-4 h-4 mr-2" />
+                  <Share2 className="w-5 h-5 mr-2" />
                   Share Book
                 </Button>
               </div>
