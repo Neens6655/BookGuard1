@@ -225,12 +225,44 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     <h3 className="text-2xl font-bold text-foreground mb-2">
                       {result.final_verdict || "Evaluation Complete"}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {result.final_verdict === "Approved" ? "Safe & culturally aligned - Fully suitable for UAE families" :
-                       result.final_verdict === "Whitelisted" ? "Safe for UAE families - Culturally and ethically acceptable" :
-                       result.final_verdict === "Parent Guidance" ? "Safe but contains moderate issues - Parents should review before giving" :
-                       "Violates UAE/Islamic values or child safety standards - Not suitable for children"}
-                    </p>
+                    
+                    {/* Executive Summary based on verdict */}
+                    {result.final_verdict === "Not Whitelisted" ? (
+                      <div className="space-y-2 mb-3">
+                        <p className="text-sm font-semibold text-red-700">
+                          {result.system1_uae_values?.rating === "Severe" 
+                            ? "Severe UAE/Islamic cultural violations detected"
+                            : result.system2_child_safety?.rating === "Severe"
+                            ? "Severe child safety concerns identified"
+                            : "Not suitable for children"}
+                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {result.system1_uae_values?.rating === "Severe" && result.system1_uae_values.assessment
+                            ? result.system1_uae_values.assessment
+                            : result.system2_child_safety?.rating === "Severe" && result.system2_child_safety.assessment
+                            ? result.system2_child_safety.assessment
+                            : result.executive_summary || "This book contains content that violates UAE/Islamic values or child safety standards."}
+                        </p>
+                      </div>
+                    ) : result.final_verdict === "Parent Guidance" ? (
+                      <div className="space-y-2 mb-3">
+                        <p className="text-sm font-semibold text-yellow-700">Requires parental discussion and guidance</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {result.system1_uae_values?.rating === "Moderate" && result.system1_uae_values.assessment
+                            ? result.system1_uae_values.assessment
+                            : result.system2_child_safety?.rating === "Moderate" && result.system2_child_safety.assessment
+                            ? result.system2_child_safety.assessment
+                            : result.executive_summary || "Parents should review content before sharing with children."}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                        {result.executive_summary || 
+                         (result.final_verdict === "Approved" ? "Safe & culturally aligned - Fully suitable for UAE families" :
+                          "Safe for UAE families - Culturally and ethically acceptable")}
+                      </p>
+                    )}
+                    
                     <div className="flex items-center gap-2">
                       <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
                         Ages {result.recommended_age || result.recommended_minimum_age}
