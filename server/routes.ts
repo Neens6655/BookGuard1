@@ -642,24 +642,6 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
             </ul>
           ` : ''}
         </div>
-
-        ${result.parent_discussion_guide ? `
-          <div class="section discussion-guide">
-            <h3>💬 Parent Discussion Guide</h3>
-            <div class="discussion-section">
-              <h4>Before Reading:</h4>
-              <ul>
-                ${result.parent_discussion_guide.before_reading?.map((q: string) => `<li>${q}</li>`).join('') || '<li>No questions available</li>'}
-              </ul>
-            </div>
-            <div class="discussion-section">
-              <h4>After Reading:</h4>
-              <ul>
-                ${result.parent_discussion_guide.after_reading?.map((q: string) => `<li>${q}</li>`).join('') || '<li>No questions available</li>'}
-              </ul>
-            </div>
-          </div>
-        ` : ''}
       </div>
     `;
   }).join('');
@@ -680,42 +662,43 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
       color: #333;
-      padding: 40px;
+      padding: 20px;
+      font-size: 11px;
     }
 
     .header {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
-      padding: 40px;
-      border-radius: 20px;
-      margin-bottom: 40px;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 20px;
       box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
       text-align: center;
     }
 
     .logo {
-      width: 80px;
-      height: 80px;
+      width: 50px;
+      height: 50px;
       background: white;
-      border-radius: 20px;
+      border-radius: 12px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      margin-bottom: 20px;
+      font-size: 24px;
+      margin-bottom: 12px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
     .header h1 {
-      font-size: 36px;
-      margin-bottom: 10px;
+      font-size: 24px;
+      margin-bottom: 8px;
       font-weight: 700;
     }
 
     .header .subtitle {
-      font-size: 18px;
+      font-size: 12px;
       opacity: 0.95;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     .header .stats {
@@ -728,27 +711,27 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
 
     .stat-item {
       background: rgba(255,255,255,0.15);
-      padding: 15px 30px;
-      border-radius: 12px;
+      padding: 10px 20px;
+      border-radius: 8px;
       backdrop-filter: blur(10px);
     }
 
     .stat-number {
-      font-size: 32px;
+      font-size: 20px;
       font-weight: 700;
     }
 
     .stat-label {
-      font-size: 14px;
+      font-size: 10px;
       opacity: 0.9;
-      margin-top: 5px;
+      margin-top: 3px;
     }
 
     .book-card {
       background: white;
-      border-radius: 20px;
-      padding: 40px;
-      margin-bottom: 40px;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       page-break-inside: avoid;
     }
@@ -757,16 +740,16 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 25px;
-      border-bottom: 3px solid #10b981;
-      padding-bottom: 20px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #10b981;
+      padding-bottom: 10px;
     }
 
     .book-header h2 {
-      font-size: 28px;
+      font-size: 16px;
       color: #1a1a1a;
       flex: 1;
-      line-height: 1.3;
+      line-height: 1.2;
     }
 
     .book-number {
@@ -775,10 +758,10 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
     }
 
     .badge {
-      padding: 10px 20px;
-      border-radius: 25px;
+      padding: 5px 12px;
+      border-radius: 15px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 10px;
       white-space: nowrap;
     }
 
@@ -790,50 +773,51 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
 
     .book-meta {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-      padding: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 10px;
       background: #f8fffe;
-      border-radius: 12px;
-      border-left: 4px solid #10b981;
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
     }
 
     .meta-item {
-      font-size: 14px;
+      font-size: 10px;
       color: #555;
     }
 
     .meta-item strong {
       color: #10b981;
-      margin-right: 8px;
+      margin-right: 5px;
     }
 
     .section {
-      margin: 30px 0;
+      margin: 12px 0;
     }
 
     .section h3 {
-      font-size: 22px;
+      font-size: 13px;
       color: #1a1a1a;
-      margin-bottom: 15px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
     }
 
     .section p {
-      line-height: 1.8;
+      line-height: 1.4;
       color: #555;
-      margin-bottom: 15px;
+      margin-bottom: 6px;
+      font-size: 10px;
     }
 
     .system-card {
       background: #f8f9fa;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 15px;
-      border-left: 4px solid #10b981;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-left: 3px solid #10b981;
       position: relative;
     }
 
@@ -858,104 +842,86 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
     }
 
     .system-card h4 {
-      font-size: 18px;
-      margin-bottom: 10px;
+      font-size: 11px;
+      margin-bottom: 5px;
       color: #1a1a1a;
+    }
+
+    .system-card p {
+      font-size: 10px;
+      line-height: 1.3;
     }
 
     .rating-badge {
       display: inline-block;
       background: #10b981;
       color: white;
-      padding: 5px 15px;
-      border-radius: 20px;
-      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 9px;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
     }
 
     .age-badge {
       display: inline-block;
       background: linear-gradient(135deg, #a855f7, #7c3aed);
       color: white;
-      padding: 12px 24px;
-      border-radius: 25px;
-      font-size: 18px;
+      padding: 6px 15px;
+      border-radius: 15px;
+      font-size: 12px;
       font-weight: 600;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
     }
 
     .min-age {
-      font-size: 13px;
+      font-size: 10px;
       color: #059669;
       font-weight: 600;
-      margin-top: 8px;
+      margin-top: 5px;
     }
 
     .values-list {
       list-style: none;
       padding: 0;
-      margin: 15px 0;
+      margin: 8px 0;
     }
 
     .values-list li {
-      padding: 10px 0;
-      padding-left: 30px;
+      padding: 5px 0;
+      padding-left: 20px;
       position: relative;
-      line-height: 1.6;
+      line-height: 1.3;
+      font-size: 10px;
     }
 
     .values-list li:before {
       content: "✨";
       position: absolute;
       left: 0;
-    }
-
-    .discussion-guide {
-      background: #fff7ed;
-      padding: 25px;
-      border-radius: 15px;
-      border: 2px solid #fb923c;
-    }
-
-    .discussion-section {
-      margin: 20px 0;
-    }
-
-    .discussion-section h4 {
-      color: #ea580c;
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-
-    .discussion-section ul {
-      padding-left: 20px;
-    }
-
-    .discussion-section li {
-      margin: 10px 0;
-      line-height: 1.6;
-      color: #555;
+      font-size: 10px;
     }
 
     .footer {
       text-align: center;
-      padding: 40px;
+      padding: 20px;
       background: white;
-      border-radius: 20px;
-      margin-top: 40px;
+      border-radius: 15px;
+      margin-top: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
     .footer h3 {
       color: #10b981;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
     }
 
     .footer p {
       color: #666;
-      margin: 5px 0;
+      margin: 3px 0;
+      font-size: 10px;
     }
 
     @media print {
