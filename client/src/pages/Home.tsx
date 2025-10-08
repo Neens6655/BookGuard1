@@ -326,7 +326,7 @@ export default function Home() {
         {currentView === 'home' && (
           <>
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-500 text-white py-24 overflow-hidden">
+            <section className="relative bg-gradient-to-br from-green-500 via-emerald-500 to-cyan-500 text-white py-24 overflow-hidden">
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute inset-0" style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
@@ -350,7 +350,7 @@ export default function Home() {
                     <Button 
                       size="lg"
                       variant="outline"
-                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600"
+                      className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white hover:text-green-600 hover:shadow-xl hover:scale-105 transition-all duration-300"
                       onClick={() => setCurrentView('library')}
                       data-testid="button-browse-books"
                     >
@@ -359,17 +359,17 @@ export default function Home() {
                     </Button>
                     <Button 
                       size="lg"
-                      className="bg-gradient-to-r from-green-400 to-green-600 text-white hover:from-green-500 hover:to-green-700 border-0"
+                      className="bg-white text-green-600 hover:bg-green-50 hover:shadow-2xl hover:scale-105 transition-all duration-300 border-0 font-semibold"
                       onClick={() => setCurrentView('upload')}
                       data-testid="button-add-books-hero"
                     >
                       <BookPlus className="w-5 h-5 mr-2" />
-                      Add books
+                      Add Books
                     </Button>
                     <Button 
                       size="lg"
                       variant="outline"
-                      className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600"
+                      className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white hover:text-cyan-600 hover:shadow-xl hover:scale-105 transition-all duration-300"
                       onClick={() => setCurrentView('upload')}
                       data-testid="button-ai-assessment-hero"
                     >
