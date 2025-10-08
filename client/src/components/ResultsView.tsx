@@ -219,12 +219,18 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-foreground mb-1">N/A</div>
-                    <div className="text-sm text-muted-foreground">Pages</div>
+                    <div className="text-2xl font-bold text-foreground mb-1">{result.language || 'N/A'}</div>
+                    <div className="text-sm text-muted-foreground">Language</div>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-foreground mb-1">N/A</div>
-                    <div className="text-sm text-muted-foreground">Minutes</div>
+                    <div className={`text-2xl font-bold mb-1 ${
+                      result.language_complexity === 'Low' ? 'text-green-600' : 
+                      result.language_complexity === 'Moderate' ? 'text-yellow-600' : 
+                      'text-orange-600'
+                    }`}>
+                      {result.language_complexity}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Complexity</div>
                   </div>
                   <div className="bg-white rounded-lg p-4">
                     <div className={`text-2xl font-bold mb-1 ${result.whitelist_score >= 70 ? 'text-green-600' : 'text-orange-600'}`}>
