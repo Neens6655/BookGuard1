@@ -6,6 +6,28 @@ This full-stack web application evaluates children's and family books for conten
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Verdict Consolidation (January 2025)
+Successfully consolidated "Approved" and "Whitelisted" verdicts into a single **"Whitelisted"** status across the entire application. This unification simplifies the user experience and ensures consistent terminology throughout the system. The final verdict now supports exactly three options:
+
+1. **✅ Whitelisted** (Green): Safe and culturally aligned for UAE families
+2. **🟡 Parent Guidance** (Yellow): Safe but requires parental review
+3. **🚫 Not Whitelisted** (Red): Not suitable; violates standards
+
+**Changes implemented:**
+- Updated database schema enum (removed "Approved" from final_verdict)
+- Migrated all 9 existing "Approved" records to "Whitelisted" in production database
+- Updated OpenAI service prompts to generate only the 3 consolidated verdicts
+- Unified all UI components (FilterSidebar, BookCard, ResultsView, HowItWorks, Home) to use "Whitelisted" terminology
+- Updated marketing copy and parent-facing content to reflect the consolidated terminology
+- Verified through automated E2E testing with 0 "Approved" references remaining
+
+**Monitoring recommendations:**
+- Monitor future data imports to ensure no "Approved" verdicts are generated
+- Review third-party integrations for terminology consistency
+- Extend regression testing to verify verdict badge styling per status
+
 ## System Architecture
 
 ### Frontend Architecture
