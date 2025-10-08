@@ -254,14 +254,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 </p>
                 
                 <div className="grid md:grid-cols-2 gap-4">
-                  {/* System 1: UAE Values */}
+                  {/* UAE Values */}
                   <div className={`rounded-lg p-4 border-2 ${
                     result.system1_uae_values?.rating === "Safe" ? "bg-green-50 border-green-300" :
                     result.system1_uae_values?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
                     "bg-red-50 border-red-300"
                   }`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-foreground">System 1: UAE Values</h5>
+                      <h5 className="font-semibold text-foreground">UAE Values</h5>
                       <Badge variant="outline" className={
                         result.system1_uae_values?.rating === "Safe" ? "text-green-700 border-green-700" :
                         result.system1_uae_values?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
@@ -275,14 +275,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     </p>
                   </div>
 
-                  {/* System 2: Child Safety */}
+                  {/* Child Safety */}
                   <div className={`rounded-lg p-4 border-2 ${
                     result.system2_child_safety?.rating === "Safe" ? "bg-green-50 border-green-300" :
                     result.system2_child_safety?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
                     "bg-red-50 border-red-300"
                   }`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-foreground">System 2: Child Safety</h5>
+                      <h5 className="font-semibold text-foreground">Child Safety</h5>
                       <Badge variant="outline" className={
                         result.system2_child_safety?.rating === "Safe" ? "text-green-700 border-green-700" :
                         result.system2_child_safety?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
@@ -296,14 +296,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     </p>
                   </div>
 
-                  {/* System 3: Theme Complexity */}
+                  {/* Content Complexity */}
                   <div className={`rounded-lg p-4 border-2 ${
                     result.system3_theme_complexity?.rating === "Simple" ? "bg-green-50 border-green-300" :
                     result.system3_theme_complexity?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
                     "bg-orange-50 border-orange-300"
                   }`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-foreground">System 3: Theme</h5>
+                      <h5 className="font-semibold text-foreground">Content</h5>
                       <Badge variant="outline" className={
                         result.system3_theme_complexity?.rating === "Simple" ? "text-green-700 border-green-700" :
                         result.system3_theme_complexity?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
@@ -317,14 +317,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     </p>
                   </div>
 
-                  {/* System 4: Language Complexity */}
+                  {/* Language Complexity */}
                   <div className={`rounded-lg p-4 border-2 ${
                     result.system4_language_complexity?.rating === "Easy" ? "bg-green-50 border-green-300" :
                     result.system4_language_complexity?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
                     "bg-orange-50 border-orange-300"
                   }`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="font-semibold text-foreground">System 4: Language</h5>
+                      <h5 className="font-semibold text-foreground">Language</h5>
                       <Badge variant="outline" className={
                         result.system4_language_complexity?.rating === "Easy" ? "text-green-700 border-green-700" :
                         result.system4_language_complexity?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
@@ -514,7 +514,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-bold text-foreground text-xl">System 1: UAE / Islamic / Arab Values</h4>
+                          <h4 className="font-bold text-foreground text-xl">UAE / Islamic / Arab Values</h4>
                           <Badge className={
                             result.system1_uae_values.rating === "Safe" ? "bg-green-100 text-green-700 hover:bg-green-100" :
                             result.system1_uae_values.rating === "Moderate" ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100" :
@@ -569,7 +569,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-bold text-foreground text-xl">System 2: General Child Safety</h4>
+                          <h4 className="font-bold text-foreground text-xl">General Child Safety</h4>
                           <Badge className={
                             result.system2_child_safety.rating === "Safe" ? "bg-green-100 text-green-700 hover:bg-green-100" :
                             result.system2_child_safety.rating === "Moderate" ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100" :
