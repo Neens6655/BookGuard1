@@ -392,17 +392,6 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 )}
               </div>
 
-              {/* About This Book */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <BookOpen className="w-5 h-5 text-foreground" />
-                  <h4 className="font-semibold text-foreground text-lg">About This Book</h4>
-                </div>
-                <p className="text-muted-foreground leading-relaxed">
-                  {result.executive_summary}
-                </p>
-              </div>
-
               {/* Age Recommendations - Prominent Section */}
               <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-blue-100">
                 <div className="flex items-center gap-2 mb-4">
