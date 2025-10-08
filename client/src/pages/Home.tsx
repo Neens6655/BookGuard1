@@ -378,47 +378,39 @@ export default function Home() {
                     </Button>
                   </div>
 
-                  {/* Trust Indicators */}
-                  <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-7 h-7 text-white" />
+                  {/* Trust Indicators - Minimal */}
+                  <div className="flex justify-center items-center gap-8 max-w-3xl mx-auto">
+                    <div className="flex items-center gap-2">
+                      <Brain className="w-5 h-5 text-white/80" />
+                      <div className="text-left">
+                        <div className="text-xl font-semibold" data-testid="stat-ai-capabilities">
+                          {completedBooks.length}+
                         </div>
-                        <div className="text-left">
-                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-books-analyzed">
-                            {completedBooks.length}+
-                          </div>
-                          <div className="text-white/90 text-sm font-medium">Books Analyzed</div>
-                        </div>
+                        <div className="text-white/70 text-xs">AI Capabilities</div>
                       </div>
                     </div>
                     
-                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Shield className="w-7 h-7 text-white" />
+                    <div className="w-px h-8 bg-white/30"></div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-white/80" />
+                      <div className="text-left">
+                        <div className="text-xl font-semibold" data-testid="stat-evaluation-systems">
+                          4
                         </div>
-                        <div className="text-left">
-                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-evaluation-systems">
-                            4
-                          </div>
-                          <div className="text-white/90 text-sm font-medium">Evaluation Systems</div>
-                        </div>
+                        <div className="text-white/70 text-xs">Systems</div>
                       </div>
                     </div>
                     
-                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Sparkles className="w-7 h-7 text-white" />
+                    <div className="w-px h-8 bg-white/30"></div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-white/80" />
+                      <div className="text-left">
+                        <div className="text-xl font-semibold" data-testid="stat-instant-results">
+                          {'<'}5min
                         </div>
-                        <div className="text-left">
-                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-instant-results">
-                            {'<'}5min
-                          </div>
-                          <div className="text-white/90 text-sm font-medium">Instant Results</div>
-                        </div>
+                        <div className="text-white/70 text-xs">Results</div>
                       </div>
                     </div>
                   </div>
