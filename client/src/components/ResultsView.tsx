@@ -548,9 +548,158 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             </TabsContent>
 
             <TabsContent value="lessons" className="mt-6">
-              <div className="space-y-4">
-                <h4 className="font-semibold text-lg">Lessons Learned</h4>
-                <p className="text-muted-foreground">{result.lessons_learned}</p>
+              <div className="space-y-6">
+                {/* Introduction */}
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Lightbulb className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-foreground text-lg mb-2">Values & Ethics Guide for Parents</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Use this book as a tool to teach your children important life lessons, Islamic values, and ethical principles. Below are key teachings from the book and practical ways to reinforce them.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Lessons */}
+                <div>
+                  <h5 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-blue-600" />
+                    Key Lessons from the Book
+                  </h5>
+                  <div className="bg-white rounded-lg p-5 border border-gray-200">
+                    <p className="text-muted-foreground leading-relaxed">{result.lessons_learned}</p>
+                  </div>
+                </div>
+
+                {/* How to Teach These Values */}
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-100">
+                  <h5 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-purple-600" />
+                    How to Teach These Values
+                  </h5>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        1. Lead by Example
+                      </h6>
+                      <p className="text-sm text-muted-foreground">
+                        Children learn best by observing. Demonstrate the values from this book in your daily life. Show patience, kindness, honesty, and the other virtues the book teaches.
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        2. Connect to Real-Life Situations
+                      </h6>
+                      <p className="text-sm text-muted-foreground">
+                        When similar situations arise in your child's life, reference the book's lessons. Ask: "Do you remember how the character handled this?" This helps them apply values practically.
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        3. Link to Islamic Teachings
+                      </h6>
+                      <p className="text-sm text-muted-foreground">
+                        Connect the book's lessons to Islamic values. Mention relevant Quranic verses or Hadith that support these teachings. This strengthens their faith alongside character development.
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        4. Encourage Reflection
+                      </h6>
+                      <p className="text-sm text-muted-foreground">
+                        Ask your child how they would apply these lessons. Questions like "What would you do differently?" or "How can you practice this at school?" promote deeper understanding.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Islamic & UAE Values Connection */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+                  <h5 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 text-green-600" />
+                    Islamic & UAE Cultural Values
+                  </h5>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-green-700 mb-2">Respect & Kindness (Akhlaq)</h6>
+                      <p className="text-sm text-muted-foreground">
+                        Reinforce the importance of good character (akhlaq) as taught by Prophet Muhammad (PBUH). Discuss how the book's characters demonstrate respect, compassion, and kindness.
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-green-700 mb-2">Honesty & Trustworthiness (Amanah)</h6>
+                      <p className="text-sm text-muted-foreground">
+                        Emphasize the Islamic principle of trustworthiness. Help children understand that being truthful and reliable are core Islamic values reflected in the story.
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-green-700 mb-2">Patience & Perseverance (Sabr)</h6>
+                      <p className="text-sm text-muted-foreground">
+                        Teach the value of patience (sabr) in achieving goals. Connect challenges faced by characters to the Islamic teaching that "Allah is with those who are patient" (Quran 2:153).
+                      </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <h6 className="font-semibold text-green-700 mb-2">Gratitude & Appreciation (Shukr)</h6>
+                      <p className="text-sm text-muted-foreground">
+                        Highlight moments of gratitude in the book. Teach children to say "Alhamdulillah" and appreciate Allah's blessings, just as characters in the story appreciate what they have.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Practical Activities */}
+                <div className="bg-blue-50 rounded-lg p-6 border border-blue-100">
+                  <h5 className="font-bold text-foreground mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-600" />
+                    Practical Family Activities
+                  </h5>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-blue-700">1</span>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-foreground mb-1">Family Reading Circle</h6>
+                        <p className="text-sm text-muted-foreground">Read the book together as a family. Take turns reading pages and pause to discuss the values being presented.</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-blue-700">2</span>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-foreground mb-1">Role-Playing Scenarios</h6>
+                        <p className="text-sm text-muted-foreground">Act out key scenes from the book. Let children play different characters to understand various perspectives and moral choices.</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-blue-700">3</span>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-foreground mb-1">Daily Value Practice</h6>
+                        <p className="text-sm text-muted-foreground">Choose one value from the book each week. Challenge your child to practice it daily and share their experiences at dinner.</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-bold text-blue-700">4</span>
+                      </div>
+                      <div>
+                        <h6 className="font-medium text-foreground mb-1">Creative Expression</h6>
+                        <p className="text-sm text-muted-foreground">Encourage children to draw, write, or create art inspired by the book's lessons. Display their work to reinforce positive values.</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </TabsContent>
 
