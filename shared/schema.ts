@@ -42,7 +42,40 @@ export const evaluationResultSchema = z.object({
   language: z.enum(["Arabic", "English", "Bilingual"]).optional(),
   rating: z.number().optional(),
   executive_summary: z.string(),
-  language_complexity: z.enum(["Low", "Moderate", "High"]),
+  
+  // New 4-system framework
+  system1_uae_values: z.object({
+    rating: z.enum(["Safe", "Moderate", "Severe"]),
+    assessment: z.string(),
+    evidence: z.string().nullable().optional(),
+    concerns: z.array(z.string()),
+  }),
+  
+  system2_child_safety: z.object({
+    rating: z.enum(["Safe", "Moderate", "Severe"]),
+    assessment: z.string(),
+    evidence: z.string().nullable().optional(),
+    concerns: z.array(z.string()),
+  }),
+  
+  system3_theme_complexity: z.object({
+    rating: z.enum(["Simple", "Moderate", "High"]),
+    assessment: z.string(),
+    min_age: z.number(),
+  }),
+  
+  system4_language_complexity: z.object({
+    rating: z.enum(["Easy", "Moderate", "Advanced"]),
+    assessment: z.string(),
+    min_age: z.number(),
+  }),
+  
+  final_verdict: z.enum(["Approved", "Whitelisted", "Parent Guidance", "Not Whitelisted"]),
+  recommended_age: z.string(),
+  age_rationale: z.string(),
+  
+  // Legacy fields for backward compatibility
+  language_complexity: z.enum(["Low", "Moderate", "High"]).optional(),
   domains: z.object({
     gambling: z.string(),
     language: z.string(),
@@ -50,7 +83,7 @@ export const evaluationResultSchema = z.object({
     alcohol_drugs_smoking: z.string(),
     sex_nudity: z.string(),
     islamic_arab_uae_cultural_ethics: z.string(),
-  }),
+  }).optional(),
   domain_evidence: z.object({
     gambling: z.string().nullable().optional(),
     language: z.string().nullable().optional(),
@@ -59,11 +92,6 @@ export const evaluationResultSchema = z.object({
     sex_nudity: z.string().nullable().optional(),
     islamic_arab_uae_cultural_ethics: z.string().nullable().optional(),
   }).optional(),
-  lessons_learned: z.string(),
-  parent_discussion_guide: z.object({
-    before_reading: z.array(z.string()),
-    after_reading: z.array(z.string()),
-  }),
   age_verdicts: z.object({
     "0-3": z.string(),
     "3-5": z.string(),
@@ -72,6 +100,13 @@ export const evaluationResultSchema = z.object({
     "13-16": z.string(),
     "17+": z.string(),
     "21+": z.string(),
+  }).optional(),
+  domain_scores: z.record(z.number()).optional(),
+  
+  lessons_learned: z.string(),
+  parent_discussion_guide: z.object({
+    before_reading: z.array(z.string()),
+    after_reading: z.array(z.string()),
   }),
   recommended_minimum_age: z.string(),
   key_drivers: z.array(z.string()),
@@ -79,7 +114,6 @@ export const evaluationResultSchema = z.object({
   themes: z.array(z.string()).optional(),
   whitelist_score: z.number(),
   whitelist_verdict: z.string(),
-  domain_scores: z.record(z.number()).optional(),
 });
 
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;
