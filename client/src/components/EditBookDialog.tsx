@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, Loader2, BookOpen } from 'lucide-react';
+import { Upload, Loader2, BookOpen, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type Evaluation } from '@/types/evaluation';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface EditBookDialogProps {
   open: boolean;
@@ -17,6 +19,8 @@ interface EditBookDialogProps {
 export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBookDialogProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [title, setTitle] = useState(book.result?.title || '');
   const [author, setAuthor] = useState(book.result?.author || '');
   const [publisher, setPublisher] = useState(book.result?.publisher || '');
@@ -104,6 +108,38 @@ export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBook
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+
+    try {
+      const response = await apiRequest('DELETE', `/api/evaluations/${book.id}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to delete book');
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Book deleted successfully!',
+      });
+
+      // Invalidate queries to refresh the book list
+      queryClient.invalidateQueries({ queryKey: ['/api/evaluations'] });
+
+      onSuccess();
+      onOpenChange(false);
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to delete book',
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -195,33 +231,78 @@ export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBook
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-between items-center pt-4 border-t">
             <Button
               type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-              data-testid="button-cancel-edit"
+              variant="destructive"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSubmitting || isDeleting}
+              data-testid="button-delete-book"
             >
-              Cancel
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Book
             </Button>
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              data-testid="button-save-edit"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Save Changes'
-              )}
-            </Button>
+            
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isSubmitting || isDeleting}
+                data-testid="button-cancel-edit"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || isDeleting}
+                data-testid="button-save-edit"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Book?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{book.result?.title || 'this book'}"? This action cannot be undone and will permanently remove the book and its evaluation data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting} data-testid="button-cancel-delete">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }

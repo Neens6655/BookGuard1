@@ -161,6 +161,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete evaluation
+  app.delete("/api/evaluations/:id", async (req, res) => {
+    try {
+      const evaluation = await storage.getEvaluation(req.params.id);
+      
+      if (!evaluation) {
+        return res.status(404).json({ error: "Evaluation not found" });
+      }
+
+      const deleted = await storage.deleteEvaluation(req.params.id);
+      
+      if (!deleted) {
+        return res.status(500).json({ error: "Failed to delete evaluation" });
+      }
+
+      res.json({ success: true, message: "Evaluation deleted successfully" });
+    } catch (error) {
+      console.error("Delete evaluation error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to delete evaluation" 
+      });
+    }
+  });
+
   // Download report formats
   app.get("/api/evaluate/:id/download/:format", async (req, res) => {
     try {
