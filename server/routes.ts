@@ -924,10 +924,172 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
       font-size: 10px;
     }
 
+    .methodology-page {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      page-break-before: always;
+      page-break-after: always;
+    }
+
+    .methodology-title {
+      font-size: 18px;
+      color: #10b981;
+      text-align: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #10b981;
+    }
+
+    .methodology-intro {
+      margin-bottom: 12px;
+      padding: 10px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
+      border-radius: 8px;
+    }
+
+    .methodology-intro p {
+      font-size: 10px;
+      line-height: 1.4;
+      color: #333;
+      margin: 0;
+    }
+
+    .systems-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .system-detail {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
+    }
+
+    .system-detail.cultural-detail {
+      border-left-color: #10b981;
+      background: linear-gradient(to right, #f0fdf4, #ffffff);
+    }
+
+    .system-detail.safety-detail {
+      border-left-color: #3b82f6;
+      background: linear-gradient(to right, #eff6ff, #ffffff);
+    }
+
+    .system-detail.theme-detail {
+      border-left-color: #a855f7;
+      background: linear-gradient(to right, #faf5ff, #ffffff);
+    }
+
+    .system-detail.language-detail {
+      border-left-color: #f97316;
+      background: linear-gradient(to right, #fff7ed, #ffffff);
+    }
+
+    .system-detail h3 {
+      font-size: 11px;
+      margin-bottom: 5px;
+      color: #1a1a1a;
+    }
+
+    .system-detail p {
+      font-size: 9px;
+      line-height: 1.3;
+      margin: 3px 0;
+      color: #555;
+    }
+
+    .system-detail ul {
+      margin: 3px 0;
+      padding-left: 15px;
+    }
+
+    .system-detail li {
+      font-size: 9px;
+      line-height: 1.3;
+      margin: 2px 0;
+    }
+
+    .verdict-section {
+      margin-bottom: 12px;
+    }
+
+    .verdict-section h3 {
+      font-size: 12px;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .verdict-item {
+      padding: 8px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .verdict-item.whitelisted-verdict {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 2px solid #10b981;
+    }
+
+    .verdict-item.guidance-verdict {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 2px solid #f59e0b;
+    }
+
+    .verdict-item.rejected-verdict {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 2px solid #ef4444;
+    }
+
+    .verdict-item h4 {
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .verdict-item p {
+      font-size: 9px;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .methodology-footer {
+      background: #f8fffe;
+      padding: 8px;
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
+    }
+
+    .methodology-footer p {
+      font-size: 9px;
+      line-height: 1.3;
+      margin: 3px 0;
+      color: #555;
+    }
+
     @media print {
       body {
         background: white;
         padding: 20px;
+      }
+      
+      /* Force methodology page to be on its own page */
+      .methodology-page {
+        page-break-before: always;
+        page-break-after: always;
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
       
       /* Prevent page breaks inside major content blocks */
@@ -977,7 +1139,7 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
   <div class="header">
     <div class="logo">📚</div>
     <h1>Whitelisted Books Report</h1>
-    <div class="subtitle">Emirates BookGuard - UAE Ministry of Education</div>
+    <div class="subtitle">Emirates BookGuard</div>
     <div class="subtitle">Celebrating books that inspire, protect, and uphold our values</div>
     <div class="stats">
       <div class="stat-item">
@@ -991,12 +1153,82 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
     </div>
   </div>
 
+  <div class="methodology-page">
+    <h2 class="methodology-title">📋 Evaluation Methodology & Scoring System</h2>
+    
+    <div class="methodology-intro">
+      <p>Emirates BookGuard employs a rigorous 4-System Evaluation Framework to assess children's and family books for content appropriateness, cultural alignment, and age suitability. Each book undergoes comprehensive AI-powered analysis using advanced language models trained to evaluate content against specific criteria.</p>
+    </div>
+
+    <div class="systems-grid">
+      <div class="system-detail cultural-detail">
+        <h3>System 1: Cultural Values Assessment</h3>
+        <p><strong>Purpose:</strong> Evaluates alignment with Islamic, Arab, and UAE cultural ethics and values.</p>
+        <p><strong>Rating Scale:</strong></p>
+        <ul>
+          <li><strong>Safe:</strong> Fully aligned with cultural values, promotes positive Islamic/Arab principles</li>
+          <li><strong>Moderate:</strong> Minor cultural considerations, may require context or discussion</li>
+          <li><strong>Severe:</strong> Contains elements that conflict with core cultural values (automatic rejection)</li>
+        </ul>
+        <p><strong>Key Criteria:</strong> Religious respect, family values, modesty standards, cultural traditions, moral lessons</p>
+      </div>
+
+      <div class="system-detail safety-detail">
+        <h3>System 2: Child Safety Assessment</h3>
+        <p><strong>Purpose:</strong> Identifies potentially harmful content including violence, inappropriate themes, or disturbing imagery.</p>
+        <p><strong>Rating Scale:</strong></p>
+        <ul>
+          <li><strong>Safe:</strong> Age-appropriate content with no concerning elements</li>
+          <li><strong>Moderate:</strong> Mild themes that may require parental guidance or context</li>
+          <li><strong>Severe:</strong> Contains harmful, disturbing, or inappropriate content (automatic rejection)</li>
+        </ul>
+        <p><strong>Key Criteria:</strong> Violence levels, scary content, age-inappropriate themes, emotional impact, character behavior</p>
+      </div>
+
+      <div class="system-detail theme-detail">
+        <h3>System 3: Theme Complexity Assessment</h3>
+        <p><strong>Purpose:</strong> Evaluates thematic sophistication and developmental readiness requirements.</p>
+        <p><strong>Scoring:</strong> Age-based recommendations (e.g., "8-10 years", "6+ years")</p>
+        <p><strong>Key Criteria:</strong> Abstract concepts, moral complexity, emotional depth, narrative structure, psychological themes, required cognitive maturity</p>
+      </div>
+
+      <div class="system-detail language-detail">
+        <h3>System 4: Language Complexity Assessment</h3>
+        <p><strong>Purpose:</strong> Analyzes reading level, vocabulary difficulty, and linguistic sophistication.</p>
+        <p><strong>Scoring:</strong> Minimum age recommendations based on language proficiency</p>
+        <p><strong>Key Criteria:</strong> Vocabulary difficulty, sentence complexity, reading fluency requirements, comprehension level, linguistic patterns</p>
+      </div>
+    </div>
+
+    <div class="verdict-section">
+      <h3>Final Verdict Determination</h3>
+      <div class="verdict-grid">
+        <div class="verdict-item whitelisted-verdict">
+          <h4>✅ Whitelisted</h4>
+          <p>Book is safe, culturally aligned, and appropriate for the recommended age group. Passes all four systems with Safe ratings in Systems 1 & 2.</p>
+        </div>
+        <div class="verdict-item guidance-verdict">
+          <h4>🟡 Parent Guidance</h4>
+          <p>Book is generally safe but contains elements requiring parental context, discussion, or supervision. May have Moderate ratings in Systems 1 or 2.</p>
+        </div>
+        <div class="verdict-item rejected-verdict">
+          <h4>🚫 Not Whitelisted</h4>
+          <p>Book contains Severe violations in System 1 (Cultural Values) or System 2 (Child Safety). Automatic rejection regardless of other factors.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="methodology-footer">
+      <p><strong>AI Analysis:</strong> Powered by GPT-4o with evidence-based evaluation including textual quotes, page references, and detailed reasoning.</p>
+      <p><strong>Report Contents:</strong> Each whitelisted book includes executive summary, all 4 systems assessments, age recommendations, key lessons, and cultural values alignment.</p>
+    </div>
+  </div>
+
   ${booksHTML}
 
   <div class="footer">
     <h3>🌟 Emirates BookGuard</h3>
     <p>Protecting Young Minds • Building Future Generations</p>
-    <p style="margin-top: 20px; font-size: 14px;">For questions or support, please contact the UAE Ministry of Education</p>
     <p style="font-size: 12px; color: #999; margin-top: 20px;">Generated by Emirates BookGuard Evaluation System • ${timestamp}</p>
   </div>
 </body>
