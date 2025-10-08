@@ -35,6 +35,7 @@ export default function Home() {
   const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [selectedVerdicts, setSelectedVerdicts] = useState<string[]>([]);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -191,10 +192,19 @@ export default function Home() {
     );
   };
 
+  const handleVerdictToggle = (verdict: string) => {
+    setSelectedVerdicts(prev => 
+      prev.includes(verdict) 
+        ? prev.filter(v => v !== verdict)
+        : [...prev, verdict]
+    );
+  };
+
   const handleClearFilters = () => {
     setSelectedAgeGroups([]);
     setSelectedLanguages([]);
     setSelectedGenres([]);
+    setSelectedVerdicts([]);
   };
 
   const parseAgeRange = (ageStr: string): { min: number; max: number } => {
@@ -247,7 +257,10 @@ export default function Home() {
         return bookGenres.some(bg => bg.toLowerCase().includes(genre.toLowerCase()));
       });
 
-    return matchesSearch && matchesAgeGroup && matchesLanguage && matchesGenre;
+    const matchesVerdict = selectedVerdicts.length === 0 || 
+      selectedVerdicts.includes(result.final_verdict || '');
+
+    return matchesSearch && matchesAgeGroup && matchesLanguage && matchesGenre && matchesVerdict;
   });
 
   return (
@@ -462,9 +475,11 @@ export default function Home() {
                         selectedAgeGroups={selectedAgeGroups}
                         selectedLanguages={selectedLanguages}
                         selectedGenres={selectedGenres}
+                        selectedVerdicts={selectedVerdicts}
                         onAgeGroupChange={handleAgeGroupToggle}
                         onLanguageChange={handleLanguageToggle}
                         onGenreChange={handleGenreToggle}
+                        onVerdictChange={handleVerdictToggle}
                         onClearFilters={handleClearFilters}
                       />
                     </div>
