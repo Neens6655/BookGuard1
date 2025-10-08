@@ -10,6 +10,23 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**4-System Evaluation Framework (October 2025)**:
+- Replaced legacy scoring methodology with comprehensive 4-system evaluation framework:
+  - **System 1: UAE/Islamic/Arab Cultural Values** - Red-line system for cultural alignment (Safe/Moderate/Severe ratings)
+  - **System 2: General Child Safety** - Red-line system for harmful content (Safe/Moderate/Severe ratings)
+  - **System 3: Theme Complexity** - Developmental readiness assessment (Ages 3+, 5+, 7+, 9+, 12+, 15+, 18+)
+  - **System 4: Language Complexity** - Reading level assessment (Ages 3+, 5+, 7+, 9+, 12+, 15+, 18+)
+- Automatic rejection logic: "Severe" rating in System 1 or System 2 triggers "Not Whitelisted" verdict
+- Age recommendation calculated from higher value between Theme and Language complexity
+- Visual label system with 4 verdict states:
+  - 🟢 **Approved** (Safe & culturally aligned, minimal concerns)
+  - ✅ **Whitelisted** (Safe for families, minor concerns addressed)
+  - 🟡 **Parent Guidance** (Safe with moderate concerns requiring discussion)
+  - 🚫 **Not Whitelisted** (Severe violations - automatic rejection)
+- Enhanced evidence presentation with 3-5 line quotes for Systems 1 and 2
+- Updated ResultsView with dedicated System 1 and System 2 detailed cards showing ratings, assessments, concerns, and evidence
+- Maintains backward compatibility with legacy domain-based evaluations
+
 **Database Persistence Implementation (October 2025)**:
 - Implemented PostgreSQL database storage for permanent evaluation persistence
 - Book evaluations now persist across server restarts and sessions
@@ -152,9 +169,15 @@ evaluations table:
 
 **OpenAI API**:
 - Model: GPT-4o (configured for structured outputs)
-- Purpose: Book content analysis and evaluation
+- Purpose: Book content analysis using 4-system evaluation framework
 - Input: Extracted book text (max 50,000 characters with smart sampling)
-- Output: Structured JSON evaluation with domains, age verdicts, recommendations
+- Output: Structured JSON evaluation with:
+  - System 1 (UAE/Islamic/Arab Values): rating, assessment, concerns, evidence
+  - System 2 (Child Safety): rating, assessment, concerns, evidence
+  - System 3 (Theme Complexity): age rating with rationale
+  - System 4 (Language Complexity): age rating with rationale
+  - Final verdict (Approved/Whitelisted/Parent Guidance/Not Whitelisted)
+  - Recommended age, key features, parent discussion guide
 - API key required via `OPENAI_API_KEY` environment variable
 
 **Neon Database** (Active):
