@@ -301,9 +301,6 @@ export default function Home() {
                 <span className="text-muted-foreground">|</span>
                 <button className="text-foreground font-medium">EN</button>
               </div>
-              <Button variant="ghost" size="icon">
-                <Settings className="w-5 h-5" />
-              </Button>
             </div>
           </div>
         </div>

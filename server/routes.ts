@@ -26,6 +26,22 @@ const upload = multer({
   },
 });
 
+const imageUpload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit for images
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PNG, JPEG, and WebP images are allowed'));
+    }
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Upload and start evaluation
@@ -89,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update evaluation metadata (title, author, publisher, cover image)
-  app.patch("/api/evaluations/:id", upload.single("coverImage"), async (req, res) => {
+  app.patch("/api/evaluations/:id", imageUpload.single("coverImage"), async (req, res) => {
     try {
       const evaluation = await storage.getEvaluation(req.params.id);
       
@@ -110,25 +126,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = validationResult.data;
       const updates: any = {};
       
-      // Handle cover image upload with validation
+      // Handle cover image upload (multer already validated file type and size)
       if (req.file) {
-        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-        const maxFileSize = 10 * 1024 * 1024; // 10MB
-        
-        if (!allowedMimeTypes.includes(req.file.mimetype)) {
-          await fs.unlink(req.file.path).catch(console.error);
-          return res.status(400).json({ 
-            error: "Invalid file type. Only PNG, JPEG, and WebP images are allowed." 
-          });
-        }
-        
-        if (req.file.size > maxFileSize) {
-          await fs.unlink(req.file.path).catch(console.error);
-          return res.status(400).json({ 
-            error: "File too large. Maximum size is 10MB." 
-          });
-        }
-        
         const coverImageDataUrl = `data:${req.file.mimetype};base64,${(await fs.readFile(req.file.path)).toString('base64')}`;
         updates.coverImage = coverImageDataUrl;
         
