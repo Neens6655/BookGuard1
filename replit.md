@@ -8,6 +8,36 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### PDF Report Generation Feature (October 2025)
+Implemented professional PDF report generation for whitelisted books with branded, visually appealing design:
+
+**Features:**
+- **Branded PDF Reports**: Beautiful A4 PDF reports with 📚 brand logo, green gradient header, and Fresh Garden theme styling
+- **Card-Based Layout**: Each book displayed in a professional card with cover image, metadata, and 4-system evaluation breakdown
+- **Color-Coded Systems**: Visual cards for Cultural Values (green), Child Safety (blue), Theme Complexity (purple), Language Level (orange)
+- **Professional Formatting**: Badges for ratings and age groups, shadows, gradients, and proper typography
+- **Comprehensive Content**: Includes executive summary, all 4 systems assessments, age recommendations, key lessons, cultural values, and discussion guides
+- **One-Click Download**: Hero section button to download complete report of all whitelisted books
+
+**Technical Implementation:**
+- Installed Puppeteer for HTML-to-PDF conversion with system Chromium
+- Dynamic path detection for Chromium executable (`which chromium`)
+- Configured headless browser with proper args (--no-sandbox, --disable-setuid-sandbox, --disable-dev-shm-usage, --disable-gpu)
+- A4 format with 20px margins and background printing enabled
+- File naming: `Whitelisted_Books_Report_YYYY-MM-DD.pdf`
+- E2E tested and verified with 2.9MB PDF generation successful
+
+**User Experience:**
+- Download Report button in homepage hero section
+- Success toast notification on completion
+- Supports multiple sequential downloads
+- Friendly, professional format (not overly formal)
+
+**Future Considerations:**
+- Add HTML escaping for user-sourced fields in template
+- Monitor Puppeteer launch latency; consider pooling for high volume
+- Add regression test for PDF endpoint non-empty buffer validation
+
 ### Verdict Consolidation (January 2025)
 Successfully consolidated "Approved" and "Whitelisted" verdicts into a single **"Whitelisted"** status across the entire application. This unification simplifies the user experience and ensures consistent terminology throughout the system. The final verdict now supports exactly three options:
 
@@ -58,6 +88,9 @@ Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessme
     *   `epub-parser`: Extracts content from EPUB files.
     *   `rtf-parser`: Handles Rich Text Format documents.
     *   Node.js `fs` module: For plain text files.
+*   **PDF Generation**:
+    *   `Puppeteer`: Headless browser automation for HTML-to-PDF conversion.
+    *   `Chromium`: System-level browser binary (Nix package) used by Puppeteer for PDF rendering.
 *   **UI Component Libraries**:
     *   `Shadcn/ui` & `Radix UI`: For accessible and customizable UI components.
     *   `React Hook Form` with `Zod`: For form validation.
