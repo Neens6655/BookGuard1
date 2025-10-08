@@ -28,6 +28,10 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
   const maxDomainScore = Object.keys(domainScores).length * 5; // 6 domains × 5 max score
   
   const isPerfectScore = totalDomainScore === 0;
+  
+  // Approval status based on whitelist score (80+ = approved)
+  const whitelistScore = result.whitelist_score || 0;
+  const isApproved = whitelistScore >= 80;
 
   // Genre color mapping
   const genreColors: { [key: string]: string } = {
@@ -167,15 +171,19 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
           </p>
         </div>
         
-        {/* Perfect Score Indicator */}
-        <div className={`flex items-center gap-1.5 pt-2 border-t ${isPerfectScore ? 'text-green-600' : 'text-yellow-600'}`}>
-          <CheckCircle className="w-4 h-4" />
-          <span className="text-xs font-semibold">
-            {isPerfectScore ? 'Perfect Score' : 'Excellent'}
-          </span>
-          <span className="text-xs ml-auto">
-            {totalDomainScore}/{maxDomainScore || 27}
-          </span>
+        {/* Approval Badge */}
+        <div className="pt-2 border-t">
+          <Badge 
+            className={`w-full justify-center ${
+              isApproved 
+                ? 'bg-green-100 text-green-700 hover:bg-green-100 border border-green-300' 
+                : 'bg-red-100 text-red-700 hover:bg-red-100 border border-red-300'
+            }`}
+            data-testid={`badge-approval-${book.id}`}
+          >
+            <CheckCircle className={`w-3 h-3 mr-1 ${isApproved ? 'text-green-600' : 'text-red-600'}`} />
+            {isApproved ? 'Approved UAE Families' : 'Not Approved'}
+          </Badge>
         </div>
       </CardContent>
     </Card>
