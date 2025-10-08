@@ -816,8 +816,8 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     How to Teach These Values
                   </h5>
                   <div className="space-y-4">
-                    {result.cultural_teaching_methods && result.cultural_teaching_methods.length > 0 ? (
-                      result.cultural_teaching_methods.map((method, idx) => (
+                    {(result as any).cultural_teaching_methods && (result as any).cultural_teaching_methods.length > 0 ? (
+                      (result as any).cultural_teaching_methods.map((method: { title: string; description: string }, idx: number) => (
                         <div key={idx} className="bg-white rounded-lg p-4">
                           <h6 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-green-600" />
@@ -878,8 +878,8 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     Islamic & UAE Cultural Values
                   </h5>
                   <div className="grid md:grid-cols-2 gap-4">
-                    {result.islamic_uae_values && result.islamic_uae_values.length > 0 ? (
-                      result.islamic_uae_values.map((value, idx) => (
+                    {(result as any).islamic_uae_values && (result as any).islamic_uae_values.length > 0 ? (
+                      (result as any).islamic_uae_values.map((value: { title: string; arabic_name?: string; description: string }, idx: number) => (
                         <div key={idx} className="bg-white rounded-lg p-4">
                           <h6 className="font-semibold text-green-700 mb-2">
                             {value.title}{value.arabic_name ? ` (${value.arabic_name})` : ''}
@@ -927,8 +927,8 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     Practical Family Activities
                   </h5>
                   <ul className="space-y-3">
-                    {result.family_activities && result.family_activities.length > 0 ? (
-                      result.family_activities.map((activity, idx) => (
+                    {(result as any).family_activities && (result as any).family_activities.length > 0 ? (
+                      (result as any).family_activities.map((activity: { title: string; description: string }, idx: number) => (
                         <li key={idx} className="flex items-start gap-3">
                           <div className="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
                             <span className="text-xs font-bold text-blue-700">{idx + 1}</span>
