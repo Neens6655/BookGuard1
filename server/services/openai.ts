@@ -204,3 +204,141 @@ Return complete JSON output only.
     throw new Error(`Book evaluation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+export interface DeepAnalysisResult {
+  title: string;
+  author?: string;
+  
+  narrative_structure: {
+    plot_complexity: string;
+    character_development: string;
+    pacing: string;
+    themes: string[];
+  };
+  
+  language_metrics: {
+    vocabulary_level: string;
+    sentence_complexity: string;
+    reading_ease_score: number;
+    unique_word_count: number;
+  };
+  
+  cultural_assessment: {
+    islamic_values: string[];
+    uae_cultural_elements: string[];
+    universal_themes: string[];
+    potential_concerns: string[];
+  };
+  
+  educational_insights: {
+    learning_objectives: string[];
+    skill_development: string[];
+    discussion_topics: string[];
+  };
+  
+  safety_analysis: {
+    content_warnings: string[];
+    age_appropriateness: string;
+    parental_guidance_areas: string[];
+    positive_messages: string[];
+  };
+  
+  recommendations: {
+    best_for: string;
+    teaching_strategies: string[];
+    complementary_books: string[];
+  };
+}
+
+export async function deepAnalyzeBook(bookText: string): Promise<DeepAnalysisResult> {
+  const deepAnalysisPrompt = `
+You are an expert literary analyst and educational specialist for the UAE Ministry of Education.
+Provide an in-depth, technical analysis of this children's/family book with actionable insights.
+
+Return detailed JSON with these fields:
+{
+  "title": "Book Title",
+  "author": "Author name or null if unknown",
+  
+  "narrative_structure": {
+    "plot_complexity": "Detailed analysis of plot structure, narrative arc, and story development",
+    "character_development": "Analysis of character arcs, growth, and psychological depth",
+    "pacing": "Evaluation of narrative rhythm, tension, and flow",
+    "themes": ["List 4-6 key themes explored in the book"]
+  },
+  
+  "language_metrics": {
+    "vocabulary_level": "Reading level (e.g., 'Grade 3-5 (Ages 8-10)')",
+    "sentence_complexity": "Analysis of sentence structure and syntax patterns",
+    "reading_ease_score": 72 (0-100 scale, higher = easier),
+    "unique_word_count": 1250 (estimated based on book length)
+  },
+  
+  "cultural_assessment": {
+    "islamic_values": ["List specific Islamic values present (e.g., 'Honesty (Sidq)', 'Patience (Sabr)')"],
+    "uae_cultural_elements": ["List UAE/Arab cultural elements (e.g., 'Desert landscape', 'Traditional values')"],
+    "universal_themes": ["List universal themes (e.g., 'Coming of age', 'Overcoming obstacles')"],
+    "potential_concerns": ["List any cultural considerations or concerns, or empty array if none"]
+  },
+  
+  "educational_insights": {
+    "learning_objectives": ["3-5 key learning objectives this book achieves"],
+    "skill_development": ["List cognitive, emotional, or social skills developed"],
+    "discussion_topics": ["3-5 questions or topics for meaningful discussions"]
+  },
+  
+  "safety_analysis": {
+    "content_warnings": ["List specific warnings or empty array if none"],
+    "age_appropriateness": "Detailed age recommendation with reasoning",
+    "parental_guidance_areas": ["Topics requiring parental support or discussion"],
+    "positive_messages": ["List positive values and messages conveyed"]
+  },
+  
+  "recommendations": {
+    "best_for": "Detailed description of ideal audience and context",
+    "teaching_strategies": ["3-5 practical teaching/reading strategies"],
+    "complementary_books": ["Similar or related books/genres that pair well"]
+  }
+}
+
+Analysis Guidelines:
+- Be specific and technical in your assessments
+- Provide actionable insights for educators and parents
+- Include concrete examples from the text when possible
+- Consider UAE educational context and cultural values
+- Focus on both literary merit and educational value
+- Estimate reading metrics based on text complexity
+
+Return complete JSON output only.
+`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: deepAnalysisPrompt
+        },
+        {
+          role: "user",
+          content: `BOOK TEXT:\n${bookText}`
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: 8192,
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) {
+      throw new Error("No response content from OpenAI");
+    }
+
+    const result = JSON.parse(content);
+    return result;
+
+  } catch (error) {
+    console.error("OpenAI deep analysis error:", error);
+    throw new Error(`Deep analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

@@ -5,7 +5,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema } from "@shared/schema";
-import { evaluateBook } from "./services/openai";
+import { evaluateBook, deepAnalyzeBook } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 import { fromError } from "zod-validation-error";
 
@@ -218,6 +218,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Download error:", error);
       res.status(500).json({ 
         error: error instanceof Error ? error.message : "Download failed" 
+      });
+    }
+  });
+
+  // Deep Analysis Endpoint
+  app.post("/api/deep-analyze", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Extract text from file
+      const bookText = await extractTextFromFile(req.file.path, req.file.originalname);
+      
+      // Perform deep analysis
+      const analysisResult = await deepAnalyzeBook(bookText);
+      
+      // Cleanup uploaded file
+      await fs.unlink(req.file.path).catch(console.error);
+      
+      res.json(analysisResult);
+
+    } catch (error) {
+      console.error("Deep analysis error:", error);
+      // Cleanup file on error
+      if (req.file?.path) {
+        await fs.unlink(req.file.path).catch(console.error);
+      }
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Deep analysis failed" 
       });
     }
   });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle } from 'lucide-react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { type Evaluation, type EvaluationResult } from '@/types/evaluation';
 
 type ViewState = 'home' | 'library' | 'upload' | 'processing' | 'results';
@@ -28,6 +29,7 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -294,12 +296,12 @@ export default function Home() {
             <div className="flex items-center space-x-3">
               <Button 
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-white"
-                onClick={() => setCurrentView('upload')}
+                className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                onClick={() => setLocation('/ai-assessment')}
                 data-testid="button-ai-assessment"
               >
-                <Sparkles className="w-4 h-4 mr-2" />
-                AI Assessment
+                <Brain className="w-4 h-4 mr-2" />
+                AI Deep Analysis
               </Button>
               <Button 
                 className="bg-primary text-white hover:bg-primary/90"
