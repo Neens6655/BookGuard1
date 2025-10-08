@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface FilterSidebarProps {
   selectedAgeGroups: string[];
@@ -30,10 +31,10 @@ const LANGUAGES = [
 ];
 
 const VERDICTS = [
-  { value: 'Approved', label: 'Approved', emoji: '🟢', bgColor: 'bg-green-500/10 hover:bg-green-500/20', borderColor: 'border-green-500/30', textColor: 'text-green-700' },
-  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', bgColor: 'bg-emerald-500/10 hover:bg-emerald-500/20', borderColor: 'border-emerald-500/30', textColor: 'text-emerald-700' },
-  { value: 'Parent Guidance', label: 'Parent Guidance', emoji: '🟡', bgColor: 'bg-yellow-500/10 hover:bg-yellow-500/20', borderColor: 'border-yellow-500/30', textColor: 'text-yellow-700' },
-  { value: 'Not Whitelisted', label: 'Not Whitelisted', emoji: '🚫', bgColor: 'bg-red-500/10 hover:bg-red-500/20', borderColor: 'border-red-500/30', textColor: 'text-red-700' },
+  { value: 'Approved', label: 'Approved', emoji: '🟢', activeColor: 'bg-green-500 border-green-600 text-white', hoverColor: 'hover:border-green-400' },
+  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', activeColor: 'bg-emerald-500 border-emerald-600 text-white', hoverColor: 'hover:border-emerald-400' },
+  { value: 'Parent Guidance', label: 'Parent Guidance', emoji: '🟡', activeColor: 'bg-yellow-500 border-yellow-600 text-white', hoverColor: 'hover:border-yellow-400' },
+  { value: 'Not Whitelisted', label: 'Not Whitelisted', emoji: '🚫', activeColor: 'bg-red-500 border-red-600 text-white', hoverColor: 'hover:border-red-400' },
 ];
 
 const GENRES = [
@@ -61,18 +62,18 @@ export function FilterSidebar({
   const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0;
 
   return (
-    <Card className="sticky top-4 bg-gradient-to-br from-green-50/90 via-emerald-50/80 to-cyan-50/90 backdrop-blur-sm border-emerald-200/60 shadow-lg">
-      <CardHeader className="pb-3">
+    <Card className="sticky top-4 border-2 border-emerald-200 shadow-lg bg-white">
+      <CardHeader className="pb-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-emerald-100">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+          <CardTitle className="text-lg font-bold text-emerald-900">
             Filters
           </CardTitle>
           {hasActiveFilters && (
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="sm" 
               onClick={onClearFilters}
-              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100/80 h-7 px-2 text-xs font-medium transition-all hover:scale-105"
+              className="text-emerald-600 border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-400 h-8 px-3 text-xs font-semibold"
               data-testid="button-clear-filters"
             >
               Clear All
@@ -80,45 +81,47 @@ export function FilterSidebar({
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-5 pt-0">
-        {/* Verdict/Status Filter - Pill Style */}
+      <CardContent className="space-y-6 pt-6">
+        {/* Verdict/Status Filter */}
         <div>
-          <h3 className="font-semibold text-xs uppercase tracking-wider text-emerald-700 mb-2.5">Status</h3>
+          <h3 className="font-bold text-sm text-gray-900 mb-3">Status</h3>
           <div className="flex flex-wrap gap-2">
             {VERDICTS.map((verdict) => (
               <button
                 key={verdict.value}
                 onClick={() => onVerdictChange(verdict.value)}
                 className={`
-                  inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-                  transition-all duration-200 border backdrop-blur-sm
+                  inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold
+                  transition-all duration-200 border-2
                   ${selectedVerdicts.includes(verdict.value) 
-                    ? `${verdict.bgColor} ${verdict.borderColor} ${verdict.textColor} shadow-md scale-105` 
-                    : 'bg-white/70 border-gray-200 text-gray-600 hover:bg-white hover:border-emerald-300 hover:scale-105'
+                    ? verdict.activeColor
+                    : `bg-white border-gray-300 text-gray-700 ${verdict.hoverColor} hover:bg-gray-50`
                   }
                 `}
                 data-testid={`checkbox-verdict-${verdict.value.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <span className="text-sm">{verdict.emoji}</span>
+                <span className="text-base">{verdict.emoji}</span>
                 <span className="whitespace-nowrap">{verdict.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Age Group Filter - Compact Pills */}
+        <Separator className="bg-emerald-100" />
+
+        {/* Age Group Filter */}
         <div>
-          <h3 className="font-semibold text-xs uppercase tracking-wider text-emerald-700 mb-2.5">Age</h3>
+          <h3 className="font-bold text-sm text-gray-900 mb-3">Age Group</h3>
           <div className="flex flex-wrap gap-2">
             {AGE_GROUPS.map((age) => (
               <button
                 key={age.value}
                 onClick={() => onAgeGroupChange(age.value)}
                 className={`
-                  px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 backdrop-blur-sm
+                  px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border-2 min-w-[60px]
                   ${selectedAgeGroups.includes(age.value) 
-                    ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md scale-105' 
-                    : 'bg-white/70 text-gray-700 hover:bg-white hover:shadow-md hover:scale-105 hover:text-emerald-700'
+                    ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 border-emerald-600 text-white shadow-md' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-emerald-400 hover:bg-emerald-50'
                   }
                 `}
                 data-testid={`checkbox-age-${age.value}`}
@@ -129,19 +132,21 @@ export function FilterSidebar({
           </div>
         </div>
 
-        {/* Language Filter - Compact Pills */}
+        <Separator className="bg-emerald-100" />
+
+        {/* Language Filter */}
         <div>
-          <h3 className="font-semibold text-xs uppercase tracking-wider text-emerald-700 mb-2.5">Language</h3>
+          <h3 className="font-bold text-sm text-gray-900 mb-3">Language</h3>
           <div className="flex flex-wrap gap-2">
             {LANGUAGES.map((lang) => (
               <button
                 key={lang.value}
                 onClick={() => onLanguageChange(lang.value)}
                 className={`
-                  px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 backdrop-blur-sm
+                  px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border-2
                   ${selectedLanguages.includes(lang.value) 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md scale-105' 
-                    : 'bg-white/70 text-gray-700 hover:bg-white hover:shadow-md hover:scale-105 hover:text-green-700'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-600 text-white shadow-md' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-green-400 hover:bg-green-50'
                   }
                 `}
                 data-testid={`checkbox-language-${lang.value.toLowerCase()}`}
@@ -152,25 +157,27 @@ export function FilterSidebar({
           </div>
         </div>
 
-        {/* Genre Filter - Icon Pills */}
+        <Separator className="bg-emerald-100" />
+
+        {/* Genre Filter */}
         <div>
-          <h3 className="font-semibold text-xs uppercase tracking-wider text-emerald-700 mb-2.5">Genre</h3>
+          <h3 className="font-bold text-sm text-gray-900 mb-3">Genre</h3>
           <div className="flex flex-wrap gap-2">
             {GENRES.map((genre) => (
               <button
                 key={genre.value}
                 onClick={() => onGenreChange(genre.value)}
                 className={`
-                  inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-                  transition-all duration-200 backdrop-blur-sm
+                  inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold
+                  transition-all duration-200 border-2
                   ${selectedGenres.includes(genre.value) 
-                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-white shadow-md scale-105' 
-                    : 'bg-white/70 text-gray-700 hover:bg-white hover:shadow-md hover:scale-105 hover:text-cyan-700'
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 border-cyan-600 text-white shadow-md' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-cyan-400 hover:bg-cyan-50'
                   }
                 `}
                 data-testid={`checkbox-genre-${genre.value.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <span>{genre.icon}</span>
+                <span className="text-base">{genre.icon}</span>
                 <span>{genre.label}</span>
               </button>
             ))}
