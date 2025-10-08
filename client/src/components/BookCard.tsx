@@ -29,9 +29,45 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
   
   const isPerfectScore = totalDomainScore === 0;
   
-  // Approval status based on whitelist score (80+ = approved)
-  const whitelistScore = result.whitelist_score || 0;
-  const isApproved = whitelistScore >= 80;
+  // Visual label based on final_verdict
+  const finalVerdict = result.final_verdict || (result.whitelist_score >= 80 ? "Whitelisted" : "Not Whitelisted");
+  
+  const verdictConfig = {
+    "Approved": {
+      symbol: "🟢",
+      label: "Approved",
+      subtext: "Safe & culturally aligned",
+      bgClass: "bg-green-100",
+      textClass: "text-green-700",
+      borderClass: "border-green-300"
+    },
+    "Whitelisted": {
+      symbol: "✅",
+      label: "Whitelisted",
+      subtext: "Safe for UAE families",
+      bgClass: "bg-blue-100",
+      textClass: "text-blue-700",
+      borderClass: "border-blue-300"
+    },
+    "Parent Guidance": {
+      symbol: "🟡",
+      label: "Parent Guidance",
+      subtext: "Review before giving",
+      bgClass: "bg-yellow-100",
+      textClass: "text-yellow-700",
+      borderClass: "border-yellow-300"
+    },
+    "Not Whitelisted": {
+      symbol: "🚫",
+      label: "Not Whitelisted",
+      subtext: "Not suitable",
+      bgClass: "bg-red-100",
+      textClass: "text-red-700",
+      borderClass: "border-red-300"
+    }
+  };
+  
+  const verdictDisplay = verdictConfig[finalVerdict] || verdictConfig["Not Whitelisted"];
 
   // Genre color mapping
   const genreColors: { [key: string]: string } = {
@@ -171,19 +207,15 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
           </p>
         </div>
         
-        {/* Approval Badge */}
+        {/* Verdict Badge */}
         <div className="pt-2 border-t">
-          <Badge 
-            className={`w-full justify-center ${
-              isApproved 
-                ? 'bg-green-100 text-green-700 hover:bg-green-100 border border-green-300' 
-                : 'bg-red-100 text-red-700 hover:bg-red-100 border border-red-300'
-            }`}
-            data-testid={`badge-approval-${book.id}`}
-          >
-            <CheckCircle className={`w-3 h-3 mr-1 ${isApproved ? 'text-green-600' : 'text-red-600'}`} />
-            {isApproved ? 'Approved UAE Families' : 'Not Approved'}
-          </Badge>
+          <div className={`${verdictDisplay.bgClass} ${verdictDisplay.textClass} border ${verdictDisplay.borderClass} rounded-lg p-2.5 text-center`}>
+            <div className="flex items-center justify-center gap-1.5 mb-0.5">
+              <span className="text-base">{verdictDisplay.symbol}</span>
+              <span className="font-bold text-xs">{verdictDisplay.label}</span>
+            </div>
+            <p className="text-[10px] opacity-90">{verdictDisplay.subtext}</p>
+          </div>
         </div>
       </CardContent>
     </Card>
