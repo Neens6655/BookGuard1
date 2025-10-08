@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe } from 'lucide-react';
+import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +55,18 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
           {/* Decorative gradient orbs */}
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-300/30 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-cyan-300/30 rounded-full blur-3xl"></div>
+          
+          {/* Back Button */}
+          {onBackToLibrary && (
+            <button 
+              onClick={onBackToLibrary}
+              className="absolute top-8 left-8 z-20 group flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-white/20 hover:scale-105 transition-all duration-300 hover:shadow-lg"
+              data-testid="button-back-to-home-header"
+            >
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
+              <span className="font-medium">Back</span>
+            </button>
+          )}
           
           <div className="relative grid md:grid-cols-3 gap-10 items-start">
             {/* Book Cover */}
