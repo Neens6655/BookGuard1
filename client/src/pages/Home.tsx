@@ -378,25 +378,48 @@ export default function Home() {
                     </Button>
                   </div>
 
-                  {/* Stats */}
-                  <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                    <div className="text-center">
-                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-approved-books">
-                        {approvedBooks.length}+
+                  {/* Trust Indicators */}
+                  <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-books-analyzed">
+                            {completedBooks.length}+
+                          </div>
+                          <div className="text-white/90 text-sm font-medium">Books Analyzed</div>
+                        </div>
                       </div>
-                      <div className="text-white/80">Approved Books</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-compliance">
-                        100%
+                    
+                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Shield className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-evaluation-systems">
+                            4
+                          </div>
+                          <div className="text-white/90 text-sm font-medium">Evaluation Systems</div>
+                        </div>
                       </div>
-                      <div className="text-white/80">Ethical Compliance</div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-4xl md:text-5xl font-bold mb-2" data-testid="stat-rating">
-                        4.9★
+                    
+                    <div className="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 hover:bg-white/25 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-white/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-3xl md:text-4xl font-bold mb-1" data-testid="stat-instant-results">
+                            {'<'}5min
+                          </div>
+                          <div className="text-white/90 text-sm font-medium">Instant Results</div>
+                        </div>
                       </div>
-                      <div className="text-white/80">Parent Rating</div>
                     </div>
                   </div>
                 </div>
