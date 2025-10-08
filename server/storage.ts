@@ -19,6 +19,7 @@ export interface IStorage {
   createEvaluation(evaluation: InsertEvaluation): Promise<Evaluation>;
   getEvaluation(id: string): Promise<Evaluation | undefined>;
   updateEvaluation(id: string, updates: Partial<Evaluation>): Promise<Evaluation | undefined>;
+  deleteEvaluation(id: string): Promise<boolean>;
   getAllEvaluations(): Promise<Evaluation[]>;
 }
 
@@ -60,6 +61,10 @@ export class MemStorage implements IStorage {
     };
     this.evaluations.set(id, updated);
     return updated;
+  }
+
+  async deleteEvaluation(id: string): Promise<boolean> {
+    return this.evaluations.delete(id);
   }
 
   async getAllEvaluations(): Promise<Evaluation[]> {
@@ -114,6 +119,17 @@ export class DbStorage implements IStorage {
       return updated;
     } catch (error) {
       console.error("Database error updating evaluation:", error);
+      throw error;
+    }
+  }
+
+  async deleteEvaluation(id: string): Promise<boolean> {
+    if (!db) throw new Error("Database not initialized");
+    try {
+      const result = await db.delete(evaluations).where(eq(evaluations.id, id));
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error("Database error deleting evaluation:", error);
       throw error;
     }
   }
