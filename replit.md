@@ -49,6 +49,11 @@ Preferred communication style: Simple, everyday language.
 - Cover image upload supports drag-and-drop interface with live preview
 - Changes persist in PostgreSQL database and update UI in real-time
 - Settings icon appears on book card cover for easy access to editing features
+- Delete functionality with confirmation dialog to prevent accidental deletions:
+  - DELETE /api/evaluations/:id endpoint for permanent book removal
+  - AlertDialog confirmation shows book title and deletion warning
+  - Successful deletion invalidates cache and refreshes book list
+  - Deletes book evaluation and all associated data from database
 
 ## System Architecture
 
