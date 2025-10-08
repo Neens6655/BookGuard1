@@ -34,7 +34,7 @@ export interface EvaluationResult {
     min_age: number;
   };
   
-  final_verdict: "Approved" | "Whitelisted" | "Parent Guidance" | "Not Whitelisted";
+  final_verdict: "Whitelisted" | "Parent Guidance" | "Not Whitelisted";
   recommended_age: string;
   age_rationale: string;
   

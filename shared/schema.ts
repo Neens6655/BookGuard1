@@ -70,7 +70,7 @@ export const evaluationResultSchema = z.object({
     min_age: z.number(),
   }),
   
-  final_verdict: z.enum(["Approved", "Whitelisted", "Parent Guidance", "Not Whitelisted"]),
+  final_verdict: z.enum(["Whitelisted", "Parent Guidance", "Not Whitelisted"]),
   recommended_age: z.string(),
   age_rationale: z.string(),
   
