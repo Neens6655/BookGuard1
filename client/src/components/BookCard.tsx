@@ -85,7 +85,7 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
           <Button
             size="icon"
             variant="secondary"
-            className="absolute top-3 left-3 bg-white/90 hover:bg-white shadow-md h-8 w-8"
+            className="absolute top-3 left-3 z-10 bg-white/90 hover:bg-white shadow-md h-8 w-8"
             onClick={handleEditClick}
             data-testid={`button-edit-book-${book.id}`}
           >
