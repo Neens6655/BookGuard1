@@ -271,11 +271,15 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <Shield className="text-primary w-8 h-8" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                <Shield className="w-7 h-7 text-white" />
+              </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground" data-testid="app-title">Emirates BookGuard</h1>
-                <p className="text-xs text-muted-foreground">Protecting Young Minds</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent" data-testid="app-title">
+                  Emirates BookGuard
+                </h1>
+                <p className="text-xs text-muted-foreground font-medium">Protecting Young Minds</p>
               </div>
             </div>
             
@@ -764,11 +768,15 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-1">
-              <div className="flex items-center space-x-3 mb-4">
-                <Shield className="text-primary w-8 h-8" />
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-foreground">Emirates BookGuard</h3>
-                  <p className="text-xs text-muted-foreground">Powered by AI</p>
+                  <h3 className="font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                    Emirates BookGuard
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-medium">Powered by AI</p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
