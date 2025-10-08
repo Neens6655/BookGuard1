@@ -57,6 +57,12 @@ export default function Home() {
     count: completedBooks.length > 0 ? Math.floor(Math.random() * 24) + 1 : 0
   }));
 
+  // Helper function to change view and scroll to top
+  const changeView = (view: ViewState) => {
+    setCurrentView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleFileUpload = async (file: File) => {
     try {
       const formData = new FormData();
@@ -77,7 +83,7 @@ export default function Home() {
         updatedAt: new Date().toISOString(),
       });
 
-      setCurrentView('processing');
+      changeView('processing');
       
       pollEvaluationProgress(data.id);
     } catch (error) {
@@ -97,7 +103,7 @@ export default function Home() {
       setEvaluation(data);
 
       if (data.status === 'completed' && data.result) {
-        setCurrentView('home');
+        changeView('home');
         refetch();
         toast({
           title: 'Analysis Complete',
@@ -114,7 +120,7 @@ export default function Home() {
         title: 'Analysis Failed',
         description: error instanceof Error ? error.message : 'Analysis failed. Please try again.',
       });
-      setCurrentView('home');
+      changeView('home');
     }
   };
 
@@ -161,11 +167,11 @@ export default function Home() {
 
   const handleViewBook = (book: Evaluation) => {
     setEvaluation(book);
-    setCurrentView('results');
+    changeView('results');
   };
 
   const handleBackToHome = () => {
-    setCurrentView('home');
+    changeView('home');
     setEvaluation(null);
     refetch();
   };
@@ -309,7 +315,7 @@ export default function Home() {
               </Button>
               <Button 
                 className="bg-primary text-white hover:bg-primary/90"
-                onClick={() => setCurrentView('upload')}
+                onClick={() => changeView('upload')}
                 data-testid="button-add-books"
               >
                 <BookPlus className="w-4 h-4 mr-2" />
@@ -355,7 +361,7 @@ export default function Home() {
                       size="lg"
                       variant="outline"
                       className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white hover:text-green-600 hover:shadow-xl hover:scale-105 transition-all duration-300"
-                      onClick={() => setCurrentView('library')}
+                      onClick={() => changeView('library')}
                       data-testid="button-browse-books"
                     >
                       <BookOpen className="w-5 h-5 mr-2" />
@@ -364,7 +370,7 @@ export default function Home() {
                     <Button 
                       size="lg"
                       className="bg-white text-green-600 hover:bg-green-50 hover:shadow-2xl hover:scale-105 transition-all duration-300 border-0 font-semibold"
-                      onClick={() => setCurrentView('upload')}
+                      onClick={() => changeView('upload')}
                       data-testid="button-add-books-hero"
                     >
                       <BookPlus className="w-5 h-5 mr-2" />
@@ -374,7 +380,7 @@ export default function Home() {
                       size="lg"
                       variant="outline"
                       className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white hover:text-cyan-600 hover:shadow-xl hover:scale-105 transition-all duration-300"
-                      onClick={() => setCurrentView('upload')}
+                      onClick={() => changeView('upload')}
                       data-testid="button-ai-assessment-hero"
                     >
                       <Sparkles className="w-5 h-5 mr-2" />
@@ -646,7 +652,7 @@ export default function Home() {
                     <p className="text-muted-foreground mb-6">
                       Upload your first book to get started with our AI-powered analysis
                     </p>
-                    <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload-home">
+                    <Button onClick={() => changeView('upload')} data-testid="button-first-upload-home">
                       <BookPlus className="w-4 h-4 mr-2" />
                       Upload Book
                     </Button>
@@ -703,7 +709,7 @@ export default function Home() {
                     {searchQuery ? 'Try adjusting your search' : 'Upload your first book to get started'}
                   </p>
                   {!searchQuery && (
-                    <Button onClick={() => setCurrentView('upload')} data-testid="button-first-upload">
+                    <Button onClick={() => changeView('upload')} data-testid="button-first-upload">
                       <BookPlus className="w-4 h-4 mr-2" />
                       Upload Book
                     </Button>
@@ -756,7 +762,7 @@ export default function Home() {
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
             coverImage={evaluation.coverImage}
-            onNewAssessment={() => setCurrentView('upload')}
+            onNewAssessment={() => changeView('upload')}
             onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}
           />
