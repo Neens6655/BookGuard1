@@ -252,6 +252,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate Whitelisted Books Report
+  app.get("/api/reports/whitelisted", async (req, res) => {
+    try {
+      const allEvaluations = await storage.getAllEvaluations();
+      
+      // Filter only whitelisted books with results
+      const whitelistedBooks = allEvaluations.filter(
+        (evaluation) => 
+          evaluation.status === "completed" &&
+          evaluation.result &&
+          (evaluation.result as any)?.final_verdict === "Whitelisted"
+      );
+
+      if (whitelistedBooks.length === 0) {
+        return res.status(404).json({ error: "No whitelisted books found" });
+      }
+
+      // Generate comprehensive report
+      const reportContent = generateWhitelistedBooksReport(whitelistedBooks);
+      
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `Whitelisted_Books_Report_${timestamp}.txt`;
+
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(reportContent);
+
+    } catch (error) {
+      console.error("Whitelisted report error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to generate report" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
@@ -357,4 +392,168 @@ ${result.key_drivers?.map((d: string) => `- ${d}`).join('\n') || '- No key drive
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;
+}
+
+function generateWhitelistedBooksReport(evaluations: any[]): string {
+  const timestamp = new Date().toLocaleString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  // Sort books alphabetically by title
+  const sortedBooks = evaluations.sort((a, b) => {
+    const titleA = (a.result?.title || a.filename || '').toLowerCase();
+    const titleB = (b.result?.title || b.filename || '').toLowerCase();
+    return titleA.localeCompare(titleB);
+  });
+
+  let report = `
+═══════════════════════════════════════════════════════════════════
+            WHITELISTED BOOKS REPORT
+            UAE Ministry of Education - Emirates BookGuard
+═══════════════════════════════════════════════════════════════════
+
+Report Generated: ${timestamp}
+Total Whitelisted Books: ${evaluations.length}
+
+This report contains comprehensive evaluations of all books that have
+been approved as culturally aligned, safe, and appropriate for UAE families.
+
+═══════════════════════════════════════════════════════════════════
+
+`;
+
+  sortedBooks.forEach((evaluation, index) => {
+    const result = evaluation.result || {};
+    const bookNumber = index + 1;
+
+    report += `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BOOK ${bookNumber}: ${result.title || evaluation.filename || 'Unknown Title'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 BASIC INFORMATION
+───────────────────────────────────────────────────────────────────
+  Title:        ${result.title || 'Not available'}
+  Author:       ${result.author || 'Not available'}
+  Publisher:    ${result.publisher || 'Not available'}
+  Language:     ${result.language || 'Not available'}
+
+✅ VERDICT: WHITELISTED
+  Whitelist Score: ${result.whitelist_score || 'N/A'} / 100
+  
+📝 EXECUTIVE SUMMARY
+───────────────────────────────────────────────────────────────────
+${result.executive_summary || 'No summary available.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHY THIS BOOK IS WHITELISTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formatSystemEvaluation('SYSTEM 1: UAE/Islamic/Arab Cultural Values', result.system1_uae_values)}
+
+${formatSystemEvaluation('SYSTEM 2: General Child Safety', result.system2_child_safety)}
+
+${formatSystemEvaluation('SYSTEM 3: Theme Complexity', result.system3_theme_complexity)}
+
+${formatSystemEvaluation('SYSTEM 4: Language Complexity', result.system4_language_complexity)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AGE RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Recommended Age: ${result.recommended_age || result.recommended_minimum_age || 'Not available'}
+  
+  Rationale:
+  ${result.age_rationale || 'No rationale provided.'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEY LESSONS & VALUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${result.lessons_learned || 'No lessons documented.'}
+
+${result.key_drivers && result.key_drivers.length > 0 ? `
+📌 Key Drivers:
+${result.key_drivers.map((d: string) => `  • ${d}`).join('\n')}
+` : ''}
+
+${result.islamic_uae_values && result.islamic_uae_values.length > 0 ? `
+🕌 Islamic & UAE Values Highlighted:
+${result.islamic_uae_values.map((v: any) => `  • ${v.title}${v.arabic_name ? ` (${v.arabic_name})` : ''}: ${v.description}`).join('\n')}
+` : ''}
+
+${result.cultural_teaching_methods && result.cultural_teaching_methods.length > 0 ? `
+📖 Cultural Teaching Methods:
+${result.cultural_teaching_methods.map((m: any) => `  • ${m.title}: ${m.description}`).join('\n')}
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARENT DISCUSSION GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${result.parent_discussion_guide ? `
+Before Reading:
+${result.parent_discussion_guide.before_reading?.map((q: string) => `  • ${q}`).join('\n') || '  • No questions available'}
+
+After Reading:
+${result.parent_discussion_guide.after_reading?.map((q: string) => `  • ${q}`).join('\n') || '  • No questions available'}
+` : 'No discussion guide available.'}
+
+`;
+  });
+
+  report += `
+═══════════════════════════════════════════════════════════════════
+END OF REPORT
+═══════════════════════════════════════════════════════════════════
+
+Total Books in Report: ${evaluations.length}
+
+For questions or concerns, please contact the UAE Ministry of Education.
+Emirates BookGuard - Protecting Young Minds
+
+Generated by Emirates BookGuard Evaluation System
+Report Date: ${timestamp}
+═══════════════════════════════════════════════════════════════════
+`;
+
+  return report;
+}
+
+function formatSystemEvaluation(systemName: string, systemData: any): string {
+  if (!systemData) {
+    return `${systemName}
+  Status: Data not available
+`;
+  }
+
+  let output = `${systemName}
+  Rating: ${systemData.rating || 'Not available'}
+  
+  Assessment:
+  ${systemData.assessment || 'No assessment provided.'}
+`;
+
+  if (systemData.concerns && systemData.concerns.length > 0) {
+    output += `
+  Concerns Addressed:
+${systemData.concerns.map((c: string) => `    • ${c}`).join('\n')}
+`;
+  }
+
+  if (systemData.evidence) {
+    output += `
+  Evidence:
+  ${systemData.evidence}
+`;
+  }
+
+  if (systemData.min_age !== undefined) {
+    output += `
+  Minimum Age: ${systemData.min_age}+ years
+`;
+  }
+
+  return output;
 }

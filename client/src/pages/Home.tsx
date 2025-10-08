@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart } from 'lucide-react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, FileDown } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
@@ -163,6 +163,47 @@ export default function Home() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadWhitelistedReport = async () => {
+    try {
+      const response = await apiRequest('GET', '/api/reports/whitelisted');
+      
+      if (!response.ok) {
+        // Try to get error message from JSON response
+        let errorMessage = 'Failed to generate report. Please try again.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // If not JSON, use default message
+        }
+        
+        toast({
+          variant: 'destructive',
+          title: 'Report Generation Failed',
+          description: errorMessage,
+        });
+        return;
+      }
+
+      const text = await response.text();
+      const blob = new Blob([text], { type: 'text/plain; charset=utf-8' });
+      
+      const timestamp = new Date().toISOString().split('T')[0];
+      downloadBlob(blob, `Whitelisted_Books_Report_${timestamp}.txt`);
+
+      toast({
+        title: 'Report Downloaded',
+        description: 'Whitelisted books report has been successfully downloaded.',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Download Failed',
+        description: error instanceof Error ? error.message : 'Failed to generate report. Please try again.',
+      });
+    }
   };
 
   const handleViewBook = (book: Evaluation) => {
@@ -385,6 +426,16 @@ export default function Home() {
                     >
                       <Sparkles className="w-5 h-5 mr-2" />
                       Deep AI
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-emerald-600 hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300"
+                      onClick={handleDownloadWhitelistedReport}
+                      data-testid="button-download-report"
+                    >
+                      <FileDown className="w-5 h-5 mr-2" />
+                      Download Report
                     </Button>
                   </div>
 
