@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { type Evaluation, type EvaluationResult } from '@/types/evaluation';
 
 type ViewState = 'home' | 'library' | 'upload' | 'processing' | 'results';
@@ -785,8 +785,8 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-foreground mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition">About Us</a></li>
-                <li><a href="#" className="hover:text-foreground transition">How It Works</a></li>
+                <li><Link href="/about" className="hover:text-foreground transition" data-testid="link-about-footer">About Us</Link></li>
+                <li><Link href="/how-it-works" className="hover:text-foreground transition" data-testid="link-how-it-works-footer">How It Works</Link></li>
                 <li><a href="#" className="hover:text-foreground transition">FAQ</a></li>
                 <li><a href="#" className="hover:text-foreground transition">Contact</a></li>
               </ul>
