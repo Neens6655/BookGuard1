@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Cloud, FileText, File, AlertCircle } from 'lucide-react';
+import { Cloud, FileText, File, AlertCircle, Shield, Heart, Target, Languages } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -112,23 +112,53 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
         </Alert>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        <div className="bg-card rounded-lg p-4 border border-border text-center" data-testid="stat-books-analyzed">
-          <div className="text-2xl font-bold text-primary">12,847</div>
-          <div className="text-sm text-muted-foreground mt-1">Books Analyzed</div>
+      {/* 4-System Evaluation Framework */}
+      <div className="mt-8">
+        <div className="text-center mb-4">
+          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            4-System Evaluation Framework
+          </h4>
         </div>
-        <div className="bg-card rounded-lg p-4 border border-border text-center" data-testid="stat-accuracy">
-          <div className="text-2xl font-bold text-secondary">98.5%</div>
-          <div className="text-sm text-muted-foreground mt-1">Accuracy Rate</div>
-        </div>
-        <div className="bg-card rounded-lg p-4 border border-border text-center" data-testid="stat-steps">
-          <div className="text-2xl font-bold text-accent">7 Steps</div>
-          <div className="text-sm text-muted-foreground mt-1">AI Analysis</div>
-        </div>
-        <div className="bg-card rounded-lg p-4 border border-border text-center" data-testid="stat-languages">
-          <div className="text-2xl font-bold text-primary">2 Lang</div>
-          <div className="text-sm text-muted-foreground mt-1">EN | AR</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* System 1: Cultural Values */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200 text-center group hover:shadow-md transition-all" data-testid="system-cultural-values">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-xs font-bold text-green-700 mb-1">SYSTEM 1</div>
+            <div className="text-sm font-semibold text-foreground">Cultural Values</div>
+            <div className="text-xs text-muted-foreground mt-1">UAE/Islamic/Arab</div>
+          </div>
+
+          {/* System 2: Child Safety */}
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200 text-center group hover:shadow-md transition-all" data-testid="system-child-safety">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Heart className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-xs font-bold text-blue-700 mb-1">SYSTEM 2</div>
+            <div className="text-sm font-semibold text-foreground">Child Safety</div>
+            <div className="text-xs text-muted-foreground mt-1">Global Standards</div>
+          </div>
+
+          {/* System 3: Theme Complexity */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200 text-center group hover:shadow-md transition-all" data-testid="system-theme-complexity">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Target className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-xs font-bold text-purple-700 mb-1">SYSTEM 3</div>
+            <div className="text-sm font-semibold text-foreground">Theme Level</div>
+            <div className="text-xs text-muted-foreground mt-1">Age Readiness</div>
+          </div>
+
+          {/* System 4: Language Complexity */}
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border-2 border-orange-200 text-center group hover:shadow-md transition-all" data-testid="system-language-complexity">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Languages className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-xs font-bold text-orange-700 mb-1">SYSTEM 4</div>
+            <div className="text-sm font-semibold text-foreground">Language Level</div>
+            <div className="text-xs text-muted-foreground mt-1">Reading Ability</div>
+          </div>
         </div>
       </div>
     </div>
