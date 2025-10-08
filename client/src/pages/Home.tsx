@@ -187,15 +187,14 @@ export default function Home() {
         return;
       }
 
-      const text = await response.text();
-      const blob = new Blob([text], { type: 'text/plain; charset=utf-8' });
+      const pdfBlob = await response.blob();
       
       const timestamp = new Date().toISOString().split('T')[0];
-      downloadBlob(blob, `Whitelisted_Books_Report_${timestamp}.txt`);
+      downloadBlob(pdfBlob, `Whitelisted_Books_Report_${timestamp}.pdf`);
 
       toast({
         title: 'Report Downloaded',
-        description: 'Whitelisted books report has been successfully downloaded.',
+        description: 'Beautiful PDF report has been successfully downloaded!',
       });
     } catch (error) {
       toast({
