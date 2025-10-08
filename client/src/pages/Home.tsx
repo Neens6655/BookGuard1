@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain } from 'lucide-react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
@@ -403,38 +403,129 @@ export default function Home() {
               </div>
             </section>
 
-            {/* Categories Section */}
-            <section className="py-16 bg-gray-50">
+            {/* Value Proposition - 4-System Evaluation */}
+            <section className="py-20 bg-gradient-to-b from-white to-gray-50">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                  <Badge variant="outline" className="mb-4">
-                    <Shield className="w-3 h-3 mr-2" />
-                    Carefully Curated
+                <div className="text-center mb-16">
+                  <Badge variant="outline" className="mb-4 border-green-200 text-green-700">
+                    <Brain className="w-3 h-3 mr-2" />
+                    AI-Powered 4-System Evaluation
                   </Badge>
-                  <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                    Discover the Perfect Reading World
+                  <h3 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+                    How We Keep Your Children Safe
                   </h3>
                   <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Collections carefully selected by Islamic education and UAE culture experts to ensure healthy and safe development for your child
+                    Every book is analyzed through our comprehensive 4-system framework, ensuring cultural alignment, safety, and age-appropriate content for UAE families
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {categoriesWithCounts.map((category, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setSelectedCategory(category.name);
-                        setCurrentView('library');
-                      }}
-                      className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-all border border-border hover:border-primary"
-                      data-testid={`category-${category.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
-                    >
-                      <div className="text-4xl mb-3">{category.emoji}</div>
-                      <h4 className="font-semibold text-foreground mb-2">{category.name}</h4>
-                      <p className="text-sm text-muted-foreground">{category.count} books</p>
-                    </button>
-                  ))}
+                {/* 4-System Cards */}
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                  {/* System 1: Cultural Values */}
+                  <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border-2 border-green-100 hover:border-green-300 group">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Shield className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="mb-4">
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">System 1</Badge>
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground mb-3">Cultural Values</h4>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                      Ensures alignment with UAE, Islamic, and Arab cultural ethics and values
+                    </p>
+                    <div className="flex items-center text-sm text-green-600 font-medium">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Red-line protection
+                    </div>
+                  </div>
+
+                  {/* System 2: Child Safety */}
+                  <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border-2 border-blue-100 hover:border-blue-300 group">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Heart className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="mb-4">
+                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">System 2</Badge>
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground mb-3">Child Safety</h4>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                      Screens for violence, inappropriate themes, and harmful content
+                    </p>
+                    <div className="flex items-center text-sm text-blue-600 font-medium">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Red-line protection
+                    </div>
+                  </div>
+
+                  {/* System 3: Content Complexity */}
+                  <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border-2 border-purple-100 hover:border-purple-300 group">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Target className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="mb-4">
+                      <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">System 3</Badge>
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground mb-3">Theme Complexity</h4>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                      Assesses developmental readiness and age-appropriate themes
+                    </p>
+                    <div className="flex items-center text-sm text-purple-600 font-medium">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Age-based scoring
+                    </div>
+                  </div>
+
+                  {/* System 4: Language Complexity */}
+                  <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border-2 border-orange-100 hover:border-orange-300 group">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Languages className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="mb-4">
+                      <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">System 4</Badge>
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground mb-3">Language Level</h4>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                      Evaluates reading difficulty and vocabulary comprehension
+                    </p>
+                    <div className="flex items-center text-sm text-orange-600 font-medium">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Reading-level match
+                    </div>
+                  </div>
+                </div>
+
+                {/* Parent Value Props */}
+                <div className="bg-gradient-to-br from-green-50 to-cyan-50 rounded-2xl p-8 md:p-12">
+                  <h4 className="text-2xl font-bold text-foreground mb-8 text-center">Why Parents Trust Emirates BookGuard</h4>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Shield className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-foreground mb-2">Automatic Rejection</h5>
+                        <p className="text-sm text-muted-foreground">Books with severe cultural violations or safety concerns are automatically flagged</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Users className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-foreground mb-2">Age Recommendations</h5>
+                        <p className="text-sm text-muted-foreground">Precise age guidance based on content and language complexity analysis</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <MessageCircle className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-foreground mb-2">Discussion Guides</h5>
+                        <p className="text-sm text-muted-foreground">Parent conversation starters for every approved book</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
