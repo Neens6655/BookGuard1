@@ -87,6 +87,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update evaluation metadata (title, author, publisher, cover image)
+  app.patch("/api/evaluations/:id", upload.single("coverImage"), async (req, res) => {
+    try {
+      const evaluation = await storage.getEvaluation(req.params.id);
+      
+      if (!evaluation) {
+        return res.status(404).json({ error: "Evaluation not found" });
+      }
+
+      const updates: any = {};
+      
+      // Handle cover image upload
+      if (req.file) {
+        const coverImageDataUrl = `data:${req.file.mimetype};base64,${(await fs.readFile(req.file.path)).toString('base64')}`;
+        updates.coverImage = coverImageDataUrl;
+        
+        // Cleanup uploaded file
+        await fs.unlink(req.file.path).catch(console.error);
+      }
+
+      // Handle metadata updates in result object
+      if (req.body.title || req.body.author || req.body.publisher) {
+        const currentResult = evaluation.result || {};
+        updates.result = {
+          ...currentResult,
+          ...(req.body.title && { title: req.body.title }),
+          ...(req.body.author && { author: req.body.author }),
+          ...(req.body.publisher && { publisher: req.body.publisher }),
+        };
+      }
+
+      const updatedEvaluation = await storage.updateEvaluation(req.params.id, updates);
+      
+      if (!updatedEvaluation) {
+        return res.status(404).json({ error: "Failed to update evaluation" });
+      }
+
+      res.json(updatedEvaluation);
+    } catch (error) {
+      console.error("Update evaluation error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to update evaluation" 
+      });
+    }
+  });
+
   // Download report formats
   app.get("/api/evaluate/:id/download/:format", async (req, res) => {
     try {
