@@ -55,6 +55,42 @@ Return a detailed JSON with these fields:
     "before_reading": ["Question 1", "Question 2", "Question 3"],
     "after_reading": ["Question 1", "Question 2", "Question 3", "Question 4"]
   },
+  
+  "cultural_teaching_methods": [
+    {
+      "title": "Specific teaching method based on this book's lessons (e.g., 'Connect Kindness to Daily Prayer')",
+      "description": "Detailed explanation of how parents can teach this specific value from the book in context of UAE/Islamic/Arab culture (2-3 sentences)"
+    },
+    {
+      "title": "Another method relevant to this book",
+      "description": "Detailed implementation guidance"
+    }
+  ],
+  
+  "islamic_uae_values": [
+    {
+      "title": "Specific Islamic/UAE value found in THIS book (e.g., 'Cooperation (Ta'awun)')",
+      "arabic_name": "Arabic term if applicable (e.g., 'التعاون')",
+      "description": "How this value appears in the book and how to discuss it with children, connecting to Islamic teachings or Quranic verses where relevant (2-3 sentences)"
+    },
+    {
+      "title": "Another value from THIS book",
+      "arabic_name": "Arabic term",
+      "description": "Context-specific explanation"
+    }
+  ],
+  
+  "family_activities": [
+    {
+      "title": "Activity based on THIS book's themes (e.g., 'Create a Gratitude Journal inspired by the story')",
+      "description": "Specific activity that connects to the book's plot, characters, or lessons (2-3 sentences)"
+    },
+    {
+      "title": "Another activity for THIS book",
+      "description": "Detailed activity description"
+    }
+  ],
+  
   "key_drivers": ["List of reasons behind the classification"],
   "genres": ["Select from: Islamic, UAE Culture, Culture, Heritage, Adventure, Fantasy, Mystery, Science, STEM, Educational, Bedtime, Interactive, Nature, Friendship, Emotions, Philosophy, Humor, Gaming, Social Learning, Traditional"],
   "themes": ["List 2-3 main themes from the book (e.g., 'Nature / Resilience', 'Friendship / Diversity', 'Hope / Future')"]
@@ -151,6 +187,25 @@ Return a detailed JSON with these fields:
    - ✅ Whitelisted: Safe for UAE families, general use
    - 🟡 Parent Guidance: Safe but moderate issues, review before giving
    - 🚫 Not Whitelisted: Violates UAE/Islamic values or child safety
+
+🔹 CULTURAL TEACHING CONTENT (CRITICAL):
+
+**cultural_teaching_methods** - Generate 3-4 teaching methods SPECIFIC to THIS book's content:
+- MUST be directly related to the book's plot, characters, or lessons
+- MUST reflect UAE/Islamic/Arab cultural context
+- Examples: "Connect [Character]'s honesty to Hadith about truthfulness", "Use the desert scene to discuss patience (Sabr) during hardship"
+
+**islamic_uae_values** - Identify 3-4 Islamic/UAE values ACTUALLY PRESENT in THIS book:
+- ONLY include values that appear in the book's narrative
+- Provide Arabic terms (e.g., Amanah, Sabr, Shukr, Ta'awun, Ihsan, Adl)
+- Connect to specific Quranic verses or Islamic teachings where relevant
+- Examples: "Honesty (Amanah) - when [character] tells the truth despite consequences, reflecting 'Speak truth even if it is bitter' (Hadith)"
+
+**family_activities** - Create 3-4 activities SPECIFIC to THIS book:
+- MUST connect directly to the book's themes, characters, or setting
+- Examples: "Re-enact [specific scene] to practice [value]", "Create art inspired by [book's setting] while discussing [theme]"
+
+AVOID generic content. Every field must be contextual to THIS specific book.
 
 Return complete JSON output only.
 `;

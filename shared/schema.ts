@@ -108,6 +108,24 @@ export const evaluationResultSchema = z.object({
     before_reading: z.array(z.string()),
     after_reading: z.array(z.string()),
   }),
+  
+  // Dynamic UAE/Islamic/Arab Cultural Values Teaching Content
+  cultural_teaching_methods: z.array(z.object({
+    title: z.string(),
+    description: z.string(),
+  })).optional(),
+  
+  islamic_uae_values: z.array(z.object({
+    title: z.string(),
+    arabic_name: z.string().optional(),
+    description: z.string(),
+  })).optional(),
+  
+  family_activities: z.array(z.object({
+    title: z.string(),
+    description: z.string(),
+  })).optional(),
+  
   recommended_minimum_age: z.string(),
   key_drivers: z.array(z.string()),
   genres: z.array(z.string()).optional(),
