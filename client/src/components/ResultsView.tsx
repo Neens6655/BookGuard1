@@ -211,42 +211,141 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             </TabsList>
 
             <TabsContent value="overview" className="mt-6 space-y-6">
-              {/* Quick Stats */}
-              <div className="bg-blue-50 rounded-lg p-6">
+              {/* Final Verdict - Most Prominent */}
+              <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 border-2 border-purple-200">
+                <div className="flex items-start gap-4">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-4xl">
+                      {result.final_verdict === "Approved" ? "🟢" :
+                       result.final_verdict === "Whitelisted" ? "✅" :
+                       result.final_verdict === "Parent Guidance" ? "🟡" : "🚫"}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      {result.final_verdict || "Evaluation Complete"}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {result.final_verdict === "Approved" ? "Safe & culturally aligned - Fully suitable for UAE families" :
+                       result.final_verdict === "Whitelisted" ? "Safe for UAE families - Culturally and ethically acceptable" :
+                       result.final_verdict === "Parent Guidance" ? "Safe but contains moderate issues - Parents should review before giving" :
+                       "Violates UAE/Islamic values or child safety standards - Not suitable for children"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
+                        Ages {result.recommended_age || result.recommended_minimum_age}
+                      </Badge>
+                      <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">
+                        {result.language || 'Multilingual'}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4-System Framework Overview */}
+              <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200">
                 <div className="flex items-center gap-2 mb-4">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                  <h4 className="font-semibold text-foreground">Quick Stats</h4>
+                  <Shield className="w-6 h-6 text-green-600" />
+                  <h4 className="font-bold text-foreground text-xl">Evaluation Framework</h4>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-white rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-foreground mb-1">{result.language || 'N/A'}</div>
-                    <div className="text-sm text-muted-foreground">Language</div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  This book has been evaluated using the UAE Ministry of Education's 4-system framework for comprehensive content assessment.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* System 1: UAE Values */}
+                  <div className={`rounded-lg p-4 border-2 ${
+                    result.system1_uae_values?.rating === "Safe" ? "bg-green-50 border-green-300" :
+                    result.system1_uae_values?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-red-50 border-red-300"
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-foreground">System 1: UAE Values</h5>
+                      <Badge variant="outline" className={
+                        result.system1_uae_values?.rating === "Safe" ? "text-green-700 border-green-700" :
+                        result.system1_uae_values?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
+                        "text-red-700 border-red-700"
+                      }>
+                        {result.system1_uae_values?.rating || "N/A"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Islamic, Arab & UAE Cultural Ethics
+                    </p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 text-center">
-                    <div className={`text-2xl font-bold mb-1 ${
-                      result.language_complexity === 'Low' ? 'text-green-600' : 
-                      result.language_complexity === 'Moderate' ? 'text-yellow-600' : 
-                      'text-orange-600'
-                    }`}>
-                      {result.language_complexity}
+
+                  {/* System 2: Child Safety */}
+                  <div className={`rounded-lg p-4 border-2 ${
+                    result.system2_child_safety?.rating === "Safe" ? "bg-green-50 border-green-300" :
+                    result.system2_child_safety?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-red-50 border-red-300"
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-foreground">System 2: Child Safety</h5>
+                      <Badge variant="outline" className={
+                        result.system2_child_safety?.rating === "Safe" ? "text-green-700 border-green-700" :
+                        result.system2_child_safety?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
+                        "text-red-700 border-red-700"
+                      }>
+                        {result.system2_child_safety?.rating || "N/A"}
+                      </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground">Complexity</div>
+                    <p className="text-xs text-muted-foreground">
+                      Global child safety standards
+                    </p>
                   </div>
-                  <div className="bg-white rounded-lg p-4">
-                    <div className={`text-2xl font-bold mb-1 ${result.whitelist_score >= 70 ? 'text-green-600' : 'text-orange-600'}`}>
-                      {result.whitelist_score}
+
+                  {/* System 3: Theme Complexity */}
+                  <div className={`rounded-lg p-4 border-2 ${
+                    result.system3_theme_complexity?.rating === "Simple" ? "bg-green-50 border-green-300" :
+                    result.system3_theme_complexity?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-orange-50 border-orange-300"
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-foreground">System 3: Theme</h5>
+                      <Badge variant="outline" className={
+                        result.system3_theme_complexity?.rating === "Simple" ? "text-green-700 border-green-700" :
+                        result.system3_theme_complexity?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
+                        "text-orange-700 border-orange-700"
+                      }>
+                        {result.system3_theme_complexity?.rating || "N/A"}
+                      </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground mb-2">Safety Score</div>
-                    <div className="text-xs text-muted-foreground">out of 100</div>
-                    <Progress value={result.whitelist_score} className="mt-2 h-2" />
-                    <div className="flex items-center gap-1 mt-2">
-                      <CheckCircle className="w-3 h-3 text-green-600" />
-                      <span className="text-xs font-medium text-green-600">
-                        {result.whitelist_score >= 70 ? 'Excellent Score' : 'Good Score'}
-                      </span>
+                    <p className="text-xs text-muted-foreground">
+                      Min Age: {result.system3_theme_complexity?.min_age || "N/A"}+
+                    </p>
+                  </div>
+
+                  {/* System 4: Language Complexity */}
+                  <div className={`rounded-lg p-4 border-2 ${
+                    result.system4_language_complexity?.rating === "Easy" ? "bg-green-50 border-green-300" :
+                    result.system4_language_complexity?.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-orange-50 border-orange-300"
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="font-semibold text-foreground">System 4: Language</h5>
+                      <Badge variant="outline" className={
+                        result.system4_language_complexity?.rating === "Easy" ? "text-green-700 border-green-700" :
+                        result.system4_language_complexity?.rating === "Moderate" ? "text-yellow-700 border-yellow-700" :
+                        "text-orange-700 border-orange-700"
+                      }>
+                        {result.system4_language_complexity?.rating || "N/A"}
+                      </Badge>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      Min Age: {result.system4_language_complexity?.min_age || "N/A"}+
+                    </p>
                   </div>
                 </div>
+
+                {/* Age Rationale */}
+                {result.age_rationale && (
+                  <div className="mt-4 bg-white rounded-lg p-4 border border-gray-200">
+                    <h6 className="font-medium text-foreground text-sm mb-2">Age Recommendation Rationale:</h6>
+                    <p className="text-sm text-muted-foreground">{result.age_rationale}</p>
+                  </div>
+                )}
               </div>
 
               {/* About This Book */}
@@ -398,19 +497,123 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
 
             <TabsContent value="safety" className="mt-6">
               <div className="space-y-6">
-                {/* Domain Analysis Header */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-bold text-foreground text-lg">Content Safety Analysis</h4>
+                {/* System 1: UAE/Islamic/Arab Values */}
+                {result.system1_uae_values && (
+                  <div className={`rounded-xl p-6 border-2 ${
+                    result.system1_uae_values.rating === "Safe" ? "bg-green-50 border-green-300" :
+                    result.system1_uae_values.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-red-50 border-red-300"
+                  }`}>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-md flex-shrink-0">
+                        <Globe className={`w-7 h-7 ${
+                          result.system1_uae_values.rating === "Safe" ? "text-green-600" :
+                          result.system1_uae_values.rating === "Moderate" ? "text-yellow-600" :
+                          "text-red-600"
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold text-foreground text-xl">System 1: UAE / Islamic / Arab Values</h4>
+                          <Badge className={
+                            result.system1_uae_values.rating === "Safe" ? "bg-green-100 text-green-700 hover:bg-green-100" :
+                            result.system1_uae_values.rating === "Moderate" ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100" :
+                            "bg-red-100 text-red-700 hover:bg-red-100"
+                          }>
+                            {result.system1_uae_values.rating}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{result.system1_uae_values.assessment}</p>
+                        
+                        {result.system1_uae_values.concerns && result.system1_uae_values.concerns.length > 0 && (
+                          <div className="bg-white rounded-lg p-3 mb-3">
+                            <h6 className="font-medium text-sm mb-2">Specific Concerns:</h6>
+                            <ul className="space-y-1">
+                              {result.system1_uae_values.concerns.map((concern, idx) => (
+                                <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                  <span className="text-red-500 mt-0.5">•</span>
+                                  <span>{concern}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {result.system1_uae_values.evidence && (
+                          <div className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                            <h6 className="font-medium text-sm mb-2 text-blue-700">Evidence from Book:</h6>
+                            <blockquote className="text-sm text-foreground italic leading-relaxed whitespace-pre-line">
+                              "{result.system1_uae_values.evidence}"
+                            </blockquote>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Detailed evaluation across key content domains with specific findings from the book
-                  </p>
-                </div>
+                )}
 
-                {/* Domain Cards */}
+                {/* System 2: Child Safety */}
+                {result.system2_child_safety && (
+                  <div className={`rounded-xl p-6 border-2 ${
+                    result.system2_child_safety.rating === "Safe" ? "bg-green-50 border-green-300" :
+                    result.system2_child_safety.rating === "Moderate" ? "bg-yellow-50 border-yellow-300" :
+                    "bg-red-50 border-red-300"
+                  }`}>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-md flex-shrink-0">
+                        <Shield className={`w-7 h-7 ${
+                          result.system2_child_safety.rating === "Safe" ? "text-green-600" :
+                          result.system2_child_safety.rating === "Moderate" ? "text-yellow-600" :
+                          "text-red-600"
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-bold text-foreground text-xl">System 2: General Child Safety</h4>
+                          <Badge className={
+                            result.system2_child_safety.rating === "Safe" ? "bg-green-100 text-green-700 hover:bg-green-100" :
+                            result.system2_child_safety.rating === "Moderate" ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-100" :
+                            "bg-red-100 text-red-700 hover:bg-red-100"
+                          }>
+                            {result.system2_child_safety.rating}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{result.system2_child_safety.assessment}</p>
+                        
+                        {result.system2_child_safety.concerns && result.system2_child_safety.concerns.length > 0 && (
+                          <div className="bg-white rounded-lg p-3 mb-3">
+                            <h6 className="font-medium text-sm mb-2">Specific Concerns:</h6>
+                            <ul className="space-y-1">
+                              {result.system2_child_safety.concerns.map((concern, idx) => (
+                                <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                                  <span className="text-red-500 mt-0.5">•</span>
+                                  <span>{concern}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {result.system2_child_safety.evidence && (
+                          <div className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
+                            <h6 className="font-medium text-sm mb-2 text-blue-700">Evidence from Book:</h6>
+                            <blockquote className="text-sm text-foreground italic leading-relaxed whitespace-pre-line">
+                              "{result.system2_child_safety.evidence}"
+                            </blockquote>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Legacy Domain Analysis (for backward compatibility) */}
+                {result.domains && (
                 <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h5 className="font-medium text-foreground mb-2">Legacy Domain Breakdown</h5>
+                    <p className="text-xs text-muted-foreground">Detailed content analysis by domain (older evaluation format)</p>
+                  </div>
                   {Object.entries(result.domains).map(([domain, assessment]) => {
                     // Get domain icon and colors
                     const domainConfig = {
@@ -525,6 +728,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     );
                   })}
                 </div>
+                )}
 
                 {/* Overall Safety Summary */}
                 <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-100">
