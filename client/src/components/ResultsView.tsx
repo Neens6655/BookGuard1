@@ -138,6 +138,12 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 <div className="text-xs text-muted-foreground">Rating</div>
               </div>
               <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600" data-testid="age-header">
+                  {result.recommended_minimum_age}
+                </div>
+                <div className="text-xs text-muted-foreground">Age</div>
+              </div>
+              <div className="text-center">
                 <div className={`w-12 h-12 rounded-full ${isApproved ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center`}>
                   {isApproved ? (
                     <CheckCircle className="w-7 h-7 text-green-600" />
