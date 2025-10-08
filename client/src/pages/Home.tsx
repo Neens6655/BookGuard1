@@ -553,7 +553,7 @@ export default function Home() {
                     Book Library
                   </h3>
                   <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Discover 1,000+ approved children's books with comprehensive ratings and academic review
+                    Building a trusted collection of children's books that honor Islamic values, embrace UAE cultural heritage, and nurture young minds with confidence
                   </p>
                 </div>
 
