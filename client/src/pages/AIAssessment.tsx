@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, BookOpen, Download, Plus, ArrowLeft, Sparkles, Brain, Shield, TrendingUp, AlertTriangle, CheckCircle2, Target, Languages, RotateCcw, FileText, Quote } from 'lucide-react';
+import { Upload, BookOpen, Download, Plus, ArrowLeft, Sparkles, Brain, Shield, TrendingUp, AlertTriangle, CheckCircle2, Target, Languages, RotateCcw, FileText, Quote, XCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -78,6 +78,39 @@ export default function AIAssessment() {
   const [progress, setProgress] = useState(0);
   const [analysis, setAnalysis] = useState<DeepAnalysis | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const getWhitelistStatus = (analysis: DeepAnalysis) => {
+    const riskLevel = analysis.safety_analysis.risk_assessment.level;
+    const hasSevereConcerns = analysis.cultural_assessment.potential_concerns.some(
+      c => c.severity === 'High' || c.severity === 'Severe'
+    );
+    const hasModerateConcerns = analysis.cultural_assessment.potential_concerns.some(
+      c => c.severity === 'Moderate'
+    );
+    const hasContentWarnings = analysis.safety_analysis.content_warnings.length > 0;
+
+    if (hasSevereConcerns || riskLevel === 'High') {
+      return {
+        label: 'Not Whitelisted',
+        icon: XCircle,
+        className: 'bg-red-500/20 text-red-100 border-red-300/50',
+      };
+    }
+    
+    if (hasModerateConcerns || riskLevel === 'Moderate' || hasContentWarnings) {
+      return {
+        label: 'Parent Guidance',
+        icon: AlertTriangle,
+        className: 'bg-yellow-500/20 text-yellow-100 border-yellow-300/50',
+      };
+    }
+    
+    return {
+      label: 'Whitelisted',
+      icon: CheckCircle2,
+      className: 'bg-green-500/20 text-green-100 border-green-300/50',
+    };
+  };
 
   const handleFileSelect = (selectedFile: File) => {
     const maxSize = 100 * 1024 * 1024; // 100MB
@@ -299,10 +332,36 @@ export default function AIAssessment() {
               <Card className="bg-gradient-to-br from-green-500 to-cyan-400 text-white border-0 shadow-xl">
                 <CardContent className="p-8">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex-1">
                       <h2 className="text-3xl font-bold mb-2">{analysis.title}</h2>
-                      {analysis.author && <p className="text-lg opacity-90">by {analysis.author}</p>}
+                      {analysis.author && <p className="text-lg opacity-90 mb-4">by {analysis.author}</p>}
+                      
+                      {/* Age Group and Whitelist Status */}
+                      <div className="flex items-center gap-3 mt-4">
+                        <Badge 
+                          className="bg-white/30 backdrop-blur-md text-white border-white/40 text-base px-4 py-2 flex items-center gap-2"
+                          data-testid="badge-age-group"
+                        >
+                          <Users className="w-4 h-4" />
+                          {analysis.safety_analysis.age_appropriateness.recommended_age}
+                        </Badge>
+                        
+                        {(() => {
+                          const status = getWhitelistStatus(analysis);
+                          const StatusIcon = status.icon;
+                          return (
+                            <Badge 
+                              className={`${status.className} backdrop-blur-md border text-base px-4 py-2 flex items-center gap-2`}
+                              data-testid="badge-whitelist-status"
+                            >
+                              <StatusIcon className="w-4 h-4" />
+                              {status.label}
+                            </Badge>
+                          );
+                        })()}
+                      </div>
                     </div>
+                    
                     <Badge className="bg-white/20 backdrop-blur-md text-white border-white/30 text-base px-4 py-2">
                       <CheckCircle2 className="w-4 h-4 mr-2" />
                       Analysis Complete

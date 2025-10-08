@@ -24,7 +24,7 @@ The core evaluation mechanism is a **4-System Evaluation Framework**:
 3.  **Theme Complexity**: Developmental readiness assessment (age-based).
 4.  **Language Complexity**: Reading level assessment (age-based).
 
-Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. Book catalog management includes metadata editing and deletion functionality with cover image extraction for various formats.
+Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. The assessment header displays age group recommendations and dynamic whitelist status (Whitelisted/Parent Guidance/Not Whitelisted) with appropriate icons and glassmorphism styling. Book catalog management includes metadata editing and deletion functionality with cover image extraction for various formats.
 
 ## External Dependencies
 
