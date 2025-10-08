@@ -110,7 +110,6 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
               <h2 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight leading-tight" data-testid="book-title">
                 {result.title}
               </h2>
-              <p className="text-xl opacity-95 mb-2" dir="rtl">مغامرات في الصحراء</p>
               <p className="text-lg opacity-90 mb-6">by Regional author</p>
               
               {/* Rating */}
