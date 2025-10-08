@@ -519,24 +519,6 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                   ))}
                 </div>
               </div>
-
-              {/* Approval Badge */}
-              <div className={`${isApproved ? 'bg-green-50' : 'bg-red-50'} rounded-lg p-6 text-center`}>
-                <div className={`w-16 h-16 rounded-full ${isApproved ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center mx-auto mb-3`}>
-                  {isApproved ? (
-                    <CheckCircle className="w-10 h-10 text-green-600" />
-                  ) : (
-                    <XCircle className="w-10 h-10 text-red-600" />
-                  )}
-                </div>
-                <div className={`text-xl font-bold ${isApproved ? 'text-green-700' : 'text-red-700'} mb-1`}>
-                  {isApproved ? 'APPROVED' : 'NOT APPROVED'}
-                </div>
-                <div className={`text-sm ${isApproved ? 'text-green-600' : 'text-red-600'}`}>
-                  For UAE Families
-                  {!isApproved && <span className="block mt-1 text-xs">({highRiskCount} high-risk domains found)</span>}
-                </div>
-              </div>
             </TabsContent>
 
             <TabsContent value="safety" className="mt-6">
