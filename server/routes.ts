@@ -964,8 +964,45 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
         padding: 20px;
       }
       
-      .book-card {
+      /* Prevent page breaks inside major content blocks */
+      .book-card,
+      .section,
+      .system-card,
+      .discussion-guide,
+      .discussion-section {
         page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      
+      /* Keep headings with their content */
+      h2, h3, h4 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+      
+      /* Keep meta info together */
+      .book-meta {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      
+      /* Prevent orphans and widows */
+      p, li {
+        orphans: 3;
+        widows: 3;
+      }
+      
+      /* Keep age recommendations together */
+      .age-badge,
+      .min-age {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      
+      /* Keep values list items together */
+      .values-list li {
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
     }
   </style>
