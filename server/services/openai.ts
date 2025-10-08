@@ -46,7 +46,7 @@ Return a detailed JSON with these fields:
     "min_age": 6
   },
   
-  "final_verdict": "Approved | Whitelisted | Parent Guidance | Not Whitelisted",
+  "final_verdict": "Whitelisted | Parent Guidance | Not Whitelisted",
   "recommended_age": "6-9",
   "age_rationale": "Explanation of age recommendation based on systems 3 and 4",
   
@@ -174,8 +174,8 @@ Return a detailed JSON with these fields:
 1. **Whitelist Safety Decision:**
    - If 🚫 Severe in System 1 (UAE Values) → "Not Whitelisted" (automatic)
    - If 🚫 Severe in System 2 (Child Safety) → "Not Whitelisted"
-   - If Safe in both S1 and S2 → "Approved" or "Whitelisted"
-   - If Moderate concerns exist → "Parent Guidance" or "Whitelisted"
+   - If Safe in both S1 and S2 → "Whitelisted"
+   - If Moderate concerns exist → "Parent Guidance"
 
 2. **Age Recommendation:**
    - Calculate from System 3 (Theme) + System 4 (Language)
@@ -183,8 +183,7 @@ Return a detailed JSON with these fields:
    - Map to age bands: 0-3, 3-5, 6-9, 10-12, 13-16, 17+
 
 3. **Visual Labels:**
-   - 🟢 Approved: Safe & culturally aligned, fully suitable
-   - ✅ Whitelisted: Safe for UAE families, general use
+   - ✅ Whitelisted: Safe & culturally aligned for UAE families
    - 🟡 Parent Guidance: Safe but moderate issues, review before giving
    - 🚫 Not Whitelisted: Violates UAE/Islamic values or child safety
 
@@ -243,9 +242,7 @@ Return complete JSON output only.
       "🚫 Not Whitelisted – Violates UAE/Islamic values or child safety" :
       result.final_verdict === "Parent Guidance" ?
       "🟡 Parent Guidance Recommended – Safe but contains moderate issues" :
-      result.final_verdict === "Approved" ?
-      "🟢 Approved – Safe & culturally aligned" :
-      "✅ Whitelisted – Safe for UAE families";
+      "✅ Whitelisted – Safe & culturally aligned for UAE families";
 
     return {
       ...result,
