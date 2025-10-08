@@ -343,7 +343,7 @@ export default function Home() {
                     Protecting Young Minds
                   </h2>
                   <p className="text-xl text-white/90 max-w-3xl mx-auto mb-10" data-testid="hero-description">
-                    Over 1,000 children's books carefully reviewed for Islamic values and UAE cultural standards by expert specialists
+                    Children's books reviewed for Islamic values and UAE cultural alignment
                   </p>
                   
                   <div className="flex flex-wrap justify-center gap-4 mb-16">
