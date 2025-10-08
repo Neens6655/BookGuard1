@@ -374,7 +374,7 @@ export default function Home() {
                       data-testid="button-ai-assessment-hero"
                     >
                       <Sparkles className="w-5 h-5 mr-2" />
-                      AI Assessment
+                      Deep AI
                     </Button>
                   </div>
 
