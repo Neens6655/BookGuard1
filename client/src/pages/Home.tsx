@@ -547,7 +547,7 @@ export default function Home() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-foreground mb-2">Discussion Guides</h5>
-                        <p className="text-sm text-muted-foreground">Parent conversation starters for every approved book</p>
+                        <p className="text-sm text-muted-foreground">Parent conversation starters for every whitelisted book</p>
                       </div>
                     </div>
                   </div>

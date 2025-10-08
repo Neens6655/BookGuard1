@@ -253,20 +253,12 @@ export function HowItWorks() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <Card className="border-2 border-green-200 bg-green-50">
-              <CardContent className="pt-6 text-center">
-                <div className="text-5xl mb-3">🟢</div>
-                <h4 className="text-xl font-bold text-foreground mb-2">Approved</h4>
-                <p className="text-sm text-muted-foreground">Fully suitable, safe, and culturally aligned</p>
-              </CardContent>
-            </Card>
-
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             <Card className="border-2 border-green-200 bg-green-50">
               <CardContent className="pt-6 text-center">
                 <div className="text-5xl mb-3">✅</div>
                 <h4 className="text-xl font-bold text-foreground mb-2">Whitelisted</h4>
-                <p className="text-sm text-muted-foreground">Safe for UAE families and institutions</p>
+                <p className="text-sm text-muted-foreground">Safe & culturally aligned for UAE families and institutions</p>
               </CardContent>
             </Card>
 

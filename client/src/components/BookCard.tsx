@@ -33,21 +33,13 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
   const finalVerdict = result.final_verdict || (result.whitelist_score >= 80 ? "Whitelisted" : "Not Whitelisted");
   
   const verdictConfig = {
-    "Approved": {
-      symbol: "🟢",
-      label: "Approved",
-      subtext: "Safe & culturally aligned",
-      bgClass: "bg-green-100",
-      textClass: "text-green-700",
-      borderClass: "border-green-300"
-    },
     "Whitelisted": {
       symbol: "✅",
       label: "Whitelisted",
-      subtext: "Safe for UAE families",
-      bgClass: "bg-blue-100",
-      textClass: "text-blue-700",
-      borderClass: "border-blue-300"
+      subtext: "Safe & culturally aligned for UAE families",
+      bgClass: "bg-green-100",
+      textClass: "text-green-700",
+      borderClass: "border-green-300"
     },
     "Parent Guidance": {
       symbol: "🟡",

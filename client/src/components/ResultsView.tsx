@@ -93,9 +93,16 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
             <div className="md:col-span-2 text-white">
               {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-6">
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 shadow-lg" data-testid="badge-islamic-approved">
-                  <Shield className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Islamic Approved</span>
+                <div className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full backdrop-blur-md border shadow-lg ${
+                  result.final_verdict === "Whitelisted" ? "bg-green-500/90 border-green-400/50" :
+                  result.final_verdict === "Parent Guidance" ? "bg-yellow-500/90 border-yellow-400/50" :
+                  "bg-red-500/90 border-red-400/50"
+                }`} data-testid="badge-verdict-status">
+                  <span className="text-lg">
+                    {result.final_verdict === "Whitelisted" ? "✅" :
+                     result.final_verdict === "Parent Guidance" ? "🟡" : "🚫"}
+                  </span>
+                  <span className="text-sm font-semibold">{result.final_verdict || "Whitelisted"}</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-blue-200 shadow-lg" data-testid="badge-age-range">
                   <Users className="w-4 h-4 text-blue-600" />
@@ -187,26 +194,24 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
               </div>
               <div className="text-center">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  result.final_verdict === "Approved" ? 'bg-green-100' :
                   result.final_verdict === "Whitelisted" ? 'bg-green-100' :
                   result.final_verdict === "Parent Guidance" ? 'bg-yellow-100' :
                   'bg-red-100'
                 }`}>
                   <span className="text-2xl">
-                    {result.final_verdict === "Approved" ? "🟢" :
-                     result.final_verdict === "Whitelisted" ? "✅" :
+                    {result.final_verdict === "Whitelisted" ? "✅" :
                      result.final_verdict === "Parent Guidance" ? "🟡" :
                      result.final_verdict === "Not Whitelisted" ? "🚫" :
                      isApproved ? "✅" : "🚫"}
                   </span>
                 </div>
                 <div className={`text-xs mt-1 font-medium ${
-                  result.final_verdict === "Approved" || result.final_verdict === "Whitelisted" ? 'text-green-600' :
+                  result.final_verdict === "Whitelisted" ? 'text-green-600' :
                   result.final_verdict === "Parent Guidance" ? 'text-yellow-600' :
                   result.final_verdict === "Not Whitelisted" ? 'text-red-600' :
                   isApproved ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {result.final_verdict || (isApproved ? 'Approved' : 'Not Approved')}
+                  {result.final_verdict || (isApproved ? 'Whitelisted' : 'Not Whitelisted')}
                 </div>
               </div>
             </div>
@@ -270,8 +275,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 <div className="flex items-start gap-4">
                   <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg flex-shrink-0">
                     <span className="text-4xl">
-                      {result.final_verdict === "Approved" ? "🟢" :
-                       result.final_verdict === "Whitelisted" ? "✅" :
+                      {result.final_verdict === "Whitelisted" ? "✅" :
                        result.final_verdict === "Parent Guidance" ? "🟡" : "🚫"}
                     </span>
                   </div>
@@ -311,9 +315,7 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                       </div>
                     ) : (
                       <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
-                        {result.executive_summary || 
-                         (result.final_verdict === "Approved" ? "Safe & culturally aligned - Fully suitable for UAE families" :
-                          "Safe for UAE families - Culturally and ethically acceptable")}
+                        {result.executive_summary || "Safe & culturally aligned for UAE families - Fully suitable"}
                       </p>
                     )}
                     

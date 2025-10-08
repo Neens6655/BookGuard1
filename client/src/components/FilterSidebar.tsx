@@ -31,8 +31,7 @@ const LANGUAGES = [
 ];
 
 const VERDICTS = [
-  { value: 'Approved', label: 'Approved', emoji: '🟢', activeColor: 'bg-green-500 border-green-600 text-white', hoverColor: 'hover:border-green-400' },
-  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', activeColor: 'bg-emerald-500 border-emerald-600 text-white', hoverColor: 'hover:border-emerald-400' },
+  { value: 'Whitelisted', label: 'Whitelisted', emoji: '✅', activeColor: 'bg-green-500 border-green-600 text-white', hoverColor: 'hover:border-green-400' },
   { value: 'Parent Guidance', label: 'Parent Guidance', emoji: '🟡', activeColor: 'bg-yellow-500 border-yellow-600 text-white', hoverColor: 'hover:border-yellow-400' },
   { value: 'Not Whitelisted', label: 'Not Whitelisted', emoji: '🚫', activeColor: 'bg-red-500 border-red-600 text-white', hoverColor: 'hover:border-red-400' },
 ];
