@@ -343,7 +343,7 @@ export default function Home() {
                     Protecting Young Minds
                   </h2>
                   <p className="text-xl text-white/90 max-w-3xl mx-auto mb-10" data-testid="hero-description">
-                    Safeguarding young hearts and minds with books that inspire, protect, and honor our values for generations to come
+                    Safeguarding young minds with books that inspire, protect, and uphold our values for generations to come
                   </p>
                   
                   <div className="flex flex-wrap justify-center gap-4 mb-16">
