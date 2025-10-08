@@ -101,6 +101,22 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 {result.executive_summary}
               </p>
               
+              {/* Key Features */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-5 h-5 text-yellow-300" />
+                  <h4 className="font-semibold text-white text-base">Key Features</h4>
+                </div>
+                <div className="space-y-2">
+                  {result.key_drivers.map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-300 mt-0.5" />
+                      <span className="text-white/90 text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
               <div className="flex flex-wrap gap-3">
                 <Button 
                   className="bg-white text-purple-600 hover:bg-white/90"
@@ -489,22 +505,6 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                     >
                       {genre.name}
                     </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Key Features */}
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Star className="w-5 h-5 text-yellow-600" />
-                  <h4 className="font-semibold text-foreground text-lg">Key Features</h4>
-                </div>
-                <div className="space-y-2">
-                  {result.key_drivers.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </div>
                   ))}
                 </div>
               </div>
