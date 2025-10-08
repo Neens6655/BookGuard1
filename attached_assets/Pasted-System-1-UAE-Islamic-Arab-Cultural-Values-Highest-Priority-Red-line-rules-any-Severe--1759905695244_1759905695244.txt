@@ -1,0 +1,162 @@
+System 1: UAE / Islamic / Arab Cultural Values (Highest Priority)
+
+(Red-line rules: any Severe = 🚫 Not Whitelisted)
+
+✅ Safe
+
+Respects Islam, prophets, Qur’an, and all religions.
+
+Positive Arab/Islamic values: family, modesty, hospitality, prayer, Ramadan, Eid.
+
+Respect for parents, teachers, leaders, and authority.
+
+Neutral Western cultural references that don’t contradict UAE morals.
+
+⚠️ Moderate Concern
+
+Fantasy/magic presented as imagination, not truth.
+
+Non-Islamic festivals shown neutrally.
+
+Mild romance/crushes without physical intimacy.
+
+Light disobedience/sarcasm but later corrected.
+
+Mild rude words (“stupid,” “shut up”).
+
+🚫 Severe Concern
+
+Mockery or insult of Islam, prophets, Qur’an, or prayer.
+
+Negative stereotypes of Arabs/Emiratis/Muslims.
+
+Alcohol, gambling, drugs, or immodesty shown positively.
+
+Strong profanity or obscene jokes.
+
+Romantic/sexual behavior for children or LGBTQ+ promotion.
+
+Encouraging rebellion against parents, teachers, or leaders.
+
+🔹 System 2: General Child Safety (Global Standards)
+✅ Safe
+
+Light humor, slapstick, playful adventures.
+
+Positive lessons: teamwork, kindness, sharing.
+
+⚠️ Moderate Concern
+
+Mild fantasy violence, scary creatures.
+
+Sad themes (loss of pet, moving away).
+
+Light bullying, later resolved.
+
+🚫 Severe Concern
+
+Gore, torture, graphic death.
+
+Explicit sexual content or grooming risk.
+
+Substance use (alcohol, smoking, drugs) normalized.
+
+Suicide, extreme bullying, exploitation.
+
+🔹 System 3: Context / Theme Complexity
+✅ Simple
+
+Everyday family/friends/school life.
+
+Clear good vs bad.
+
+Concrete lessons (helping others, sharing).
+
+⚠️ Moderate
+
+Moral dilemmas (honesty vs loyalty).
+
+Emotional maturity themes (grief, divorce, betrayal).
+
+Abstract ideas (justice, freedom, mortality).
+
+🚫 High Complexity
+
+War, politics, trauma.
+
+Philosophical/existential questions.
+
+Multi-layered, abstract narratives.
+
+🔹 System 4: Language Complexity
+✅ Easy
+
+Short sentences, everyday vocabulary.
+
+Repetition, rhymes, pictures supporting text.
+
+⚠️ Moderate
+
+Longer sentences, grade 3–6 vocabulary.
+
+Figurative language, idioms.
+
+Cultural expressions requiring context.
+
+🚫 Advanced
+
+Rare/academic words.
+
+Complex syntax, poetic/figurative density.
+
+Requires advanced cultural/linguistic knowledge.
+
+🔗 Final Verdict Rules
+1. Whitelist Safety Decision
+
+If 🚫 Severe in System 1 (UAE Values) → 🚫 Not Whitelisted (automatic).
+
+If 🚫 Severe in System 2 (Child Safety) → 🚫 Not Whitelisted.
+
+If Safe/Moderate only → Whitelisted.
+
+2. Developmental Suitability
+
+From System 3 (Theme) + System 4 (Language).
+
+Final Recommended Age = higher of the two.
+
+🟢 Visual Label System for Parents
+Symbol	Category	Meaning	Parent Action
+🟢 Approved	Safe & culturally aligned	Fully suitable	Can be freely read
+✅ Whitelisted	Safe for UAE families	Culturally and ethically acceptable	General use
+🟡 Parent Guidance Recommended	Safe but contains moderate issues	Parents should guide/decide	Review before giving
+🚫 Not Whitelisted	Violates UAE/Islamic values or child safety	Not suitable	Avoid for children
+🧩 Example Outputs
+
+Book: Charlotte’s Web
+
+System 1: ✅ Safe
+
+System 2: ⚠️ Moderate (death theme)
+
+System 3: ⚠️ Moderate (loss, sacrifice)
+
+System 4: ⚠️ Moderate (vocabulary)
+Verdict: 🟡 Parent Guidance Recommended | Age 10+
+
+Book: Harry Potter
+
+System 1: ⚠️ Moderate (magic fantasy)
+
+System 2: ⚠️ Moderate (fantasy violence)
+
+System 3: ⚠️ Moderate (moral dilemmas)
+
+System 4: ⚠️ Moderate (advanced vocabulary)
+Verdict: 🟡 Parent Guidance Recommended | Age 11+
+
+Book: Percy Jackson
+
+System 1: 🚫 Severe (Greek gods portrayed as real → contradicts Islamic belief)
+Verdict: 🚫 Not Whitelisted
