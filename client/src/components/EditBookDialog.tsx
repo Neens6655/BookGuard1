@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,17 @@ export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBook
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(book.coverImage || null);
 
+  // Sync form state with book prop when it changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      setTitle(book.result?.title || '');
+      setAuthor(book.result?.author || '');
+      setPublisher(book.result?.publisher || '');
+      setCoverImageFile(null);
+      setCoverImagePreview(book.coverImage || null);
+    }
+  }, [open, book]);
+
   const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -37,14 +48,35 @@ export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Client-side validation
+    if (title.trim() === '') {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Title cannot be empty',
+      });
+      return;
+    }
+    
+    if (author.trim() === '') {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Author cannot be empty',
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
       const formData = new FormData();
       
-      if (title !== book.result?.title) formData.append('title', title);
-      if (author !== book.result?.author) formData.append('author', author);
-      if (publisher !== book.result?.publisher) formData.append('publisher', publisher);
+      // Only send fields that have non-empty values and have changed
+      if (title !== book.result?.title && title.trim()) formData.append('title', title.trim());
+      if (author !== book.result?.author && author.trim()) formData.append('author', author.trim());
+      if (publisher !== book.result?.publisher && publisher.trim()) formData.append('publisher', publisher.trim());
       if (coverImageFile) formData.append('coverImage', coverImageFile);
 
       const response = await fetch(`/api/evaluations/${book.id}`, {
@@ -53,7 +85,8 @@ export function EditBookDialog({ open, onOpenChange, book, onSuccess }: EditBook
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update book');
+        const errorData = await response.json().catch(() => ({ error: 'Failed to update book' }));
+        throw new Error(errorData.details || errorData.error || 'Failed to update book');
       }
 
       toast({

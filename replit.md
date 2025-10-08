@@ -38,6 +38,18 @@ Preferred communication style: Simple, everyday language.
 - Cover images stored as base64 data URLs in evaluation records
 - UI displays covers on book cards and detail pages with elegant fallbacks
 
+**Book Catalog Management (October 2025)**:
+- Implemented book metadata editing functionality with settings button on each book card
+- Created EditBookDialog component for editing title, author, publisher, and uploading cover images
+- Added PATCH /api/evaluations/:id endpoint with comprehensive validation:
+  - Zod schema validation for metadata fields (title, author, publisher)
+  - Image file type validation (PNG, JPEG, JPG, WebP only)
+  - File size limit of 10MB for cover images
+  - Client-side validation prevents empty required fields
+- Cover image upload supports drag-and-drop interface with live preview
+- Changes persist in PostgreSQL database and update UI in real-time
+- Settings icon appears on book card cover for easy access to editing features
+
 ## System Architecture
 
 ### Frontend Architecture

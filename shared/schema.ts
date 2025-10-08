@@ -24,6 +24,15 @@ export const insertEvaluationSchema = createInsertSchema(evaluations).omit({
 export type InsertEvaluation = z.infer<typeof insertEvaluationSchema>;
 export type Evaluation = typeof evaluations.$inferSelect;
 
+// Schema for updating book metadata
+export const updateBookMetadataSchema = z.object({
+  title: z.string().transform(s => s.trim()).pipe(z.string().min(1, "Title cannot be empty").max(500)).optional(),
+  author: z.string().transform(s => s.trim()).pipe(z.string().min(1, "Author cannot be empty").max(200)).optional(),
+  publisher: z.string().transform(s => s.trim()).pipe(z.string().min(1, "Publisher cannot be empty").max(200)).optional(),
+});
+
+export type UpdateBookMetadata = z.infer<typeof updateBookMetadataSchema>;
+
 // Evaluation result types
 export const evaluationResultSchema = z.object({
   title: z.string(),

@@ -4,9 +4,10 @@ import multer from "multer";
 import path from "path";
 import { promises as fs } from "fs";
 import { storage } from "./storage";
-import { insertEvaluationSchema } from "@shared/schema";
+import { insertEvaluationSchema, updateBookMetadataSchema } from "@shared/schema";
 import { evaluateBook } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
+import { fromError } from "zod-validation-error";
 
 const upload = multer({
   dest: "uploads/",
@@ -96,10 +97,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Evaluation not found" });
       }
 
+      // Validate metadata input
+      const validationResult = updateBookMetadataSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        const validationError = fromError(validationResult.error);
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: validationError.message 
+        });
+      }
+
+      const validatedData = validationResult.data;
       const updates: any = {};
       
-      // Handle cover image upload
+      // Handle cover image upload with validation
       if (req.file) {
+        const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+        
+        if (!allowedMimeTypes.includes(req.file.mimetype)) {
+          await fs.unlink(req.file.path).catch(console.error);
+          return res.status(400).json({ 
+            error: "Invalid file type. Only PNG, JPEG, and WebP images are allowed." 
+          });
+        }
+        
+        if (req.file.size > maxFileSize) {
+          await fs.unlink(req.file.path).catch(console.error);
+          return res.status(400).json({ 
+            error: "File too large. Maximum size is 10MB." 
+          });
+        }
+        
         const coverImageDataUrl = `data:${req.file.mimetype};base64,${(await fs.readFile(req.file.path)).toString('base64')}`;
         updates.coverImage = coverImageDataUrl;
         
@@ -108,13 +137,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Handle metadata updates in result object
-      if (req.body.title || req.body.author || req.body.publisher) {
+      if (validatedData.title || validatedData.author || validatedData.publisher) {
         const currentResult = evaluation.result || {};
         updates.result = {
           ...currentResult,
-          ...(req.body.title && { title: req.body.title }),
-          ...(req.body.author && { author: req.body.author }),
-          ...(req.body.publisher && { publisher: req.body.publisher }),
+          ...(validatedData.title && { title: validatedData.title }),
+          ...(validatedData.author && { author: validatedData.author }),
+          ...(validatedData.publisher && { publisher: validatedData.publisher }),
         };
       }
 
