@@ -663,15 +663,9 @@ export default function Home() {
                   </h2>
                   <p className="text-muted-foreground">Browse analyzed children's books</p>
                 </div>
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={handleBackToHome} data-testid="button-back-home">
-                    Back to Home
-                  </Button>
-                  <Button onClick={() => setCurrentView('upload')} data-testid="button-new-assessment">
-                    <BookPlus className="w-4 h-4 mr-2" />
-                    New Assessment
-                  </Button>
-                </div>
+                <Button variant="outline" onClick={handleBackToHome} data-testid="button-back-home">
+                  Back to Home
+                </Button>
               </div>
 
               {isLoading ? (
