@@ -85,8 +85,9 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                   <Shield className="w-4 h-4" />
                   <span className="text-sm font-semibold">Islamic Approved</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-400/40 backdrop-blur-md border border-white/30 shadow-lg" data-testid="badge-age-range">
-                  <span className="text-sm font-semibold">Ages {result.recommended_minimum_age}</span>
+                <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-blue-200 shadow-lg" data-testid="badge-age-range">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-700">Ages {result.recommended_minimum_age}</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-300/40 backdrop-blur-md border border-white/30 shadow-lg">
                   <span className="text-sm font-semibold">Arabic</span>

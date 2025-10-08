@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Star, CheckCircle, Settings } from 'lucide-react';
+import { BookOpen, Star, CheckCircle, Settings, Users } from 'lucide-react';
 import { type Evaluation } from '@/types/evaluation';
 import { EditBookDialog } from './EditBookDialog';
 
@@ -139,7 +139,8 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
           </Badge>
           
           {/* Age Badge */}
-          <Badge className="absolute bottom-3 left-3 bg-yellow-100 text-yellow-800 hover:bg-yellow-100 font-semibold">
+          <Badge className="absolute bottom-3 left-3 bg-white/95 text-blue-700 hover:bg-white font-semibold shadow-md border border-blue-200">
+            <Users className="w-3 h-3 mr-1" />
             Ages {result.recommended_minimum_age}
           </Badge>
         </div>
