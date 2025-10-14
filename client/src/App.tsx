@@ -8,6 +8,7 @@ import AIAssessment from "@/pages/AIAssessment";
 import { AboutUs } from "@/pages/AboutUs";
 import { HowItWorks } from "@/pages/HowItWorks";
 import ScoringAdmin from "@/pages/ScoringAdmin";
+import ReportGeneration from "@/pages/ReportGeneration";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/about" component={AboutUs} />
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/admin/scoring" component={ScoringAdmin} />
+      <Route path="/reports" component={ReportGeneration} />
       <Route component={NotFound} />
     </Switch>
   );
