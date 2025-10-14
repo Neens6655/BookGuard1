@@ -10,6 +10,17 @@ export const evaluations = pgTable("evaluations", {
   status: text("status", { enum: ["processing", "completed", "failed"] }).notNull().default("processing"),
   progress: integer("progress").notNull().default(0),
   result: jsonb("result"),
+  nmcAssessment: jsonb("nmc_assessment").$type<{
+    enabled: boolean;
+    finalAgeBand: string;
+    categories: {
+      gambling: { detected: boolean; ageBand: string; evidence: string; };
+      language: { detected: boolean; ageBand: string; evidence: string; };
+      violence: { detected: boolean; ageBand: string; evidence: string; };
+      substanceUse: { detected: boolean; ageBand: string; evidence: string; };
+      sexualContent: { detected: boolean; ageBand: string; evidence: string; };
+    };
+  }>(),
   coverImage: text("cover_image"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
