@@ -363,6 +363,16 @@ export default function Home() {
               </Button>
               <Button 
                 variant="ghost"
+                size="sm"
+                onClick={() => setLocation('/reports')}
+                className="text-gray-600 hover:text-green-600 hover:bg-green-50 gap-2"
+                data-testid="button-reports"
+              >
+                <FileDown className="w-4 h-4" />
+                Reports
+              </Button>
+              <Button 
+                variant="ghost"
                 size="icon"
                 onClick={() => setLocation('/admin/scoring')}
                 className="text-gray-600 hover:text-green-600 hover:bg-green-50"
