@@ -319,6 +319,171 @@ export interface DeepAnalysisResult {
   };
 }
 
+export interface NMCAssessment {
+  enabled: boolean;
+  finalAgeBand: string;
+  categories: {
+    gambling: { detected: boolean; ageBand: string; evidence: string; };
+    language: { detected: boolean; ageBand: string; evidence: string; };
+    violence: { detected: boolean; ageBand: string; evidence: string; };
+    substanceUse: { detected: boolean; ageBand: string; evidence: string; };
+    sexualContent: { detected: boolean; ageBand: string; evidence: string; };
+  };
+}
+
+export async function evaluateNMCStandards(bookText: string): Promise<NMCAssessment> {
+  const nmcPrompt = `
+You are evaluating a children's book against NMC (National Media Council) Standards.
+Evaluate the book across 5 categories with specific age band thresholds.
+
+Return JSON with this structure:
+{
+  "gambling": {
+    "detected": true/false,
+    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "evidence": "Direct quote if detected, or 'No gambling content detected'"
+  },
+  "language": {
+    "detected": true/false,
+    "ageBand": "Not Allowed | 10+ | 13+ | 17+ | 21+",
+    "evidence": "Direct quote or 'No profanity detected'"
+  },
+  "violence": {
+    "detected": true/false,
+    "ageBand": "Not Allowed | 6+ | 10+ | 13+ | 17+ | 21+",
+    "evidence": "Direct quote or 'No violence detected'"
+  },
+  "substanceUse": {
+    "detected": true/false,
+    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "evidence": "Direct quote or 'No substance use detected'"
+  },
+  "sexualContent": {
+    "detected": true/false,
+    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "evidence": "Direct quote or 'No sexual content detected'"
+  }
+}
+
+🎰 GAMBLING CATEGORY:
+- Not Allowed (0-12): No gambling references (casinos, betting, cards for money)
+- 13+: Gambling only if cautionary/educational (shows consequences)
+- 17+: Historical/contextual gambling (Victorian betting houses, etc.)
+- 21+: Casual/positive gambling portrayals
+
+📝 LANGUAGE & PROFANITY:
+- Not Allowed (0-9): No profanity, rude words, or insults
+- 10+: Mild insults only ("stupid," "dumb," "shut up")
+- 13+: Moderate slang/insults ("jerk," name-calling)
+- 17+: Strong profanity if contextualized (f***, s*** for emotional realism)
+- 21+: Explicit profanity fully permissible
+
+⚔️ VIOLENCE & TERROR:
+- Not Allowed (0-5): No violence (hitting, fighting, weapons)
+- 6+: Cartoon/fantasy violence only (non-realistic, no blood)
+- 10+: Mild peril/fantasy battles (minor injuries, positive resolution)
+- 13+: Moderate/realistic violence (crime, detective, suspense, no gore)
+- 17+: War/crime/terror themes (intense but limited gore)
+- 21+: Graphic violence permissible
+
+🍺 ALCOHOL, SMOKING & DRUGS:
+- Not Allowed (0-12): No references to alcohol, cigarettes, drugs
+- 13+: Mentions allowed if negative/cautionary
+- 17+: Realistic depictions if not glamorized (addiction, recovery)
+- 21+: Substance use without restriction
+
+💕 SEX & NUDITY:
+- Not Allowed (0-12): No sexual content or romantic intimacy
+- 13+: Light romance (hand-holding, blushing, innocent crush)
+- 17+: Non-explicit intimacy (kissing, implied romance)
+- 21+: Explicit sexual content permissible
+
+EVALUATION RULES:
+1. For each category, determine the MINIMUM age band that would allow this content
+2. If no problematic content exists in a category, mark as "Not Allowed" (safest)
+3. Provide exact quotes (2-3 lines) as evidence when content is detected
+4. Be specific about which threshold the content crosses
+
+Return complete JSON only.
+`;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: nmcPrompt
+        },
+        {
+          role: "user",
+          content: `BOOK TEXT:\n${bookText}`
+        }
+      ],
+      response_format: { type: "json_object" },
+      max_completion_tokens: 2000,
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) {
+      throw new Error("No response content from OpenAI");
+    }
+
+    const result = JSON.parse(content);
+    
+    // Calculate final age band as the HIGHEST across all categories
+    const ageBandPriority: Record<string, number> = {
+      "Not Allowed": 0,
+      "6+": 6,
+      "10+": 10,
+      "13+": 13,
+      "17+": 17,
+      "21+": 21
+    };
+    
+    const allAgeBands = [
+      result.gambling.ageBand,
+      result.language.ageBand,
+      result.violence.ageBand,
+      result.substanceUse.ageBand,
+      result.sexualContent.ageBand
+    ];
+    
+    const finalAgeBand = allAgeBands.reduce((highest, current) => {
+      const currentPriority = ageBandPriority[current] || 0;
+      const highestPriority = ageBandPriority[highest] || 0;
+      return currentPriority > highestPriority ? current : highest;
+    }, "Not Allowed");
+    
+    return {
+      enabled: true,
+      finalAgeBand,
+      categories: {
+        gambling: result.gambling,
+        language: result.language,
+        violence: result.violence,
+        substanceUse: result.substanceUse,
+        sexualContent: result.sexualContent
+      }
+    };
+
+  } catch (error) {
+    console.error("NMC evaluation error:", error);
+    // Return safe default on error
+    return {
+      enabled: false,
+      finalAgeBand: "Not Allowed",
+      categories: {
+        gambling: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
+        language: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
+        violence: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
+        substanceUse: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
+        sexualContent: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" }
+      }
+    };
+  }
+}
+
 export async function deepAnalyzeBook(bookText: string): Promise<DeepAnalysisResult> {
   const deepAnalysisPrompt = `
 You are an expert literary analyst and educational specialist for the UAE Ministry of Education.

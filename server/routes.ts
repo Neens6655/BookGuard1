@@ -6,7 +6,7 @@ import { promises as fs } from "fs";
 import puppeteer from "puppeteer";
 import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
-import { evaluateBook, deepAnalyzeBook } from "./services/openai";
+import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 import { fromError } from "zod-validation-error";
 
@@ -548,6 +548,9 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    // Evaluate against NMC Standards (parallel system)
+    const nmcAssessment = await evaluateNMCStandards(bookText);
+    
     // Update progress: Age Recommendations
     await storage.updateEvaluation(evaluationId, { progress: 95 });
     
@@ -558,6 +561,7 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       progress: 100, 
       status: "completed",
       result: result,
+      nmcAssessment: nmcAssessment,
       coverImage: coverImage 
     });
 
