@@ -21,6 +21,19 @@ export const evaluations = pgTable("evaluations", {
       sexualContent: { detected: boolean; ageBand: string; evidence: string; };
     };
   }>(),
+  goodreadsData: jsonb("goodreads_data").$type<{
+    rating?: number;
+    ratingsCount?: number;
+    reviewsCount?: number;
+    genres?: string[];
+    publishedYear?: number;
+    description?: string;
+    coverImageUrl?: string;
+    isbn?: string;
+    pageCount?: number;
+    goodreadsUrl?: string;
+    lastFetched?: string;
+  }>(),
   coverImage: text("cover_image"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
