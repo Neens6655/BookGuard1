@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
+import { searchGoodreadsBook } from "./services/apify";
 import { fromError } from "zod-validation-error";
 
 const upload = multer({
@@ -551,6 +552,12 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     // Evaluate against NMC Standards (parallel system)
     const nmcAssessment = await evaluateNMCStandards(bookText);
     
+    // Fetch Goodreads data if available
+    const goodreadsData = await searchGoodreadsBook(
+      result.title || 'Unknown', 
+      result.author
+    );
+    
     // Update progress: Age Recommendations
     await storage.updateEvaluation(evaluationId, { progress: 95 });
     
@@ -562,6 +569,7 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       status: "completed",
       result: result,
       nmcAssessment: nmcAssessment,
+      goodreadsData: goodreadsData,
       coverImage: coverImage 
     });
 
