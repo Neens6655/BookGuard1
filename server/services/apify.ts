@@ -5,6 +5,8 @@ const client = new ApifyClient({
 });
 
 export interface GoodreadsBookData {
+  status: 'ok' | 'unavailable' | 'error';
+  message?: string;
   rating?: number;
   ratingsCount?: number;
   reviewsCount?: number;
@@ -22,7 +24,10 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
   try {
     if (!process.env.APIFY_API_TOKEN) {
       console.warn("APIFY_API_TOKEN not configured, skipping Goodreads lookup");
-      return null;
+      return {
+        status: 'unavailable',
+        message: 'Apify API token not configured'
+      };
     }
 
     const searchQuery = author ? `${title} ${author}` : title;
@@ -41,12 +46,16 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
     
     if (!items || items.length === 0) {
       console.log(`No Goodreads results found for: ${searchQuery}`);
-      return null;
+      return {
+        status: 'unavailable',
+        message: 'No results found on Goodreads'
+      };
     }
 
     const book: any = items[0];
     
     return {
+      status: 'ok',
       rating: book.rating ? parseFloat(String(book.rating)) : undefined,
       ratingsCount: book.ratingsCount ? parseInt(String(book.ratingsCount).replace(/,/g, '')) : undefined,
       reviewsCount: book.reviewsCount ? parseInt(String(book.reviewsCount).replace(/,/g, '')) : undefined,
@@ -60,8 +69,27 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       lastFetched: new Date().toISOString(),
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Apify Goodreads search error:", error);
-    return null;
+    
+    // Check for specific error types
+    if (error?.statusCode === 403 || error?.message?.includes('actor-is-not-rented')) {
+      return {
+        status: 'unavailable',
+        message: 'Apify actor subscription required'
+      };
+    }
+    
+    if (error?.statusCode === 401) {
+      return {
+        status: 'unavailable',
+        message: 'Invalid Apify API token'
+      };
+    }
+    
+    return {
+      status: 'error',
+      message: error?.message || 'Failed to fetch Goodreads data'
+    };
   }
 }

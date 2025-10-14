@@ -22,6 +22,8 @@ export const evaluations = pgTable("evaluations", {
     };
   }>(),
   goodreadsData: jsonb("goodreads_data").$type<{
+    status: 'ok' | 'unavailable' | 'error';
+    message?: string;
     rating?: number;
     ratingsCount?: number;
     reviewsCount?: number;
