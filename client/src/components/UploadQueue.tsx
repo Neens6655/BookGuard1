@@ -211,11 +211,11 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Overall Progress</span>
             <span className="font-medium text-foreground">
-              {Math.round((completedCount / queueFiles.length) * 100)}%
+              {queueFiles.length > 0 ? Math.round((completedCount / queueFiles.length) * 100) : 0}%
             </span>
           </div>
           <Progress 
-            value={(completedCount / queueFiles.length) * 100} 
+            value={queueFiles.length > 0 ? (completedCount / queueFiles.length) * 100 : 0} 
             className="h-2"
           />
         </div>

@@ -44,11 +44,14 @@ export function FileUpload({ onFilesUpload, className, maxFiles = 10 }: FileUplo
     }
 
     if (acceptedFiles.length > 0) {
-      const newFiles = [...selectedFiles, ...acceptedFiles].slice(0, maxFiles);
-      if (newFiles.length > maxFiles) {
-        setError(`Maximum ${maxFiles} files allowed`);
+      const totalFiles = selectedFiles.length + acceptedFiles.length;
+      if (totalFiles > maxFiles) {
+        const allowed = maxFiles - selectedFiles.length;
+        setError(`You can only add ${allowed} more file${allowed !== 1 ? 's' : ''}. Maximum ${maxFiles} files allowed at once.`);
+        setSelectedFiles([...selectedFiles, ...acceptedFiles.slice(0, allowed)]);
+      } else {
+        setSelectedFiles([...selectedFiles, ...acceptedFiles]);
       }
-      setSelectedFiles(newFiles);
     }
   }, [selectedFiles, maxFiles]);
 
