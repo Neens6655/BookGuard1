@@ -6,143 +6,13 @@ This full-stack web application evaluates children's and family books for conten
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes
-
-### Advanced Report Generation System (October 2025)
-Implemented comprehensive report generation page with advanced filtering and book selection capabilities:
-
-**Features:**
-- **Dedicated Report Generation Page**: New `/reports` page accessible via Reports button in header
-- **Advanced Multi-Layer Filtering**:
-  - **Basic Filters**: Verdict (Whitelisted/Parent Guidance/Not Whitelisted), Age Group (3-7/8-12/13-18), Language (Arabic/English)
-  - **Scoring Criteria Filters**: Cultural Values, Child Safety (Safe/Moderate/Severe), Theme Complexity (Simple/Moderate/High), Language Level (Easy/Moderate/Advanced)
-  - **Age Range Overlap Logic**: Intelligent age filtering that handles various formats ("6-9", "6+") with proper range overlap detection
-- **Book Selection Controls**: Individual checkboxes, Select All/None buttons, visual feedback with green ring on selected books
-- **Dynamic PDF Generation**: Generate reports for any filtered subset of books via POST endpoint
-- **Real-Time Filtering**: Instant book list updates based on filter combinations
-
-**Technical Implementation:**
-- New `/api/generate-pdf-report` POST endpoint accepting array of book IDs
-- Age filtering uses `recommended_minimum_age` with `ageRangesOverlap` function for consistency
-- Proper evaluation type imports from `@/types/evaluation` for type safety
-- Filter state management with useMemo for performance optimization
-- Accordion UI for advanced filters to optimize space usage
-
-**User Experience:**
-- Reports button in header next to Settings icon
-- Filter sidebar with all 4 scoring systems represented
-- Book cards show verdict badges, age groups, and system ratings
-- Generate Report button displays count of selected books
-- Back to Home button for easy navigation
-
-**Testing & Quality:**
-- E2E tested with various filter combinations (verdict, age, language, scoring criteria)
-- Age range overlap logic verified for all age groups
-- Architect-reviewed and approved with no blocking issues
-- Consistent implementation matching existing Home page filtering
-
-**Future Enhancements:**
-- Extract shared age-range utilities to common module to avoid duplication
-- Add automated tests for edge-case age strings
-- Enhance UX with success toast confirmation after report generation
-
-### Scoring Configuration Administration System (October 2025)
-Implemented enterprise-grade scoring configuration administration system for managing evaluation criteria, weights, and thresholds:
-
-**Features:**
-- **Versioned Configurations**: Database-backed scoring configurations with version control (e.g., v1.0.0)
-- **Audit Trail**: Complete audit logging for all configuration changes (created, updated, activated, deleted)
-- **Admin Interface**: Dedicated admin page at `/admin/scoring` accessible via settings icon in header
-- **4-System Configuration**: Full control over Cultural Values (35%), Child Safety (35%), Theme Complexity (15%), Language Level (15%)
-- **Age Mapping**: Configure age ranges for Theme and Language complexity levels
-- **Verdict Rules**: Customizable thresholds for Whitelisted, Parent Guidance, and Not Whitelisted verdicts
-- **Default Configuration**: Auto-seeded UAE BookGuard configuration on first startup
-
-**Technical Implementation:**
-- PostgreSQL tables: `scoring_configs` (versioned configurations) and `scoring_audit_logs` (change tracking)
-- JSONB columns for flexible system configurations with type-safe schemas
-- RESTful API endpoints: GET/POST/PATCH/DELETE for CRUD operations, activation, and audit logs
-- Drizzle ORM for type-safe database operations with fallback to in-memory storage
-- Server startup seed function creates default configuration if none exists
-- Tab-based UI with read-only display of all system configurations
-
-**Database Schema:**
-- Scoring configurations with UUID primary keys
-- JSONB storage for system configs (criteria, weights, thresholds, age mappings)
-- Audit logs with action types, change tracking, and performer attribution
-- isActive flag ensures only one configuration is active at a time
-
-**User Experience:**
-- Settings icon (⚙️) in header navigates to admin page
-- Sidebar lists all configurations with active badge
-- Tab navigation for each system (Cultural Values, Child Safety, Theme Complexity, Language Level, Verdict)
-- Color-coded displays matching the 4-system framework theme
-- Age mapping visualization for Systems 3 and 4
-- Detailed criteria breakdown with weights and descriptions
-
-**Future Enhancements:**
-- Add configuration editing functionality (currently read-only)
-- Implement role-based access control for admin features
-- Add configuration comparison and diff viewing
-- Enable configuration cloning and versioning workflows
-
-### PDF Report Generation Feature (October 2025)
-Implemented professional PDF report generation for whitelisted books with branded, visually appealing design:
-
-**Features:**
-- **Branded PDF Reports**: Beautiful A4 PDF reports with 📚 brand logo, green gradient header, and Fresh Garden theme styling
-- **Card-Based Layout**: Each book displayed in a professional card with cover image, metadata, and 4-system evaluation breakdown
-- **Color-Coded Systems**: Visual cards for Cultural Values (green), Child Safety (blue), Theme Complexity (purple), Language Level (orange)
-- **Professional Formatting**: Badges for ratings and age groups, shadows, gradients, and proper typography
-- **Comprehensive Content**: Includes executive summary, all 4 systems assessments, age recommendations, key lessons, cultural values, and discussion guides
-- **One-Click Download**: Hero section button to download complete report of all whitelisted books
-
-**Technical Implementation:**
-- Installed Puppeteer for HTML-to-PDF conversion with system Chromium
-- Dynamic path detection for Chromium executable (`which chromium`)
-- Configured headless browser with proper args (--no-sandbox, --disable-setuid-sandbox, --disable-dev-shm-usage, --disable-gpu)
-- A4 format with 20px margins and background printing enabled
-- File naming: `Whitelisted_Books_Report_YYYY-MM-DD.pdf`
-- E2E tested and verified with 2.9MB PDF generation successful
-
-**User Experience:**
-- Download Report button in homepage hero section
-- Success toast notification on completion
-- Supports multiple sequential downloads
-- Friendly, professional format (not overly formal)
-
-**Future Considerations:**
-- Add HTML escaping for user-sourced fields in template
-- Monitor Puppeteer launch latency; consider pooling for high volume
-- Add regression test for PDF endpoint non-empty buffer validation
-
-### Verdict Consolidation (January 2025)
-Successfully consolidated "Approved" and "Whitelisted" verdicts into a single **"Whitelisted"** status across the entire application. This unification simplifies the user experience and ensures consistent terminology throughout the system. The final verdict now supports exactly three options:
-
-1. **✅ Whitelisted** (Green): Safe and culturally aligned for UAE families
-2. **🟡 Parent Guidance** (Yellow): Safe but requires parental review
-3. **🚫 Not Whitelisted** (Red): Not suitable; violates standards
-
-**Changes implemented:**
-- Updated database schema enum (removed "Approved" from final_verdict)
-- Migrated all 9 existing "Approved" records to "Whitelisted" in production database
-- Updated OpenAI service prompts to generate only the 3 consolidated verdicts
-- Unified all UI components (FilterSidebar, BookCard, ResultsView, HowItWorks, Home) to use "Whitelisted" terminology
-- Updated marketing copy and parent-facing content to reflect the consolidated terminology
-- Verified through automated E2E testing with 0 "Approved" references remaining
-
-**Monitoring recommendations:**
-- Monitor future data imports to ensure no "Approved" verdicts are generated
-- Review third-party integrations for terminology consistency
-- Extend regression testing to verify verdict badge styling per status
-
 ## System Architecture
 
 ### Frontend Architecture
-The frontend is built with **React** and **TypeScript** using **Vite**. It utilizes **Shadcn/ui** (New York style) with **Radix UI** for accessible components, styled with **Tailwind CSS** featuring a custom color palette. **TanStack Query** manages server state, while **Wouter** handles client-side routing. Typography uses **Inter** and **Noto Sans Arabic**. The **Fresh Garden Theme** features green-to-cyan gradients (green-500 → emerald-500 → cyan-500) in hero sections with enhanced glassmorphism effects and interactive button UX (scale transforms, shadow depth, smooth color transitions). Key design decisions include a library-first interface with interactive book cards, real-time progress tracking for evaluations, and drag-and-drop file upload with a 100MB limit. The homepage features an **illustrative value proposition section** showcasing the 4-system evaluation framework with color-coded cards (green for Cultural Values, blue for Child Safety, purple for Theme Complexity, orange for Language Level) and parent-focused trust indicators (automatic rejection, age recommendations, discussion guides). The application includes dedicated **About Us** (`/about`) and **How It Works** (`/how-it-works`) pages explaining the mission, stakeholders served, and detailed evaluation framework with real case studies. Hero sections and the **AI Deep Assessment** (`/ai-assessment`) page feature **interactive back buttons** with glassmorphism styling (white/transparent or green-tinted with backdrop blur), positioned in the top-left corner with smooth hover animations including scale transforms, shadow depth changes, and icon slide effects for enhanced navigation UX.
+The frontend is built with **React** and **TypeScript** using **Vite**. It utilizes **Shadcn/ui** (New York style) with **Radix UI** for accessible components, styled with **Tailwind CSS** featuring a custom color palette. **TanStack Query** manages server state, while **Wouter** handles client-side routing. Typography uses **Inter** and **Noto Sans Arabic**. The **Fresh Garden Theme** features green-to-cyan gradients in hero sections with enhanced glassmorphism effects and interactive button UX. Key design decisions include a library-first interface with interactive book cards, real-time progress tracking for evaluations, and drag-and-drop file upload with a 100MB limit. The homepage features an **illustrative value proposition section** showcasing the 4-system evaluation framework with color-coded cards and parent-focused trust indicators. The application includes dedicated **About Us** (`/about`) and **How It Works** (`/how-it-works`) pages. Hero sections and the **AI Deep Assessment** (`/ai-assessment`) page feature **interactive back buttons** with glassmorphism styling.
 
 ### Backend Architecture
-The backend uses **Node.js** with **Express.js** and **TypeScript**. It provides RESTful endpoints under `/api`. The file processing pipeline uses **Multer** for uploads, various libraries for text extraction (pdf-parse, mammoth, epub-parser, rtf-parser), and **OpenAI API** for content analysis. Asynchronous processing with progress updates and automatic file cleanup are core features. A smart text extraction strategy samples longer books (over 50,000 characters) from the beginning, middle, and end.
+The backend uses **Node.js** with **Express.js** and **TypeScript**. It provides RESTful endpoints under `/api`. The file processing pipeline uses **Multer** for uploads, various libraries for text extraction, and **OpenAI API** for content analysis. Asynchronous processing with progress updates and automatic file cleanup are core features. A smart text extraction strategy samples longer books from the beginning, middle, and end.
 
 ### Data Storage Solutions
 The application primarily uses a **PostgreSQL database** (Neon serverless) for permanent evaluation persistence, with an automatic fallback to in-memory storage if the database is unavailable. **Drizzle ORM** is used for type-safe CRUD operations. Evaluation records include UUID primary keys, file metadata, status, progress, structured JSONB results from AI analysis, and base64 encoded cover images.
@@ -154,24 +24,12 @@ The core evaluation mechanism is a **4-System Evaluation Framework**:
 3.  **Theme Complexity**: Developmental readiness assessment (age-based).
 4.  **Language Complexity**: Reading level assessment (age-based).
 
-Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. The assessment header displays age group recommendations and dynamic whitelist status (Whitelisted/Parent Guidance/Not Whitelisted) with appropriate icons and glassmorphism styling. Book catalog management includes metadata editing and deletion functionality with cover image extraction for various formats.
+Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. The assessment header displays age group recommendations and dynamic whitelist status (Whitelisted/Parent Guidance/Not Whitelisted) with appropriate icons and glassmorphism styling. Book catalog management includes metadata editing and deletion functionality with cover image extraction for various formats. The application supports batch uploads with sequential processing, real-time queue status, and progress visualization. A dedicated reports page (`/reports`) offers advanced multi-layer filtering for generating dynamic PDF reports for selected books. An enterprise-grade scoring configuration administration system (`/admin/scoring`) allows management of evaluation criteria, weights, thresholds, age mappings, and verdict rules with version control and audit trails. PDF reports are generated with a branded, visually appealing design, including card-based layouts and color-coded system breakdowns. The verdict system is consolidated into three statuses: Whitelisted, Parent Guidance, and Not Whitelisted.
 
 ## External Dependencies
 
-*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis, configured for structured JSON outputs, providing detailed evaluations based on the 4-system framework and evidence extraction.
-*   **Neon Database**: Serverless PostgreSQL used for persistent storage of book evaluations. Connected via `DATABASE_URL` environment variable.
-*   **File Processing Libraries**:
-    *   `pdf-parse`: Extracts text from PDF documents.
-    *   `mammoth`: Processes .doc and .docx files.
-    *   `epub-parser`: Extracts content from EPUB files.
-    *   `rtf-parser`: Handles Rich Text Format documents.
-    *   Node.js `fs` module: For plain text files.
-*   **PDF Generation**:
-    *   `Puppeteer`: Headless browser automation for HTML-to-PDF conversion.
-    *   `Chromium`: System-level browser binary (Nix package) used by Puppeteer for PDF rendering.
-*   **UI Component Libraries**:
-    *   `Shadcn/ui` & `Radix UI`: For accessible and customizable UI components.
-    *   `React Hook Form` with `Zod`: For form validation.
-    *   `TanStack Query`: For server state management.
-    *   `Wouter`: For client-side routing.
-    *   `Drizzle ORM`: For type-safe database interactions with PostgreSQL.
+*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis, configured for structured JSON outputs.
+*   **Neon Database**: Serverless PostgreSQL for persistent storage.
+*   **File Processing Libraries**: `pdf-parse`, `mammoth`, `epub-parser`, `rtf-parser`, Node.js `fs`.
+*   **PDF Generation**: `Puppeteer` and `Chromium` (Nix package) for HTML-to-PDF conversion.
+*   **UI Component Libraries**: `Shadcn/ui`, `Radix UI`, `React Hook Form`, `Zod`, `TanStack Query`, `Wouter`, `Drizzle ORM`.
