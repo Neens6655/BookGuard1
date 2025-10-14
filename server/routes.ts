@@ -253,6 +253,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Backfill NMC Assessment for existing evaluation
+  app.post("/api/evaluations/:id/backfill-nmc", upload.single("file"), async (req, res) => {
+    try {
+      const evaluationId = req.params.id;
+      
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Check if evaluation exists
+      const evaluation = await storage.getEvaluation(evaluationId);
+      if (!evaluation) {
+        await fs.unlink(req.file.path).catch(console.error);
+        return res.status(404).json({ error: "Evaluation not found" });
+      }
+
+      // Check if evaluation is completed
+      if (evaluation.status !== "completed") {
+        await fs.unlink(req.file.path).catch(console.error);
+        return res.status(400).json({ error: "Can only backfill NMC for completed evaluations" });
+      }
+
+      // Extract text from file
+      const bookText = await extractTextFromFile(req.file.path, req.file.originalname);
+      
+      // Run NMC evaluation
+      const nmcAssessment = await evaluateNMCStandards(bookText);
+      
+      // Update evaluation with NMC assessment
+      await storage.updateEvaluation(evaluationId, { nmcAssessment });
+      
+      // Cleanup uploaded file
+      await fs.unlink(req.file.path).catch(console.error);
+      
+      res.json({ 
+        success: true, 
+        evaluationId,
+        nmcAssessment 
+      });
+
+    } catch (error) {
+      console.error("Backfill NMC error:", error);
+      if (req.file?.path) {
+        await fs.unlink(req.file.path).catch(console.error);
+      }
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "NMC backfill failed" 
+      });
+    }
+  });
+
+  // Get evaluations without NMC assessment
+  app.get("/api/evaluations/missing-nmc", async (req, res) => {
+    try {
+      const evaluations = await storage.getAllEvaluations();
+      const missingNmc = evaluations.filter((e: Evaluation) => 
+        e.status === "completed" && !e.nmcAssessment
+      );
+      res.json(missingNmc);
+    } catch (error) {
+      console.error("Get missing NMC error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to get evaluations" 
+      });
+    }
+  });
+
   // Scoring Configuration API Routes
   
   // Get all scoring configurations
