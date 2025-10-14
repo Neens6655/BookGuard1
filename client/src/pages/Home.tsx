@@ -361,6 +361,15 @@ export default function Home() {
                 <BookPlus className="w-4 h-4 mr-2" />
                 Add books
               </Button>
+              <Button 
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation('/admin/scoring')}
+                className="text-gray-600 hover:text-green-600 hover:bg-green-50"
+                data-testid="button-admin-settings"
+              >
+                <Settings className="w-5 h-5" />
+              </Button>
               <div className="flex items-center space-x-2 text-sm">
                 <button className="text-muted-foreground hover:text-foreground">عربي</button>
                 <span className="text-muted-foreground">|</span>
