@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Cloud, FileText, File, AlertCircle, Shield, Heart, Target, Languages } from 'lucide-react';
+import { Cloud, FileText, File, AlertCircle, Shield, Heart, Target, Languages, X, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 interface FileUploadProps {
-  onFileUpload: (file: File) => void;
+  onFilesUpload: (files: File[]) => void;
   className?: string;
+  maxFiles?: number;
 }
 
 const ACCEPTED_TYPES = {
@@ -22,8 +24,9 @@ const ACCEPTED_TYPES = {
 
 const MAX_SIZE = 100 * 1024 * 1024; // 100MB
 
-export function FileUpload({ onFileUpload, className }: FileUploadProps) {
+export function FileUpload({ onFilesUpload, className, maxFiles = 10 }: FileUploadProps) {
   const [error, setError] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError(null);
@@ -31,25 +34,40 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
     if (rejectedFiles.length > 0) {
       const rejection = rejectedFiles[0];
       if (rejection.errors?.some((e: any) => e.code === 'file-too-large')) {
-        setError('File size must be less than 100MB');
+        setError('One or more files exceed 100MB size limit');
       } else if (rejection.errors?.some((e: any) => e.code === 'file-invalid-type')) {
         setError('Only PDF, Word, TXT, EPUB, and RTF files are supported');
       } else {
-        setError('Invalid file. Please try again.');
+        setError('Some files are invalid. Please try again.');
       }
       return;
     }
 
     if (acceptedFiles.length > 0) {
-      onFileUpload(acceptedFiles[0]);
+      const newFiles = [...selectedFiles, ...acceptedFiles].slice(0, maxFiles);
+      if (newFiles.length > maxFiles) {
+        setError(`Maximum ${maxFiles} files allowed`);
+      }
+      setSelectedFiles(newFiles);
     }
-  }, [onFileUpload]);
+  }, [selectedFiles, maxFiles]);
+
+  const removeFile = useCallback((index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleUploadAll = useCallback(() => {
+    if (selectedFiles.length > 0) {
+      onFilesUpload(selectedFiles);
+      setSelectedFiles([]);
+    }
+  }, [selectedFiles, onFilesUpload]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: ACCEPTED_TYPES,
     maxSize: MAX_SIZE,
-    multiple: false
+    multiple: true
   });
 
   const getFileIcon = (type: string) => {
@@ -59,13 +77,20 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
     return <File className="text-gray-400" />;
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   return (
     <div className={cn("max-w-4xl mx-auto", className)}>
       <div
         {...getRootProps()}
         className={cn(
           "upload-zone bg-card border-2 border-dashed border-border rounded-xl p-12 text-center cursor-pointer transition-all",
-          isDragActive && "drag-over"
+          isDragActive && "drag-over",
+          selectedFiles.length > 0 && "p-8"
         )}
       >
         <input {...getInputProps()} data-testid="file-input" />
@@ -74,10 +99,10 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
             <Cloud className="text-primary text-3xl w-8 h-8" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">
-            Drop your book file here
+            Drop your book files here
           </h3>
           <p className="text-muted-foreground mb-6">
-            or click to browse from your device
+            or click to browse from your device (up to {maxFiles} files)
           </p>
           <div className="flex flex-wrap justify-center gap-2 mb-6">
             <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-sm flex items-center gap-1">
@@ -110,6 +135,64 @@ export function FileUpload({ onFileUpload, className }: FileUploadProps) {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {/* Selected Files List */}
+      {selectedFiles.length > 0 && (
+        <div className="mt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-foreground">
+              Selected Files ({selectedFiles.length}/{maxFiles})
+            </h4>
+            <Button
+              onClick={handleUploadAll}
+              className="bg-gradient-to-r from-green-500 via-emerald-500 to-cyan-500 hover:from-green-600 hover:via-emerald-600 hover:to-cyan-600 text-white shadow-lg"
+              data-testid="button-upload-all"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload All ({selectedFiles.length})
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {selectedFiles.map((file, index) => (
+              <div
+                key={`${file.name}-${index}`}
+                className="bg-card border border-border rounded-lg p-3 flex items-center gap-3 group hover:border-primary/50 transition-all"
+                data-testid={`file-card-${index}`}
+              >
+                <div className="flex-shrink-0">
+                  {getFileIcon(file.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {file.name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-xs">
+                      {file.name.split('.').pop()?.toUpperCase()}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatFileSize(file.size)}
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile(index);
+                  }}
+                  className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  data-testid={`button-remove-${index}`}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* 4-System Evaluation Framework */}
