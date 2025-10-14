@@ -5,18 +5,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { type EvaluationResult } from '@/types/evaluation';
+import { type EvaluationResult, type NMCAssessment } from '@/types/evaluation';
 
 interface ResultsViewProps {
   result: EvaluationResult;
   filename: string;
   coverImage?: string | null;
+  nmcAssessment?: NMCAssessment | null;
   onNewAssessment: () => void;
   onBackToLibrary?: () => void;
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, coverImage, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, coverImage, nmcAssessment, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Map score to risk level label
@@ -106,8 +107,14 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-blue-200 shadow-lg" data-testid="badge-age-range">
                   <Users className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-blue-700">Ages {result.recommended_minimum_age}</span>
+                  <span className="text-sm font-semibold text-blue-700">UAE {result.recommended_minimum_age}</span>
                 </div>
+                {nmcAssessment && nmcAssessment.enabled && (
+                  <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-purple-200 shadow-lg" data-testid="badge-nmc-age">
+                    <Shield className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm font-semibold text-purple-700">NMC {nmcAssessment.finalAgeBand}</span>
+                  </div>
+                )}
                 <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-300/40 backdrop-blur-md border border-white/30 shadow-lg">
                   <span className="text-sm font-semibold">Arabic</span>
                 </div>
@@ -267,6 +274,16 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 <GraduationCap className="w-4 h-4 mr-2" />
                 For Parents
               </TabsTrigger>
+              {nmcAssessment && nmcAssessment.enabled && (
+                <TabsTrigger 
+                  value="nmc" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                  data-testid="tab-nmc"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  NMC Standards
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="overview" className="mt-6 space-y-6">
@@ -1058,6 +1075,156 @@ export function ResultsView({ result, filename, coverImage, onNewAssessment, onB
                 </div>
               </div>
             </TabsContent>
+
+            {nmcAssessment && nmcAssessment.enabled && (
+              <TabsContent value="nmc" className="mt-6">
+                <div className="space-y-6">
+                  {/* NMC Header */}
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-6 border border-purple-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">National Media Council (NMC) Standards</h4>
+                        <p className="text-sm text-muted-foreground">Content evaluation across 5 regulatory categories</p>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-700 text-lg px-4 py-2">
+                        {nmcAssessment.finalAgeBand}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Category Breakdown */}
+                  <div className="grid gap-4">
+                    {/* Gambling */}
+                    <Card className={`border-2 ${nmcAssessment.categories.gambling.detected ? 'border-purple-300 bg-purple-50/30' : 'border-green-300 bg-green-50/30'}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${nmcAssessment.categories.gambling.detected ? 'bg-purple-100' : 'bg-green-100'}`}>
+                              <span className="text-xl">🎰</span>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold">Gambling Content</h5>
+                              <p className="text-xs text-muted-foreground">Betting, casinos, games of chance</p>
+                            </div>
+                          </div>
+                          <Badge className={nmcAssessment.categories.gambling.detected ? 'bg-purple-600 text-white' : 'bg-green-600 text-white'}>
+                            {nmcAssessment.categories.gambling.ageBand}
+                          </Badge>
+                        </div>
+                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.gambling.detected ? 'bg-purple-50 border-purple-200' : 'bg-green-50 border-green-200'}`}>
+                          <p className="text-sm italic">{nmcAssessment.categories.gambling.evidence}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Language */}
+                    <Card className={`border-2 ${nmcAssessment.categories.language.detected ? 'border-yellow-300 bg-yellow-50/30' : 'border-green-300 bg-green-50/30'}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${nmcAssessment.categories.language.detected ? 'bg-yellow-100' : 'bg-green-100'}`}>
+                              <span className="text-xl">📝</span>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold">Language & Profanity</h5>
+                              <p className="text-xs text-muted-foreground">Inappropriate language, insults</p>
+                            </div>
+                          </div>
+                          <Badge className={nmcAssessment.categories.language.detected ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}>
+                            {nmcAssessment.categories.language.ageBand}
+                          </Badge>
+                        </div>
+                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.language.detected ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
+                          <p className="text-sm italic">{nmcAssessment.categories.language.evidence}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Violence */}
+                    <Card className={`border-2 ${nmcAssessment.categories.violence.detected ? 'border-red-300 bg-red-50/30' : 'border-green-300 bg-green-50/30'}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${nmcAssessment.categories.violence.detected ? 'bg-red-100' : 'bg-green-100'}`}>
+                              <span className="text-xl">⚔️</span>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold">Violence & Terror</h5>
+                              <p className="text-xs text-muted-foreground">Physical conflict, scary themes</p>
+                            </div>
+                          </div>
+                          <Badge className={nmcAssessment.categories.violence.detected ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}>
+                            {nmcAssessment.categories.violence.ageBand}
+                          </Badge>
+                        </div>
+                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.violence.detected ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                          <p className="text-sm italic">{nmcAssessment.categories.violence.evidence}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Substance Use */}
+                    <Card className={`border-2 ${nmcAssessment.categories.substanceUse.detected ? 'border-orange-300 bg-orange-50/30' : 'border-green-300 bg-green-50/30'}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${nmcAssessment.categories.substanceUse.detected ? 'bg-orange-100' : 'bg-green-100'}`}>
+                              <span className="text-xl">🍺</span>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold">Alcohol, Smoking & Drugs</h5>
+                              <p className="text-xs text-muted-foreground">Substance use references</p>
+                            </div>
+                          </div>
+                          <Badge className={nmcAssessment.categories.substanceUse.detected ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'}>
+                            {nmcAssessment.categories.substanceUse.ageBand}
+                          </Badge>
+                        </div>
+                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.substanceUse.detected ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'}`}>
+                          <p className="text-sm italic">{nmcAssessment.categories.substanceUse.evidence}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Sexual Content */}
+                    <Card className={`border-2 ${nmcAssessment.categories.sexualContent.detected ? 'border-pink-300 bg-pink-50/30' : 'border-green-300 bg-green-50/30'}`}>
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${nmcAssessment.categories.sexualContent.detected ? 'bg-pink-100' : 'bg-green-100'}`}>
+                              <span className="text-xl">💕</span>
+                            </div>
+                            <div>
+                              <h5 className="font-semibold">Sex & Nudity</h5>
+                              <p className="text-xs text-muted-foreground">Romantic intimacy, sexual content</p>
+                            </div>
+                          </div>
+                          <Badge className={nmcAssessment.categories.sexualContent.detected ? 'bg-pink-600 text-white' : 'bg-green-600 text-white'}>
+                            {nmcAssessment.categories.sexualContent.ageBand}
+                          </Badge>
+                        </div>
+                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.sexualContent.detected ? 'bg-pink-50 border-pink-200' : 'bg-green-50 border-green-200'}`}>
+                          <p className="text-sm italic">{nmcAssessment.categories.sexualContent.evidence}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Final Age Band Explanation */}
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-5 border border-indigo-200">
+                    <div className="flex items-start gap-3">
+                      <Info className="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" />
+                      <div>
+                        <h5 className="font-semibold text-indigo-900 mb-2">How NMC Age Band is Determined</h5>
+                        <p className="text-sm text-indigo-800">
+                          The final NMC age band (<strong>{nmcAssessment.finalAgeBand}</strong>) is determined by taking the <strong>highest (most restrictive)</strong> age rating across all 5 categories. This ensures the book meets the most stringent content requirements across all regulatory areas.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
 

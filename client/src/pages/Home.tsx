@@ -835,6 +835,7 @@ export default function Home() {
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
             coverImage={evaluation.coverImage}
+            nmcAssessment={evaluation.nmcAssessment}
             onNewAssessment={() => changeView('upload')}
             onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}
