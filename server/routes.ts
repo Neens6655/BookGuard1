@@ -5,7 +5,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import puppeteer from "puppeteer";
 import { storage } from "./storage";
-import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
+import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema, type Evaluation } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 import { fromError } from "zod-validation-error";
