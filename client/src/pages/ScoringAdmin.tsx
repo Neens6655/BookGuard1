@@ -32,6 +32,28 @@ interface SystemConfig {
   criteria: CriterionConfig[];
 }
 
+interface System3Config {
+  enabled: boolean;
+  weight: number;
+  ageMapping: {
+    simple: { minAge: number; maxAge: number };
+    moderate: { minAge: number; maxAge: number };
+    high: { minAge: number; maxAge: number };
+  };
+  criteria: CriterionConfig[];
+}
+
+interface System4Config {
+  enabled: boolean;
+  weight: number;
+  ageMapping: {
+    easy: { minAge: number; maxAge: number };
+    moderate: { minAge: number; maxAge: number };
+    advanced: { minAge: number; maxAge: number };
+  };
+  criteria: CriterionConfig[];
+}
+
 interface ScoringConfig {
   id: string;
   name: string;
@@ -40,11 +62,23 @@ interface ScoringConfig {
   isActive: number;
   system1Config: SystemConfig;
   system2Config: SystemConfig;
-  system3Config: SystemConfig;
-  system4Config: SystemConfig;
+  system3Config: System3Config;
+  system4Config: System4Config;
   verdictConfig: {
-    whitelistedThreshold: number;
-    parentGuidanceThreshold: number;
+    whitelistedRules: {
+      requireAllSafe: boolean;
+      allowedModerates: number;
+      minimumScore: number;
+    };
+    parentGuidanceRules: {
+      maxModerates: number;
+      minimumScore: number;
+    };
+    notWhitelistedRules: {
+      autoRejectSevere: boolean;
+      maxModerates: number;
+      minimumScore: number;
+    };
   };
   createdAt: Date;
   updatedAt: Date;
@@ -282,47 +316,77 @@ export default function ScoringAdmin() {
 
                     {/* System 3: Theme Complexity */}
                     <TabsContent value="system3">
-                      <SystemConfigDisplay config={selectedConfig.system3Config} systemName="Theme Complexity" />
+                      <System3ConfigDisplay config={selectedConfig.system3Config} />
                     </TabsContent>
 
                     {/* System 4: Language Level */}
                     <TabsContent value="system4">
-                      <SystemConfigDisplay config={selectedConfig.system4Config} systemName="Language Level" />
+                      <System4ConfigDisplay config={selectedConfig.system4Config} />
                     </TabsContent>
 
                     {/* Verdict Configuration */}
                     <TabsContent value="verdict">
                       <div className="space-y-6 pt-4">
                         <div>
-                          <h3 className="text-lg font-semibold mb-4">Verdict Thresholds</h3>
-                          <div className="space-y-4">
-                            <div>
-                              <Label className="text-sm font-medium">
-                                Whitelisted Threshold: {selectedConfig.verdictConfig.whitelistedThreshold}%
-                              </Label>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Books scoring above this threshold are whitelisted
-                              </p>
-                              <div className="h-2 w-full bg-green-100 dark:bg-green-900/20 rounded-full mt-2">
-                                <div
-                                  className="h-2 bg-green-600 rounded-full"
-                                  style={{ width: `${selectedConfig.verdictConfig.whitelistedThreshold}%` }}
-                                />
+                          <h3 className="text-lg font-semibold mb-4">Whitelisted Rules</h3>
+                          <div className="space-y-4 p-4 bg-green-50 dark:bg-green-900/10 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Minimum Score</Label>
+                                <p className="text-2xl font-bold text-green-600">{selectedConfig.verdictConfig.whitelistedRules.minimumScore}%</p>
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">Allowed Moderates</Label>
+                                <p className="text-2xl font-bold text-green-600">{selectedConfig.verdictConfig.whitelistedRules.allowedModerates}</p>
                               </div>
                             </div>
-                            <div>
-                              <Label className="text-sm font-medium">
-                                Parent Guidance Threshold: {selectedConfig.verdictConfig.parentGuidanceThreshold}%
-                              </Label>
-                              <p className="text-xs text-gray-500 mt-1">
-                                Books scoring above this threshold require parent guidance
-                              </p>
-                              <div className="h-2 w-full bg-yellow-100 dark:bg-yellow-900/20 rounded-full mt-2">
-                                <div
-                                  className="h-2 bg-yellow-600 rounded-full"
-                                  style={{ width: `${selectedConfig.verdictConfig.parentGuidanceThreshold}%` }}
-                                />
+                            <div className="flex items-center gap-2">
+                              <Switch checked={selectedConfig.verdictConfig.whitelistedRules.requireAllSafe} disabled />
+                              <span className="text-sm text-gray-600">
+                                {selectedConfig.verdictConfig.whitelistedRules.requireAllSafe ? "Require All Safe" : "Allow Some Moderates"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4">Parent Guidance Rules</h3>
+                          <div className="space-y-4 p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Minimum Score</Label>
+                                <p className="text-2xl font-bold text-yellow-600">{selectedConfig.verdictConfig.parentGuidanceRules.minimumScore}%</p>
                               </div>
+                              <div>
+                                <Label className="text-sm font-medium">Max Moderates</Label>
+                                <p className="text-2xl font-bold text-yellow-600">{selectedConfig.verdictConfig.parentGuidanceRules.maxModerates}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4">Not Whitelisted Rules</h3>
+                          <div className="space-y-4 p-4 bg-red-50 dark:bg-red-900/10 rounded-lg">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-sm font-medium">Minimum Score</Label>
+                                <p className="text-2xl font-bold text-red-600">{selectedConfig.verdictConfig.notWhitelistedRules.minimumScore}%</p>
+                              </div>
+                              <div>
+                                <Label className="text-sm font-medium">Max Moderates</Label>
+                                <p className="text-2xl font-bold text-red-600">{selectedConfig.verdictConfig.notWhitelistedRules.maxModerates}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Switch checked={selectedConfig.verdictConfig.notWhitelistedRules.autoRejectSevere} disabled />
+                              <span className="text-sm text-gray-600">
+                                {selectedConfig.verdictConfig.notWhitelistedRules.autoRejectSevere ? "Auto-reject books with severe ratings" : "Manual review for severe ratings"}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -394,6 +458,120 @@ function SystemConfigDisplay({ config, systemName }: { config: SystemConfig; sys
           <span className="text-sm text-gray-600">
             {config.autoRejectOnSevere ? "Enabled - Books with severe ratings will be automatically rejected" : "Disabled"}
           </span>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <h3 className="text-md font-semibold">Evaluation Criteria</h3>
+        <div className="space-y-3">
+          {config.criteria.map((criterion, index) => (
+            <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-medium text-sm">{criterion.name}</h4>
+                <Badge variant="outline">{criterion.weight}%</Badge>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{criterion.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function System3ConfigDisplay({ config }: { config: System3Config }) {
+  return (
+    <div className="space-y-6 pt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Enabled</Label>
+          <div className="flex items-center gap-2">
+            <Switch checked={config.enabled} disabled />
+            <span className="text-sm text-gray-600">{config.enabled ? "Yes" : "No"}</span>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Weight</Label>
+          <p className="text-2xl font-bold text-purple-600">{config.weight}%</p>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <h3 className="text-md font-semibold">Theme Complexity Age Mapping</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-green-700 dark:text-green-400">Simple</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.simple.minAge}-{config.ageMapping.simple.maxAge}</p>
+          </div>
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-yellow-700 dark:text-yellow-400">Moderate</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.moderate.minAge}-{config.ageMapping.moderate.maxAge}</p>
+          </div>
+          <div className="p-4 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-purple-700 dark:text-purple-400">High</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.high.minAge}-{config.ageMapping.high.maxAge}</p>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <h3 className="text-md font-semibold">Evaluation Criteria</h3>
+        <div className="space-y-3">
+          {config.criteria.map((criterion, index) => (
+            <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-medium text-sm">{criterion.name}</h4>
+                <Badge variant="outline">{criterion.weight}%</Badge>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{criterion.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function System4ConfigDisplay({ config }: { config: System4Config }) {
+  return (
+    <div className="space-y-6 pt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Enabled</Label>
+          <div className="flex items-center gap-2">
+            <Switch checked={config.enabled} disabled />
+            <span className="text-sm text-gray-600">{config.enabled ? "Yes" : "No"}</span>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Weight</Label>
+          <p className="text-2xl font-bold text-orange-600">{config.weight}%</p>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <h3 className="text-md font-semibold">Language Complexity Age Mapping</h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-green-700 dark:text-green-400">Easy</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.easy.minAge}-{config.ageMapping.easy.maxAge}</p>
+          </div>
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-yellow-700 dark:text-yellow-400">Moderate</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.moderate.minAge}-{config.ageMapping.moderate.maxAge}</p>
+          </div>
+          <div className="p-4 bg-orange-50 dark:bg-orange-900/10 rounded-lg">
+            <Label className="text-sm font-semibold text-orange-700 dark:text-orange-400">Advanced</Label>
+            <p className="text-sm text-gray-600 mt-1">Ages {config.ageMapping.advanced.minAge}-{config.ageMapping.advanced.maxAge}</p>
+          </div>
         </div>
       </div>
 
