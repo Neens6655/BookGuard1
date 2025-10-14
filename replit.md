@@ -8,6 +8,44 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Advanced Report Generation System (October 2025)
+Implemented comprehensive report generation page with advanced filtering and book selection capabilities:
+
+**Features:**
+- **Dedicated Report Generation Page**: New `/reports` page accessible via Reports button in header
+- **Advanced Multi-Layer Filtering**:
+  - **Basic Filters**: Verdict (Whitelisted/Parent Guidance/Not Whitelisted), Age Group (3-7/8-12/13-18), Language (Arabic/English)
+  - **Scoring Criteria Filters**: Cultural Values, Child Safety (Safe/Moderate/Severe), Theme Complexity (Simple/Moderate/High), Language Level (Easy/Moderate/Advanced)
+  - **Age Range Overlap Logic**: Intelligent age filtering that handles various formats ("6-9", "6+") with proper range overlap detection
+- **Book Selection Controls**: Individual checkboxes, Select All/None buttons, visual feedback with green ring on selected books
+- **Dynamic PDF Generation**: Generate reports for any filtered subset of books via POST endpoint
+- **Real-Time Filtering**: Instant book list updates based on filter combinations
+
+**Technical Implementation:**
+- New `/api/generate-pdf-report` POST endpoint accepting array of book IDs
+- Age filtering uses `recommended_minimum_age` with `ageRangesOverlap` function for consistency
+- Proper evaluation type imports from `@/types/evaluation` for type safety
+- Filter state management with useMemo for performance optimization
+- Accordion UI for advanced filters to optimize space usage
+
+**User Experience:**
+- Reports button in header next to Settings icon
+- Filter sidebar with all 4 scoring systems represented
+- Book cards show verdict badges, age groups, and system ratings
+- Generate Report button displays count of selected books
+- Back to Home button for easy navigation
+
+**Testing & Quality:**
+- E2E tested with various filter combinations (verdict, age, language, scoring criteria)
+- Age range overlap logic verified for all age groups
+- Architect-reviewed and approved with no blocking issues
+- Consistent implementation matching existing Home page filtering
+
+**Future Enhancements:**
+- Extract shared age-range utilities to common module to avoid duplication
+- Add automated tests for edge-case age strings
+- Enhance UX with success toast confirmation after report generation
+
 ### Scoring Configuration Administration System (October 2025)
 Implemented enterprise-grade scoring configuration administration system for managing evaluation criteria, weights, and thresholds:
 
