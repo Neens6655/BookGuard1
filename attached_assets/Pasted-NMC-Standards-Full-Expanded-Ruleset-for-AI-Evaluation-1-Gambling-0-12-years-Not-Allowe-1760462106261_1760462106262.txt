@@ -1,0 +1,150 @@
+NMC Standards — Full Expanded Ruleset for AI Evaluation
+1. Gambling / القمار
+
+0–12 years (Not Allowed)
+
+Description: No gambling references of any kind are acceptable. Children in this band should not be exposed to gambling terms, games of chance, casinos, or betting.
+
+❌ Example: “He played cards at the casino.”
+
+❌ Example: “She bet all her money on the race.”
+
+13+ (Allowed if Cautionary/Educational)
+
+Description: Gambling references may be included only if framed as a negative example, a cautionary tale, or an educational lesson about its dangers.
+
+✅ Example: “The story warns how gambling ruined his family.”
+
+✅ Example: “He lost everything through gambling and learned a hard lesson.”
+
+17+ (Permissible in Historical/Contextual)
+
+Description: Gambling references can be mentioned factually or historically (e.g., Victorian betting houses, mafia gambling).
+
+✅ Example: “In the 19th century, gambling dens spread across Europe.”
+
+21+ (Permissible Without Restriction)
+
+Description: Gambling depicted without restriction, including casual or positive portrayals.
+
+✅ Example: “They spent the night drinking and gambling.”
+
+2. Language & Profanity / اللغة
+
+0–9 years (Not Allowed)
+
+Description: No profanity or rude words at all. Language should be simple, positive, and respectful.
+
+❌ Example: “You idiot!”
+
+10–12 years (Mild Insults Allowed)
+
+Description: Only mild, child-level insults are acceptable (e.g., “stupid,” “dumb,” “shut up”). No swearing, obscenities, or offensive slang.
+
+✅ Example: “Stop being so stupid!”
+
+13+ (Moderate Slang/Insults Acceptable)
+
+Description: More casual insults, name-calling, or light slang may appear. Still no strong profanities.
+
+✅ Example: “He was a jerk to everyone in school.”
+
+17+ (Strong Profanity Allowed if Contextualized)
+
+Description: Strong profanities (f***, s***) can appear, but only if used for emotional realism or to show strong emotions in older teens or adults. Not to be normalized for humor.
+
+✅ Example: “That’s f***ing unbelievable,” she muttered.
+
+21+ (Explicit Profanity Fully Permissible)
+
+Description: Explicit profanity, offensive language, or vulgarities acceptable in full adult literary context.
+
+3. Violence & Terror / العنف والرعب
+
+0–5 years (Not Allowed)
+
+Description: No violence of any kind, including hitting, fighting, or weapons.
+
+❌ Example: “He hit her with a stick.”
+
+6–9 years (Cartoon/Fantasy Violence Only)
+
+Description: Permissible if exaggerated, non-realistic, and safe in tone. Must not include blood or injury.
+
+✅ Example: “The dragon blew fire, but the hero escaped unharmed.”
+
+10–12 years (Mild Peril/Fantasy Battles)
+
+Description: Action or danger allowed if not graphic. Injuries must be minor, danger should resolve positively.
+
+✅ Example: “The pirates fought with swords, but nobody was seriously hurt.”
+
+13+ (Moderate/Realistic Violence Allowed)
+
+Description: Realistic conflict (crime, detective stories, suspense, action). Some intensity permitted, but no gore or extreme horror.
+
+✅ Example: “The detective found the victim tied up in the warehouse.”
+
+17+ (Realistic War/Crime/Terror Themes)
+
+Description: Mature depictions of war, terrorism, or crime are acceptable. Violence can be intense, but gore should remain limited.
+
+✅ Example: “The soldier watched bombs fall on the city.”
+
+21+ (Graphic Violence Permissible)
+
+Description: Graphic, gory, or explicit violence acceptable in adult-only contexts.
+
+✅ Example: “The battlefield was covered in blood and severed limbs.”
+
+4. Alcohol, Smoking & Drugs / الكحول والتدخين والمخدرات
+
+0–12 years (Not Allowed)
+
+Description: No references to alcohol, cigarettes, drugs, or related paraphernalia.
+
+❌ Example: “He lit a cigarette.”
+
+13+ (Mentions Allowed if Negative)
+
+Description: May mention alcohol, smoking, or drugs only if framed as dangerous, harmful, or discouraged.
+
+✅ Example: “He learned that smoking was dangerous for his health.”
+
+17+ (Realistic Depictions Acceptable if Not Glamorized)
+
+Description: Characters may encounter substance use, addiction, or recovery, provided it is not glorified.
+
+✅ Example: “The character struggled with alcohol addiction.”
+
+21+ (Fully Permissible in Adult Context)
+
+Description: Substance use may be depicted without restriction, including glamorized use.
+
+✅ Example: “They passed around joints at the party.”
+
+5. Sex & Nudity / الجنس والتعرّي
+
+0–12 years (Not Allowed)
+
+Description: No sexual or nudity content, no romantic intimacy beyond friendship.
+
+❌ Example: “They kissed passionately in bed.”
+
+13+ (Light Romance Allowed)
+
+Description: Innocent expressions of attraction (crush, hand-holding, blushing, light kiss). No intimacy or sexual implications.
+
+✅ Example: “She blushed when he held her hand.”
+
+17+ (Non-Explicit Intimacy Allowed)
+
+Description: Teen romance may include kissing, implied intimacy, or romantic relationships, provided descriptions are non-explicit.
+
+✅ Example: “They shared a long kiss under the stars.”
+
+21+ (Explicit Content Permissible)
+
+Description: Explicit descriptions of sexual activity permissible in adult literature.
+
+✅ Example: “The novel described their sexual encounter in detail.”
