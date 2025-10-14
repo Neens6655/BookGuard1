@@ -166,6 +166,54 @@ export async function seedDefaultScoringConfig() {
         enableEvidenceExtraction: true,
         enablePageReferences: true
       },
+      nmcConfig: {
+        enabled: true,
+        categories: {
+          gambling: {
+            thresholds: [
+              { maxAge: 12, ageBand: "Not Allowed", description: "No gambling references of any kind" },
+              { maxAge: 16, ageBand: "13+", description: "Allowed if cautionary/educational" },
+              { maxAge: 20, ageBand: "17+", description: "Permissible in historical/contextual" },
+              { maxAge: 999, ageBand: "21+", description: "Permissible without restriction" }
+            ]
+          },
+          language: {
+            thresholds: [
+              { maxAge: 9, ageBand: "Not Allowed", description: "No profanity or rude words" },
+              { maxAge: 12, ageBand: "10+", description: "Mild insults allowed (stupid, dumb)" },
+              { maxAge: 16, ageBand: "13+", description: "Moderate slang/insults acceptable" },
+              { maxAge: 20, ageBand: "17+", description: "Strong profanity if contextualized" },
+              { maxAge: 999, ageBand: "21+", description: "Explicit profanity fully permissible" }
+            ]
+          },
+          violence: {
+            thresholds: [
+              { maxAge: 5, ageBand: "Not Allowed", description: "No violence of any kind" },
+              { maxAge: 9, ageBand: "6+", description: "Cartoon/fantasy violence only" },
+              { maxAge: 12, ageBand: "10+", description: "Mild peril/fantasy battles" },
+              { maxAge: 16, ageBand: "13+", description: "Moderate/realistic violence allowed" },
+              { maxAge: 20, ageBand: "17+", description: "Realistic war/crime/terror themes" },
+              { maxAge: 999, ageBand: "21+", description: "Graphic violence permissible" }
+            ]
+          },
+          substanceUse: {
+            thresholds: [
+              { maxAge: 12, ageBand: "Not Allowed", description: "No alcohol, smoking, or drugs" },
+              { maxAge: 16, ageBand: "13+", description: "Mentions allowed if negative" },
+              { maxAge: 20, ageBand: "17+", description: "Realistic depictions if not glamorized" },
+              { maxAge: 999, ageBand: "21+", description: "Fully permissible in adult context" }
+            ]
+          },
+          sexualContent: {
+            thresholds: [
+              { maxAge: 12, ageBand: "Not Allowed", description: "No sexual or nudity content" },
+              { maxAge: 16, ageBand: "13+", description: "Light romance allowed (hand-holding, blushing)" },
+              { maxAge: 20, ageBand: "17+", description: "Non-explicit intimacy allowed" },
+              { maxAge: 999, ageBand: "21+", description: "Explicit content permissible" }
+            ]
+          }
+        }
+      },
       createdBy: "system"
     };
 

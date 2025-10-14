@@ -244,6 +244,28 @@ export const scoringConfigs = pgTable("scoring_configs", {
     enablePageReferences: boolean;
   }>(),
   
+  // NMC Standards Configuration
+  nmcConfig: jsonb("nmc_config").$type<{
+    enabled: boolean;
+    categories: {
+      gambling: {
+        thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+      };
+      language: {
+        thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+      };
+      violence: {
+        thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+      };
+      substanceUse: {
+        thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+      };
+      sexualContent: {
+        thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+      };
+    };
+  }>(),
+  
   createdBy: text("created_by"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
