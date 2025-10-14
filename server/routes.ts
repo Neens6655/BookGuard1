@@ -5,7 +5,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import puppeteer from "puppeteer";
 import { storage } from "./storage";
-import { insertEvaluationSchema, updateBookMetadataSchema } from "@shared/schema";
+import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 import { fromError } from "zod-validation-error";
@@ -249,6 +249,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(500).json({ 
         error: error instanceof Error ? error.message : "Deep analysis failed" 
+      });
+    }
+  });
+
+  // Scoring Configuration API Routes
+  
+  // Get all scoring configurations
+  app.get("/api/scoring-configs", async (req, res) => {
+    try {
+      const configs = await storage.getAllScoringConfigs();
+      res.json(configs);
+    } catch (error) {
+      console.error("Get scoring configs error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to get scoring configs" 
+      });
+    }
+  });
+
+  // Get active scoring configuration
+  app.get("/api/scoring-configs/active", async (req, res) => {
+    try {
+      const config = await storage.getActiveScoringConfig();
+      if (!config) {
+        return res.status(404).json({ error: "No active scoring configuration found" });
+      }
+      res.json(config);
+    } catch (error) {
+      console.error("Get active scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to get active scoring config" 
+      });
+    }
+  });
+
+  // Get specific scoring configuration by ID
+  app.get("/api/scoring-configs/:id", async (req, res) => {
+    try {
+      const config = await storage.getScoringConfig(req.params.id);
+      if (!config) {
+        return res.status(404).json({ error: "Scoring configuration not found" });
+      }
+      res.json(config);
+    } catch (error) {
+      console.error("Get scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to get scoring config" 
+      });
+    }
+  });
+
+  // Create new scoring configuration
+  app.post("/api/scoring-configs", async (req, res) => {
+    try {
+      const validationResult = insertScoringConfigSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        const validationError = fromError(validationResult.error);
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: validationError.message 
+        });
+      }
+
+      const config = await storage.createScoringConfig(validationResult.data);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        configId: config.id,
+        action: 'created',
+        changes: null,
+        performedBy: req.body.createdBy || 'system',
+      });
+
+      res.status(201).json(config);
+    } catch (error) {
+      console.error("Create scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to create scoring config" 
+      });
+    }
+  });
+
+  // Update scoring configuration
+  app.patch("/api/scoring-configs/:id", async (req, res) => {
+    try {
+      const config = await storage.getScoringConfig(req.params.id);
+      if (!config) {
+        return res.status(404).json({ error: "Scoring configuration not found" });
+      }
+
+      const updated = await storage.updateScoringConfig(req.params.id, req.body);
+      
+      // Create audit log
+      await storage.createAuditLog({
+        configId: req.params.id,
+        action: 'updated',
+        changes: req.body,
+        performedBy: req.body.performedBy || 'system',
+      });
+
+      res.json(updated);
+    } catch (error) {
+      console.error("Update scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to update scoring config" 
+      });
+    }
+  });
+
+  // Activate scoring configuration
+  app.post("/api/scoring-configs/:id/activate", async (req, res) => {
+    try {
+      const config = await storage.getScoringConfig(req.params.id);
+      if (!config) {
+        return res.status(404).json({ error: "Scoring configuration not found" });
+      }
+
+      const success = await storage.activateScoringConfig(
+        req.params.id, 
+        req.body.performedBy || 'system'
+      );
+      
+      if (!success) {
+        return res.status(500).json({ error: "Failed to activate scoring configuration" });
+      }
+
+      res.json({ success: true, message: "Configuration activated successfully" });
+    } catch (error) {
+      console.error("Activate scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to activate scoring config" 
+      });
+    }
+  });
+
+  // Delete scoring configuration
+  app.delete("/api/scoring-configs/:id", async (req, res) => {
+    try {
+      const config = await storage.getScoringConfig(req.params.id);
+      if (!config) {
+        return res.status(404).json({ error: "Scoring configuration not found" });
+      }
+
+      if (config.isActive === 1) {
+        return res.status(400).json({ 
+          error: "Cannot delete active configuration. Please activate another configuration first." 
+        });
+      }
+
+      const deleted = await storage.deleteScoringConfig(req.params.id);
+      
+      if (!deleted) {
+        return res.status(500).json({ error: "Failed to delete scoring configuration" });
+      }
+
+      // Create audit log
+      await storage.createAuditLog({
+        configId: req.params.id,
+        action: 'deleted',
+        changes: null,
+        performedBy: req.body.performedBy || 'system',
+      });
+
+      res.json({ success: true, message: "Configuration deleted successfully" });
+    } catch (error) {
+      console.error("Delete scoring config error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to delete scoring config" 
+      });
+    }
+  });
+
+  // Get audit logs
+  app.get("/api/scoring-audit-logs", async (req, res) => {
+    try {
+      const configId = req.query.configId as string | undefined;
+      const logs = await storage.getAuditLogs(configId);
+      res.json(logs);
+    } catch (error) {
+      console.error("Get audit logs error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to get audit logs" 
       });
     }
   });
