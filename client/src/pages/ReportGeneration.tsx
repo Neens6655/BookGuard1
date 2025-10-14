@@ -28,6 +28,33 @@ import {
 type VerdictFilter = "all" | "Whitelisted" | "Parent Guidance" | "Not Whitelisted";
 type SafetyRating = "Safe" | "Moderate" | "Severe";
 
+// Helper function to parse age range strings
+const parseAgeRange = (ageStr: string): { min: number; max: number } => {
+  const numbers = ageStr.match(/\d+/g);
+  
+  if (!numbers || numbers.length === 0) {
+    return { min: 0, max: 99 };
+  }
+  
+  const nums = numbers.map(n => parseInt(n));
+  
+  if (nums.length >= 2) {
+    // Range like "6-9" or "Ages 6-9"
+    return { min: Math.min(...nums), max: Math.max(...nums) };
+  } else {
+    // Single number like "6" or "6+"
+    const age = nums[0];
+    return { min: age, max: age + 2 };
+  }
+};
+
+// Helper function to check if two age ranges overlap
+const ageRangesOverlap = (range1: string, range2: string): boolean => {
+  const r1 = parseAgeRange(range1);
+  const r2 = parseAgeRange(range2);
+  return r1.min <= r2.max && r2.min <= r1.max;
+};
+
 export default function ReportGeneration() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -59,9 +86,13 @@ export default function ReportGeneration() {
         return false;
       }
 
-      // Age group filter (use recommended_age from result)
-      if (ageGroupFilter !== "all" && evaluation.result.recommended_age !== ageGroupFilter) {
-        return false;
+      // Age group filter (use recommended_minimum_age from result)
+      if (ageGroupFilter !== "all") {
+        const recAge = evaluation.result.recommended_minimum_age;
+        // Check if the age groups overlap or match
+        if (!recAge || !ageRangesOverlap(ageGroupFilter, recAge)) {
+          return false;
+        }
       }
 
       // Language filter
@@ -479,9 +510,9 @@ export default function ReportGeneration() {
                             </Badge>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {result.recommended_age && (
+                            {result.recommended_minimum_age && (
                               <Badge variant="outline" className="text-xs">
-                                Ages {result.recommended_age}
+                                Ages {result.recommended_minimum_age}
                               </Badge>
                             )}
                             {result.language && (
