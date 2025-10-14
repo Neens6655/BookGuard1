@@ -46,6 +46,7 @@
     "@types/multer": "^2.0.0",
     "@types/puppeteer": "^5.4.7",
     "adm-zip": "^0.5.16",
+    "apify-client": "^2.18.0",
     "canvas": "^3.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
