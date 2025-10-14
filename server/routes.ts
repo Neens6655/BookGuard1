@@ -206,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           break;
 
         case 'txt':
-          const txtReport = generateTextReport(evaluation.result);
+          const txtReport = generateTextReport(evaluation.result, evaluation.nmcAssessment);
           res.setHeader('Content-Type', 'text/plain');
           res.setHeader('Content-Disposition', `attachment; filename="${filename}.txt"`);
           res.send(txtReport);
@@ -580,8 +580,8 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
   }
 }
 
-function generateTextReport(result: any): string {
-  return `
+function generateTextReport(result: any, nmcAssessment?: any): string {
+  let report = `
 📚 Book Title: ${result.title || 'Unknown'}
 
 📊 Whitelist Score: ${result.whitelist_score || 'N/A'} / 100
@@ -610,16 +610,51 @@ ${result.parent_discussion_guide?.after_reading?.map((q: string) => `- ${q}`).jo
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 Age Recommendations
-Recommended Minimum Age: ${result.recommended_minimum_age || 'N/A'}
+UAE Recommended Minimum Age: ${result.recommended_minimum_age || 'N/A'}
 
 ${result.age_verdicts ? Object.entries(result.age_verdicts).map(([age, verdict]) => `${age}: ${verdict}`).join('\n') : 'No age verdicts available'}
+`;
 
+  // Add NMC Standards section if available
+  if (nmcAssessment && nmcAssessment.enabled) {
+    report += `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛡️ NMC Standards Assessment
+Final NMC Age Band: ${nmcAssessment.finalAgeBand}
+
+Category Breakdown:
+─────────────────────────────────────────────
+🎰 Gambling Content: ${nmcAssessment.categories.gambling.ageBand}
+   ${nmcAssessment.categories.gambling.detected ? '⚠️ Detected' : '✓ Not Detected'}
+   ${nmcAssessment.categories.gambling.evidence}
+
+📝 Language & Profanity: ${nmcAssessment.categories.language.ageBand}
+   ${nmcAssessment.categories.language.detected ? '⚠️ Detected' : '✓ Not Detected'}
+   ${nmcAssessment.categories.language.evidence}
+
+⚔️ Violence & Terror: ${nmcAssessment.categories.violence.ageBand}
+   ${nmcAssessment.categories.violence.detected ? '⚠️ Detected' : '✓ Not Detected'}
+   ${nmcAssessment.categories.violence.evidence}
+
+🍺 Alcohol, Smoking & Drugs: ${nmcAssessment.categories.substanceUse.ageBand}
+   ${nmcAssessment.categories.substanceUse.detected ? '⚠️ Detected' : '✓ Not Detected'}
+   ${nmcAssessment.categories.substanceUse.evidence}
+
+💕 Sex & Nudity: ${nmcAssessment.categories.sexualContent.ageBand}
+   ${nmcAssessment.categories.sexualContent.detected ? '⚠️ Detected' : '✓ Not Detected'}
+   ${nmcAssessment.categories.sexualContent.evidence}
+`;
+  }
+
+  report += `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔑 Key Drivers
 ${result.key_drivers?.map((d: string) => `- ${d}`).join('\n') || '- No key drivers available'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;
+  
+  return report;
 }
 
 function generateWhitelistedBooksReport(evaluations: any[]): string {
@@ -856,9 +891,59 @@ function generateWhitelistedBooksHTML(evaluations: any[]): string {
 
         <div class="section">
           <h3>👨‍👩‍👧 Perfect For Ages</h3>
-          <div class="age-badge">${result.recommended_age || result.recommended_minimum_age || 'Not specified'}</div>
+          <div class="age-badge">UAE: ${result.recommended_age || result.recommended_minimum_age || 'Not specified'}</div>
           <p>${result.age_rationale || 'No rationale provided.'}</p>
         </div>
+
+        ${evaluation.nmcAssessment && evaluation.nmcAssessment.enabled ? `
+          <div class="section">
+            <h3>🛡️ NMC Standards Assessment</h3>
+            <div class="age-badge" style="background: linear-gradient(135deg, #a855f7, #7c3aed);">NMC: ${evaluation.nmcAssessment.finalAgeBand}</div>
+            <p style="margin-bottom: 10px; font-style: italic; color: #666;">Content evaluation across 5 National Media Council regulatory categories:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 8px;">
+              <div style="padding: 8px; border-radius: 6px; border-left: 3px solid ${evaluation.nmcAssessment.categories.gambling.detected ? '#a855f7' : '#10b981'}; background: ${evaluation.nmcAssessment.categories.gambling.detected ? '#faf5ff' : '#f0fdf4'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 10px;">🎰 Gambling</strong>
+                  <span style="font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: ${evaluation.nmcAssessment.categories.gambling.detected ? '#a855f7' : '#10b981'}; color: white;">${evaluation.nmcAssessment.categories.gambling.ageBand}</span>
+                </div>
+                <p style="font-size: 9px; color: #555;">${evaluation.nmcAssessment.categories.gambling.evidence}</p>
+              </div>
+              
+              <div style="padding: 8px; border-radius: 6px; border-left: 3px solid ${evaluation.nmcAssessment.categories.language.detected ? '#f59e0b' : '#10b981'}; background: ${evaluation.nmcAssessment.categories.language.detected ? '#fffbeb' : '#f0fdf4'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 10px;">📝 Language & Profanity</strong>
+                  <span style="font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: ${evaluation.nmcAssessment.categories.language.detected ? '#f59e0b' : '#10b981'}; color: white;">${evaluation.nmcAssessment.categories.language.ageBand}</span>
+                </div>
+                <p style="font-size: 9px; color: #555;">${evaluation.nmcAssessment.categories.language.evidence}</p>
+              </div>
+              
+              <div style="padding: 8px; border-radius: 6px; border-left: 3px solid ${evaluation.nmcAssessment.categories.violence.detected ? '#ef4444' : '#10b981'}; background: ${evaluation.nmcAssessment.categories.violence.detected ? '#fef2f2' : '#f0fdf4'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 10px;">⚔️ Violence & Terror</strong>
+                  <span style="font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: ${evaluation.nmcAssessment.categories.violence.detected ? '#ef4444' : '#10b981'}; color: white;">${evaluation.nmcAssessment.categories.violence.ageBand}</span>
+                </div>
+                <p style="font-size: 9px; color: #555;">${evaluation.nmcAssessment.categories.violence.evidence}</p>
+              </div>
+              
+              <div style="padding: 8px; border-radius: 6px; border-left: 3px solid ${evaluation.nmcAssessment.categories.substanceUse.detected ? '#fb923c' : '#10b981'}; background: ${evaluation.nmcAssessment.categories.substanceUse.detected ? '#fff7ed' : '#f0fdf4'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 10px;">🍺 Alcohol, Smoking & Drugs</strong>
+                  <span style="font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: ${evaluation.nmcAssessment.categories.substanceUse.detected ? '#fb923c' : '#10b981'}; color: white;">${evaluation.nmcAssessment.categories.substanceUse.ageBand}</span>
+                </div>
+                <p style="font-size: 9px; color: #555;">${evaluation.nmcAssessment.categories.substanceUse.evidence}</p>
+              </div>
+              
+              <div style="padding: 8px; border-radius: 6px; border-left: 3px solid ${evaluation.nmcAssessment.categories.sexualContent.detected ? '#ec4899' : '#10b981'}; background: ${evaluation.nmcAssessment.categories.sexualContent.detected ? '#fdf2f8' : '#f0fdf4'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="font-size: 10px;">💕 Sex & Nudity</strong>
+                  <span style="font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: ${evaluation.nmcAssessment.categories.sexualContent.detected ? '#ec4899' : '#10b981'}; color: white;">${evaluation.nmcAssessment.categories.sexualContent.ageBand}</span>
+                </div>
+                <p style="font-size: 9px; color: #555;">${evaluation.nmcAssessment.categories.sexualContent.evidence}</p>
+              </div>
+            </div>
+          </div>
+        ` : ''}
 
         <div class="section">
           <h3>💎 Key Values & Lessons</h3>
