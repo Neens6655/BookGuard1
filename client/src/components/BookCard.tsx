@@ -18,7 +18,10 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
   
   if (!result) return null;
 
-  const rating = result.rating || 4.6;
+  // Only use Goodreads rating if status is 'ok'
+  const hasGoodreadsRating = book.goodreadsData?.status === 'ok' && book.goodreadsData.rating;
+  const rating = hasGoodreadsRating ? book.goodreadsData.rating : undefined;
+  
   const genres = result.genres || result.key_drivers.slice(0, 2);
   const themes = result.themes || ['General'];
   
@@ -124,17 +127,12 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
             <Settings className="w-4 h-4" />
           </Button>
           
-          {/* Goodreads Rating Badge (if available) */}
-          {book.goodreadsData?.rating ? (
-            <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
-              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-              {book.goodreadsData.rating.toFixed(1)}
-              <span className="text-xs ml-1 text-gray-500">Goodreads</span>
-            </Badge>
-          ) : (
+          {/* Goodreads Rating Badge (only show if data is available) */}
+          {hasGoodreadsRating && rating && (
             <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
               <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
               {rating.toFixed(1)}
+              <span className="text-xs ml-1 text-gray-500">Goodreads</span>
             </Badge>
           )}
           

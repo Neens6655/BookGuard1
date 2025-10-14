@@ -592,7 +592,7 @@ function generateTextReport(result: any, nmcAssessment?: any, goodreadsData?: an
   let report = `
 📚 Book Title: ${result.title || 'Unknown'}${result.author ? ` by ${result.author}` : ''}
 
-${goodreadsData?.rating ? `⭐ Goodreads Rating: ${goodreadsData.rating.toFixed(1)}/5.0 (${goodreadsData.ratingsCount?.toLocaleString() || 'N/A'} ratings)\n` : ''}📊 Whitelist Score: ${result.whitelist_score || 'N/A'} / 100
+${goodreadsData?.status === 'ok' && goodreadsData?.rating ? `⭐ Goodreads Rating: ${goodreadsData.rating.toFixed(1)}/5.0 (${goodreadsData.ratingsCount?.toLocaleString() || 'N/A'} ratings)\n` : ''}📊 Whitelist Score: ${result.whitelist_score || 'N/A'} / 100
 Verdict: ${result.whitelist_verdict || 'N/A'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

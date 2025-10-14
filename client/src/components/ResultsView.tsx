@@ -37,7 +37,10 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
 
   // Approval based on high-risk count: more than 2 highs = not approved
   const isApproved = highRiskCount <= 2;
-  const rating = goodreadsData?.rating || result.rating || 4.6;
+  
+  // Only use Goodreads rating if status is 'ok'
+  const hasGoodreadsRating = goodreadsData?.status === 'ok' && goodreadsData.rating;
+  const rating = hasGoodreadsRating ? goodreadsData.rating : undefined;
   
   // Extract genre/themes from key_drivers
   const genres = result.key_drivers.slice(0, 4).map((driver, idx) => ({
@@ -127,14 +130,19 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
               </h2>
               <p className="text-lg opacity-90 mb-6">by Regional author</p>
               
-              {/* Rating */}
-              <div className="flex items-center space-x-1 mb-8">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className={`w-6 h-6 ${i < Math.floor(rating) ? 'fill-yellow-300 text-yellow-300' : 'fill-white/30 text-white/30'}`} />
-                ))}
-                <span className="ml-3 font-bold text-xl">{rating}</span>
-                <span className="ml-1 opacity-80 text-base">/5</span>
-              </div>
+              {/* Rating - Only show if Goodreads data is available */}
+              {hasGoodreadsRating && rating && (
+                <div className="flex items-center space-x-1 mb-8">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`w-6 h-6 ${i < Math.floor(rating) ? 'fill-yellow-300 text-yellow-300' : 'fill-white/30 text-white/30'}`} />
+                  ))}
+                  <span className="ml-3 font-bold text-xl">{rating.toFixed(1)}</span>
+                  <span className="ml-1 opacity-80 text-base">/5</span>
+                  {goodreadsData?.ratingsCount && (
+                    <span className="ml-2 text-sm opacity-80">({goodreadsData.ratingsCount.toLocaleString()} ratings)</span>
+                  )}
+                </div>
+              )}
               
               {/* Description */}
               <p className="text-lg opacity-95 leading-relaxed mb-8" data-testid="book-description">
@@ -186,7 +194,7 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
             <div>
               <h3 className="text-2xl font-bold text-foreground">Book Analysis</h3>
               <p className="text-sm text-muted-foreground">
-                {goodreadsData?.rating && (
+                {hasGoodreadsRating && goodreadsData.rating && (
                   <span className="inline-flex items-center gap-1">
                     <span className="text-yellow-500">★</span>
                     <span className="font-semibold">{goodreadsData.rating.toFixed(1)}</span>
