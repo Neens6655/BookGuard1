@@ -5,19 +5,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { type EvaluationResult, type NMCAssessment } from '@/types/evaluation';
+import { type EvaluationResult, type NMCAssessment, type GoodreadsData } from '@/types/evaluation';
 
 interface ResultsViewProps {
   result: EvaluationResult;
   filename: string;
   coverImage?: string | null;
   nmcAssessment?: NMCAssessment | null;
+  goodreadsData?: GoodreadsData | null;
   onNewAssessment: () => void;
   onBackToLibrary?: () => void;
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, coverImage, nmcAssessment, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, coverImage, nmcAssessment, goodreadsData, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Map score to risk level label
@@ -184,15 +185,21 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, onNew
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="text-2xl font-bold text-foreground">Book Analysis</h3>
-              <p className="text-sm text-muted-foreground">Comprehensive review and safety analysis</p>
+              <p className="text-sm text-muted-foreground">
+                {goodreadsData?.rating && (
+                  <span className="inline-flex items-center gap-1">
+                    <span className="text-yellow-500">★</span>
+                    <span className="font-semibold">{goodreadsData.rating.toFixed(1)}</span>
+                    {goodreadsData.ratingsCount && (
+                      <span className="text-xs">({goodreadsData.ratingsCount.toLocaleString()} Goodreads ratings)</span>
+                    )}
+                    <span className="mx-2">•</span>
+                  </span>
+                )}
+                Comprehensive review and safety analysis
+              </p>
             </div>
             <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-500" data-testid="rating-header">
-                  {rating}★
-                </div>
-                <div className="text-xs text-muted-foreground">Rating</div>
-              </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-blue-600" data-testid="age-header">
                   {result.recommended_minimum_age}

@@ -94,6 +94,20 @@ export interface NMCAssessment {
   };
 }
 
+export interface GoodreadsData {
+  rating?: number;
+  ratingsCount?: number;
+  reviewsCount?: number;
+  genres?: string[];
+  publishedYear?: number;
+  description?: string;
+  coverImageUrl?: string;
+  isbn?: string;
+  pageCount?: number;
+  goodreadsUrl?: string;
+  lastFetched?: string;
+}
+
 export interface Evaluation {
   id: string;
   filename: string;
@@ -102,6 +116,7 @@ export interface Evaluation {
   progress: number;
   result: EvaluationResult | null;
   nmcAssessment?: NMCAssessment | null;
+  goodreadsData?: GoodreadsData | null;
   coverImage: string | null;
   createdAt: string;
   updatedAt: string;

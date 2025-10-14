@@ -836,6 +836,7 @@ export default function Home() {
             filename={evaluation.filename}
             coverImage={evaluation.coverImage}
             nmcAssessment={evaluation.nmcAssessment}
+            goodreadsData={evaluation.goodreadsData}
             onNewAssessment={() => changeView('upload')}
             onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}

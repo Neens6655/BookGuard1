@@ -124,11 +124,19 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
             <Settings className="w-4 h-4" />
           </Button>
           
-          {/* Rating Badge */}
-          <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
-            <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-            {rating.toFixed(1)}
-          </Badge>
+          {/* Goodreads Rating Badge (if available) */}
+          {book.goodreadsData?.rating ? (
+            <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
+              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+              {book.goodreadsData.rating.toFixed(1)}
+              <span className="text-xs ml-1 text-gray-500">Goodreads</span>
+            </Badge>
+          ) : (
+            <Badge className="absolute top-3 right-3 bg-white text-gray-900 hover:bg-white font-semibold shadow-md">
+              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+              {rating.toFixed(1)}
+            </Badge>
+          )}
           
           {/* UAE Age Badge */}
           <Badge className="absolute bottom-3 left-3 bg-white/95 text-blue-700 hover:bg-white font-semibold shadow-md border border-blue-200">
