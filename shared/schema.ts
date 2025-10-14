@@ -34,6 +34,14 @@ export const evaluations = pgTable("evaluations", {
     isbn?: string;
     pageCount?: number;
     goodreadsUrl?: string;
+    reviews?: Array<{
+      author: string;
+      userUrl?: string;
+      rating: number;
+      text: string;
+      date: string;
+      numOfLikes?: number;
+    }>;
     lastFetched?: string;
   }>(),
   coverImage: text("cover_image"),

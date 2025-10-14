@@ -94,7 +94,18 @@ export interface NMCAssessment {
   };
 }
 
+export interface GoodreadsReview {
+  author: string;
+  userUrl?: string;
+  rating: number;
+  text: string;
+  date: string;
+  numOfLikes?: number;
+}
+
 export interface GoodreadsData {
+  status: 'ok' | 'unavailable' | 'error';
+  message?: string;
   rating?: number;
   ratingsCount?: number;
   reviewsCount?: number;
@@ -105,6 +116,7 @@ export interface GoodreadsData {
   isbn?: string;
   pageCount?: number;
   goodreadsUrl?: string;
+  reviews?: GoodreadsReview[];
   lastFetched?: string;
 }
 

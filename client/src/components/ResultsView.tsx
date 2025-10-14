@@ -78,9 +78,9 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
             <div className="md:col-span-1">
               <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-3 transform hover:scale-105 transition-transform duration-300">
                 <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl w-full aspect-[3/4] overflow-hidden relative">
-                  {coverImage ? (
+                  {(coverImage || goodreadsData?.coverImageUrl) ? (
                     <img 
-                      src={coverImage} 
+                      src={coverImage || goodreadsData?.coverImageUrl || ''} 
                       alt={result.title}
                       className="w-full h-full object-cover"
                       data-testid="img-book-cover-detail"
@@ -128,7 +128,10 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
               <h2 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight leading-tight" data-testid="book-title">
                 {result.title}
               </h2>
-              <p className="text-lg opacity-90 mb-6">by Regional author</p>
+              <p className="text-lg opacity-90 mb-2">by {result.author || 'Regional author'}</p>
+              {goodreadsData?.isbn && (
+                <p className="text-sm opacity-75 mb-6">ISBN: {goodreadsData.isbn}</p>
+              )}
               
               {/* Rating - Only show if Goodreads data is available */}
               {hasGoodreadsRating && rating && (
@@ -297,6 +300,16 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                 >
                   <Shield className="w-4 h-4 mr-2" />
                   NMC Standards
+                </TabsTrigger>
+              )}
+              {goodreadsData?.reviews && goodreadsData.reviews.length > 0 && (
+                <TabsTrigger 
+                  value="reviews" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                  data-testid="tab-reviews"
+                >
+                  <Star className="w-4 h-4 mr-2" />
+                  Reviews ({goodreadsData.reviews.length})
                 </TabsTrigger>
               )}
             </TabsList>
@@ -1237,6 +1250,66 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                       </div>
                     </div>
                   </div>
+                </div>
+              </TabsContent>
+            )}
+
+            {/* Goodreads Reviews Tab */}
+            {goodreadsData?.reviews && goodreadsData.reviews.length > 0 && (
+              <TabsContent value="reviews" className="mt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h4 className="font-semibold text-lg">Goodreads Community Reviews</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Top {goodreadsData.reviews.length} reader reviews from Goodreads
+                      </p>
+                    </div>
+                    {goodreadsData.goodreadsUrl && (
+                      <a 
+                        href={goodreadsData.goodreadsUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        View on Goodreads →
+                      </a>
+                    )}
+                  </div>
+
+                  {goodreadsData.reviews.map((review, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold">
+                              {review.author.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground">{review.author}</p>
+                              <p className="text-xs text-muted-foreground">{review.date}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
+                          {review.text}
+                        </p>
+                        {review.numOfLikes && review.numOfLikes > 0 && (
+                          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>👍 {review.numOfLikes.toLocaleString()} people found this helpful</span>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </TabsContent>
             )}

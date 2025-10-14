@@ -4,6 +4,15 @@ const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
 
+export interface GoodreadsReview {
+  author: string;
+  userUrl?: string;
+  rating: number;
+  text: string;
+  date: string;
+  numOfLikes?: number;
+}
+
 export interface GoodreadsBookData {
   status: 'ok' | 'unavailable' | 'error';
   message?: string;
@@ -17,6 +26,7 @@ export interface GoodreadsBookData {
   isbn?: string;
   pageCount?: number;
   goodreadsUrl?: string;
+  reviews?: GoodreadsReview[];
   lastFetched?: string;
 }
 
@@ -35,6 +45,7 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
     const input = {
       search: searchQuery,
       maxItems: 1,
+      includeReviews: true,
       proxy: {
         useApifyProxy: true,
       }
@@ -54,6 +65,19 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
 
     const book: any = items[0];
     
+    // Process reviews - take top 10
+    const reviews: GoodreadsReview[] = [];
+    if (Array.isArray(book.reviews)) {
+      reviews.push(...book.reviews.slice(0, 10).map((review: any) => ({
+        author: String(review.author || 'Anonymous'),
+        userUrl: review.userUrl ? String(review.userUrl) : undefined,
+        rating: review.rating ? parseInt(String(review.rating)) : 0,
+        text: String(review.text || review.html || ''),
+        date: String(review.date || ''),
+        numOfLikes: review.numOfLikes ? parseInt(String(review.numOfLikes)) : undefined,
+      })));
+    }
+    
     return {
       status: 'ok',
       rating: book.rating ? parseFloat(String(book.rating)) : undefined,
@@ -66,6 +90,7 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       isbn: book.isbn ? String(book.isbn) : undefined,
       pageCount: book.pageCount || book.pages ? parseInt(String(book.pageCount || book.pages)) : undefined,
       goodreadsUrl: book.url ? String(book.url) : undefined,
+      reviews: reviews.length > 0 ? reviews : undefined,
       lastFetched: new Date().toISOString(),
     };
 
