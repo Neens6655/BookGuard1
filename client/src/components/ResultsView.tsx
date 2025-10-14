@@ -37,7 +37,7 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
 
   // Approval based on high-risk count: more than 2 highs = not approved
   const isApproved = highRiskCount <= 2;
-  const rating = 4.6; // Mock rating based on score
+  const rating = goodreadsData?.rating || result.rating || 4.6;
   
   // Extract genre/themes from key_drivers
   const genres = result.key_drivers.slice(0, 4).map((driver, idx) => ({
