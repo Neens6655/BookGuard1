@@ -54,6 +54,27 @@ interface System4Config {
   criteria: CriterionConfig[];
 }
 
+interface NMCConfig {
+  enabled: boolean;
+  categories: {
+    gambling: {
+      thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+    };
+    language: {
+      thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+    };
+    violence: {
+      thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+    };
+    substanceUse: {
+      thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+    };
+    sexualContent: {
+      thresholds: Array<{ maxAge: number; ageBand: string; description: string; }>;
+    };
+  };
+}
+
 interface ScoringConfig {
   id: string;
   name: string;
@@ -64,6 +85,7 @@ interface ScoringConfig {
   system2Config: SystemConfig;
   system3Config: System3Config;
   system4Config: System4Config;
+  nmcConfig?: NMCConfig;
   verdictConfig: {
     whitelistedRules: {
       requireAllSafe: boolean;
@@ -296,11 +318,12 @@ export default function ScoringAdmin() {
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="system1" className="w-full">
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="grid w-full grid-cols-6">
                       <TabsTrigger value="system1" data-testid="tab-system1">Cultural Values</TabsTrigger>
                       <TabsTrigger value="system2" data-testid="tab-system2">Child Safety</TabsTrigger>
                       <TabsTrigger value="system3" data-testid="tab-system3">Theme Complexity</TabsTrigger>
                       <TabsTrigger value="system4" data-testid="tab-system4">Language Level</TabsTrigger>
+                      <TabsTrigger value="nmc" data-testid="tab-nmc">NMC Standards</TabsTrigger>
                       <TabsTrigger value="verdict" data-testid="tab-verdict">Verdict</TabsTrigger>
                     </TabsList>
 
@@ -322,6 +345,19 @@ export default function ScoringAdmin() {
                     {/* System 4: Language Level */}
                     <TabsContent value="system4">
                       <System4ConfigDisplay config={selectedConfig.system4Config} />
+                    </TabsContent>
+
+                    {/* NMC Standards */}
+                    <TabsContent value="nmc">
+                      {selectedConfig.nmcConfig ? (
+                        <NMCConfigDisplay config={selectedConfig.nmcConfig} />
+                      ) : (
+                        <div className="space-y-6 pt-4">
+                          <div className="text-center py-12 text-gray-500">
+                            <p>NMC Standards configuration not available for this version</p>
+                          </div>
+                        </div>
+                      )}
                     </TabsContent>
 
                     {/* Verdict Configuration */}
@@ -590,6 +626,85 @@ function System4ConfigDisplay({ config }: { config: System4Config }) {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function NMCConfigDisplay({ config }: { config: NMCConfig }) {
+  const categoryInfo = [
+    { key: 'gambling', name: 'Gambling Content', icon: '🎰', color: 'purple' },
+    { key: 'language', name: 'Language & Profanity', icon: '📝', color: 'yellow' },
+    { key: 'violence', name: 'Violence & Terror', icon: '⚔️', color: 'red' },
+    { key: 'substanceUse', name: 'Alcohol, Smoking & Drugs', icon: '🍺', color: 'orange' },
+    { key: 'sexualContent', name: 'Sex & Nudity', icon: '💕', color: 'pink' },
+  ];
+
+  return (
+    <div className="space-y-6 pt-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">NMC Standards Enabled</Label>
+          <div className="flex items-center gap-2">
+            <Switch checked={config.enabled} disabled />
+            <span className="text-sm text-gray-600">{config.enabled ? "Yes - Parallel evaluation system" : "No"}</span>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-4">
+        <div className="bg-purple-50 dark:bg-purple-900/10 rounded-lg p-4 border border-purple-200">
+          <h3 className="text-md font-semibold mb-2 text-purple-900 dark:text-purple-100">About NMC Standards</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            The National Media Council (NMC) Standards system runs independently from the UAE 4-system evaluation. 
+            It evaluates content across 5 regulatory categories, with each category contributing to a final age band recommendation. 
+            The final NMC age band is determined by the <strong>highest (most restrictive)</strong> age rating across all categories.
+          </p>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-6">
+        <h3 className="text-md font-semibold">Category Thresholds</h3>
+        {categoryInfo.map(({ key, name, icon, color }) => {
+          const category = config.categories[key as keyof typeof config.categories];
+          return (
+            <div key={key} className={`p-4 bg-${color}-50 dark:bg-${color}-900/10 rounded-lg border border-${color}-200`}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">{icon}</span>
+                <h4 className="font-semibold text-md">{name}</h4>
+              </div>
+              <div className="space-y-2">
+                {category.thresholds.map((threshold, index) => (
+                  <div key={index} className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Max Age: {threshold.maxAge}+</p>
+                        <Badge className="mt-1">{threshold.ageBand}</Badge>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{threshold.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <Separator />
+
+      <div className="bg-blue-50 dark:bg-blue-900/10 rounded-lg p-4 border border-blue-200">
+        <h4 className="font-semibold text-sm mb-2 text-blue-900 dark:text-blue-100">Age Band Determination</h4>
+        <p className="text-xs text-gray-600 dark:text-gray-300">
+          The final NMC age band is calculated by taking the <strong>maximum (most restrictive)</strong> age rating 
+          across all 5 categories. For example, if a book has: Gambling (0-12), Language (0-12), Violence (13+), 
+          Substance Use (0-12), and Sexual Content (0-12), the final NMC age band would be <strong>13+</strong> 
+          because Violence requires the highest age threshold.
+        </p>
       </div>
     </div>
   );
