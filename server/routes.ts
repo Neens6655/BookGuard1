@@ -470,6 +470,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate Filtered Books Report (PDF) - accepts array of book IDs
+  app.post("/api/generate-pdf-report", async (req, res) => {
+    try {
+      const { bookIds } = req.body;
+
+      if (!bookIds || !Array.isArray(bookIds) || bookIds.length === 0) {
+        return res.status(400).json({ error: "Please provide an array of book IDs" });
+      }
+
+      const allEvaluations = await storage.getAllEvaluations();
+      
+      // Filter evaluations by provided book IDs
+      const selectedBooks = allEvaluations.filter(
+        (evaluation) => 
+          bookIds.includes(evaluation.id) &&
+          evaluation.status === "completed" &&
+          evaluation.result
+      );
+
+      if (selectedBooks.length === 0) {
+        return res.status(404).json({ error: "No valid books found with the provided IDs" });
+      }
+
+      // Generate PDF report
+      const pdfBuffer = await generateWhitelistedBooksPDF(selectedBooks);
+      
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `Selected_Books_Report_${timestamp}.pdf`;
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+
+    } catch (error) {
+      console.error("Filtered report error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to generate filtered report" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
