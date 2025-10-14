@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, FileDown } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
+import { UploadQueue } from '@/components/UploadQueue';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
 import { BookCard } from '@/components/BookCard';
@@ -14,7 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, Link } from 'wouter';
 import { type Evaluation, type EvaluationResult } from '@/types/evaluation';
 
-type ViewState = 'home' | 'library' | 'upload' | 'processing' | 'results';
+type ViewState = 'home' | 'library' | 'upload' | 'queue' | 'processing' | 'results';
 
 const CATEGORIES = [
   { name: 'Islamic Stories', icon: '🕌', count: 0, emoji: '🕌' },
@@ -32,6 +33,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [queueFiles, setQueueFiles] = useState<File[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
@@ -63,36 +65,26 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleFileUpload = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+  const handleFilesUpload = (files: File[]) => {
+    if (files.length === 0) return;
+    
+    setQueueFiles(files);
+    changeView('queue');
+  };
 
-      const response = await apiRequest('POST', '/api/evaluate', formData);
-      const data = await response.json();
+  const handleQueueComplete = () => {
+    refetch();
+    changeView('home');
+    toast({
+      title: 'All Books Processed',
+      description: `Successfully processed ${queueFiles.length} ${queueFiles.length === 1 ? 'book' : 'books'}!`,
+    });
+    setQueueFiles([]);
+  };
 
-      setEvaluation({
-        id: data.id,
-        filename: file.name,
-        fileSize: file.size,
-        status: 'processing',
-        progress: 0,
-        result: null,
-        coverImage: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
-      changeView('processing');
-      
-      pollEvaluationProgress(data.id);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Upload Failed',
-        description: error instanceof Error ? error.message : 'Failed to upload file. Please try again.',
-      });
-    }
+  const handleQueueCancel = () => {
+    changeView('home');
+    setQueueFiles([]);
   };
 
   const pollEvaluationProgress = async (id: string) => {
@@ -806,13 +798,25 @@ export default function Home() {
                 </p>
               </div>
 
-              <FileUpload onFileUpload={handleFileUpload} />
+              <FileUpload onFilesUpload={handleFilesUpload} />
               
               <div className="text-center mt-6">
                 <Button variant="ghost" onClick={handleBackToHome} data-testid="button-back-home-upload">
                   Back to Home
                 </Button>
               </div>
+            </div>
+          </section>
+        )}
+
+        {currentView === 'queue' && queueFiles.length > 0 && (
+          <section className="py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <UploadQueue
+                files={queueFiles}
+                onComplete={handleQueueComplete}
+                onCancel={handleQueueCancel}
+              />
             </div>
           </section>
         )}
