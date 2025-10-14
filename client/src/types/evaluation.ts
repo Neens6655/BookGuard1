@@ -82,6 +82,18 @@ export interface EvaluationResult {
   whitelist_verdict: string;
 }
 
+export interface NMCAssessment {
+  enabled: boolean;
+  finalAgeBand: string;
+  categories: {
+    gambling: { detected: boolean; ageBand: string; evidence: string; };
+    language: { detected: boolean; ageBand: string; evidence: string; };
+    violence: { detected: boolean; ageBand: string; evidence: string; };
+    substanceUse: { detected: boolean; ageBand: string; evidence: string; };
+    sexualContent: { detected: boolean; ageBand: string; evidence: string; };
+  };
+}
+
 export interface Evaluation {
   id: string;
   filename: string;
@@ -89,6 +101,7 @@ export interface Evaluation {
   status: "processing" | "completed" | "failed";
   progress: number;
   result: EvaluationResult | null;
+  nmcAssessment?: NMCAssessment | null;
   coverImage: string | null;
   createdAt: string;
   updatedAt: string;

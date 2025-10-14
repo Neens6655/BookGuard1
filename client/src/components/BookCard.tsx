@@ -130,11 +130,19 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
             {rating.toFixed(1)}
           </Badge>
           
-          {/* Age Badge */}
+          {/* UAE Age Badge */}
           <Badge className="absolute bottom-3 left-3 bg-white/95 text-blue-700 hover:bg-white font-semibold shadow-md border border-blue-200">
             <Users className="w-3 h-3 mr-1" />
-            Ages {result.recommended_minimum_age}
+            UAE {result.recommended_minimum_age}
           </Badge>
+          
+          {/* NMC Age Badge (if available) */}
+          {book.nmcAssessment && book.nmcAssessment.enabled && (
+            <Badge className="absolute bottom-3 right-3 bg-white/95 text-purple-700 hover:bg-white font-semibold shadow-md border border-purple-200">
+              <span className="text-xs mr-1">NMC</span>
+              {book.nmcAssessment.finalAgeBand}
+            </Badge>
+          )}
         </div>
 
         <CardContent className="p-4 space-y-3">
@@ -152,14 +160,26 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
         
         {/* Age Recommendation - Prominent */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-blue-600 mb-1">Recommended Age</p>
+          <p className="text-xs font-medium text-gray-600 mb-2">Age Recommendations</p>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-xs text-blue-600 font-medium mb-0.5">UAE System</p>
               <p className="text-lg font-bold text-blue-700">
                 {result.recommended_minimum_age}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+            {book.nmcAssessment && book.nmcAssessment.enabled && (
+              <>
+                <div className="h-8 w-px bg-blue-200"></div>
+                <div className="flex-1">
+                  <p className="text-xs text-purple-600 font-medium mb-0.5">NMC Standards</p>
+                  <p className="text-lg font-bold text-purple-700">
+                    {book.nmcAssessment.finalAgeBand}
+                  </p>
+                </div>
+              </>
+            )}
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
               <BookOpen className="w-5 h-5 text-blue-600" />
             </div>
           </div>
