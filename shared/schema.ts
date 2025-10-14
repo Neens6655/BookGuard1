@@ -135,3 +135,126 @@ export const evaluationResultSchema = z.object({
 });
 
 export type EvaluationResult = z.infer<typeof evaluationResultSchema>;
+
+// Scoring Configuration Schema
+export const scoringConfigs = pgTable("scoring_configs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  version: varchar("version").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  isActive: integer("is_active").notNull().default(0), // 0 = inactive, 1 = active
+  
+  // System 1: Cultural Values Configuration
+  system1Config: jsonb("system1_config").notNull().$type<{
+    enabled: boolean;
+    weight: number; // 0-100
+    safeThreshold: number;
+    moderateThreshold: number;
+    severeThreshold: number;
+    autoRejectOnSevere: boolean;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  }>(),
+  
+  // System 2: Child Safety Configuration
+  system2Config: jsonb("system2_config").notNull().$type<{
+    enabled: boolean;
+    weight: number;
+    safeThreshold: number;
+    moderateThreshold: number;
+    severeThreshold: number;
+    autoRejectOnSevere: boolean;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  }>(),
+  
+  // System 3: Theme Complexity Configuration
+  system3Config: jsonb("system3_config").notNull().$type<{
+    enabled: boolean;
+    weight: number;
+    ageMapping: {
+      simple: { minAge: number; maxAge: number };
+      moderate: { minAge: number; maxAge: number };
+      high: { minAge: number; maxAge: number };
+    };
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  }>(),
+  
+  // System 4: Language Complexity Configuration
+  system4Config: jsonb("system4_config").notNull().$type<{
+    enabled: boolean;
+    weight: number;
+    ageMapping: {
+      easy: { minAge: number; maxAge: number };
+      moderate: { minAge: number; maxAge: number };
+      advanced: { minAge: number; maxAge: number };
+    };
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  }>(),
+  
+  // Final Verdict Configuration
+  verdictConfig: jsonb("verdict_config").notNull().$type<{
+    whitelistedRules: {
+      requireAllSafe: boolean;
+      allowedModerates: number;
+      minimumScore: number;
+    };
+    parentGuidanceRules: {
+      maxModerates: number;
+      minimumScore: number;
+    };
+    notWhitelistedRules: {
+      autoRejectSevere: boolean;
+      maxModerates: number;
+      minimumScore: number;
+    };
+  }>(),
+  
+  // AI Model Configuration
+  aiConfig: jsonb("ai_config").$type<{
+    model: string;
+    temperature: number;
+    maxTokens: number;
+    enableEvidenceExtraction: boolean;
+    enablePageReferences: boolean;
+  }>(),
+  
+  createdBy: text("created_by"),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
+});
+
+export const insertScoringConfigSchema = createInsertSchema(scoringConfigs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertScoringConfig = z.infer<typeof insertScoringConfigSchema>;
+export type ScoringConfig = typeof scoringConfigs.$inferSelect;
+
+// Audit Log for Scoring Changes
+export const scoringAuditLogs = pgTable("scoring_audit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  configId: varchar("config_id").notNull(),
+  action: text("action", { enum: ["created", "updated", "activated", "deactivated", "deleted"] }).notNull(),
+  changes: jsonb("changes"),
+  performedBy: text("performed_by"),
+  timestamp: timestamp("timestamp").notNull().default(sql`now()`),
+});
+
+export type ScoringAuditLog = typeof scoringAuditLogs.$inferSelect;
