@@ -291,6 +291,10 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     }
 
     const productDetails = detailsResults[0];
+    
+    // Debug: Log the actual product details structure
+    console.log('Amazon product details structure:', JSON.stringify(productDetails, null, 2));
+    
     const ageInfo = extractAgeInfo(productDetails);
 
     const result: AmazonBookData = {
