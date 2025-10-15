@@ -137,24 +137,23 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
     }
   }
   
-  // Check details/specifications object
-  if (productDetails.details) {
-    const details = productDetails.details;
-    
-    if (details['Reading age'] || details['reading age']) {
-      result.readingAge = details['Reading age'] || details['reading age'];
+  // Check details/specifications object (check both 'details' and 'info_table' fields)
+  const detailsObj = productDetails.details || productDetails.info_table;
+  if (detailsObj) {
+    if (detailsObj['Reading age'] || detailsObj['reading age']) {
+      result.readingAge = detailsObj['Reading age'] || detailsObj['reading age'];
       // Use reading age as target age if no other target age found
       if (!result.targetAge) {
         result.targetAge = result.readingAge;
       }
     }
     
-    if (details['Grade level'] || details['grade level']) {
-      result.gradeLevel = details['Grade level'] || details['grade level'];
+    if (detailsObj['Grade level'] || detailsObj['grade level']) {
+      result.gradeLevel = detailsObj['Grade level'] || detailsObj['grade level'];
     }
     
-    if (details['Age Range'] || details['age range'] || details['Customer recommended age']) {
-      result.targetAge = details['Age Range'] || details['age range'] || details['Customer recommended age'];
+    if (detailsObj['Age Range'] || detailsObj['age range'] || detailsObj['Customer recommended age']) {
+      result.targetAge = detailsObj['Age Range'] || detailsObj['age range'] || detailsObj['Customer recommended age'];
     }
   }
   
