@@ -71,7 +71,7 @@ export function FilterSidebar({
   onNmcBandChange,
   onClearFilters,
 }: FilterSidebarProps) {
-  const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0 || selectedNmcBands.length > 0;
+  const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0 || (selectedNmcBands?.length ?? 0) > 0;
 
   return (
     <Card className="sticky top-4 border-2 border-emerald-200 shadow-lg bg-white">
