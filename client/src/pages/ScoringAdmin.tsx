@@ -775,14 +775,28 @@ function SystemConfigEditor({
           <Label className="text-sm font-medium">Weight (%)</Label>
           {isEditMode ? (
             <div className="space-y-2">
-              <Slider
-                value={[config.weight]}
-                onValueChange={(value) => onUpdate({ weight: value[0] })}
-                min={0}
-                max={100}
-                step={5}
-                className="w-full"
-              />
+              <div className="flex items-center gap-3">
+                <Slider
+                  value={[config.weight]}
+                  onValueChange={(value) => onUpdate({ weight: value[0] })}
+                  min={0}
+                  max={100}
+                  step={5}
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  value={config.weight}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    onUpdate({ weight: Math.max(0, Math.min(100, val)) });
+                  }}
+                  min={0}
+                  max={100}
+                  className="w-20"
+                  data-testid={`input-weight-${systemName.toLowerCase().replace(/\s+/g, '-')}`}
+                />
+              </div>
               <p className="text-2xl font-bold text-green-600">{config.weight}%</p>
             </div>
           ) : (
@@ -992,14 +1006,28 @@ function System3ConfigEditor({
           <Label className="text-sm font-medium">Weight (%)</Label>
           {isEditMode ? (
             <div className="space-y-2">
-              <Slider
-                value={[config.weight]}
-                onValueChange={(value) => onUpdate({ weight: value[0] })}
-                min={0}
-                max={100}
-                step={5}
-                className="w-full"
-              />
+              <div className="flex items-center gap-3">
+                <Slider
+                  value={[config.weight]}
+                  onValueChange={(value) => onUpdate({ weight: value[0] })}
+                  min={0}
+                  max={100}
+                  step={5}
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  value={config.weight}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    onUpdate({ weight: Math.max(0, Math.min(100, val)) });
+                  }}
+                  min={0}
+                  max={100}
+                  className="w-20"
+                  data-testid="input-weight-theme-complexity"
+                />
+              </div>
               <p className="text-2xl font-bold text-purple-600">{config.weight}%</p>
             </div>
           ) : (
@@ -1246,14 +1274,28 @@ function System4ConfigEditor({
           <Label className="text-sm font-medium">Weight (%)</Label>
           {isEditMode ? (
             <div className="space-y-2">
-              <Slider
-                value={[config.weight]}
-                onValueChange={(value) => onUpdate({ weight: value[0] })}
-                min={0}
-                max={100}
-                step={5}
-                className="w-full"
-              />
+              <div className="flex items-center gap-3">
+                <Slider
+                  value={[config.weight]}
+                  onValueChange={(value) => onUpdate({ weight: value[0] })}
+                  min={0}
+                  max={100}
+                  step={5}
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  value={config.weight}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    onUpdate({ weight: Math.max(0, Math.min(100, val)) });
+                  }}
+                  min={0}
+                  max={100}
+                  className="w-20"
+                  data-testid="input-weight-language-level"
+                />
+              </div>
               <p className="text-2xl font-bold text-orange-600">{config.weight}%</p>
             </div>
           ) : (
