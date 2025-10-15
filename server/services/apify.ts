@@ -4,13 +4,17 @@ const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
 
-// Normalize text for similarity comparison
+// Normalize text for similarity comparison (Unicode-aware)
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    // Remove punctuation and special characters
-    .replace(/[^\w\s]/g, ' ')
+    // Normalize Unicode to decomposed form
+    .normalize('NFKD')
+    // Remove combining marks (accents) but keep base letters
+    .replace(/[\u0300-\u036f]/g, '')
+    // Remove punctuation and special chars but keep letters/numbers/spaces (Unicode-aware)
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     // Collapse multiple spaces
     .replace(/\s+/g, ' ')
     .trim();
