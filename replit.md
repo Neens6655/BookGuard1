@@ -37,9 +37,19 @@ Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessme
 
 ## Recent Updates
 
-### Goodreads Cover Image Integration (Oct 2025)
+### Goodreads Integration & Similarity Matching (Oct 2025)
+
+#### Cover Image Integration
 Fixed Goodreads cover image integration to properly display book covers from Goodreads API:
 - **Frontend**: BookCard and ResultsView components now prioritize Goodreads cover images (`goodreadsData?.coverImageUrl`) over uploaded covers (`coverImage`)
 - **Backend**: Apify service updated to use correct field name `book.image` from the Goodreads scraper response
 - **Fallback Chain**: Goodreads cover → Uploaded cover → BookOpen icon placeholder
-- Note: Books uploaded before this fix may need re-evaluation to fetch Goodreads cover images
+
+#### Smart Similarity Matching
+Implemented intelligent title matching to prevent incorrect Goodreads associations:
+- **Unicode-Aware Normalization**: Handles Arabic titles with diacritics (tashkeel), Latin accents, and multilingual content using NFKD normalization and `\p{M}` regex
+- **Jaccard Similarity Algorithm**: Calculates word-based similarity between book titles and author names
+- **Confidence Scoring**: Weighted average (70% title + 30% author) with 40% threshold to reject low-confidence matches
+- **Match Transparency**: Returns `matchConfidence` (0-100%) and `matchedTitle` fields for debugging
+- **Console Logging**: All matches logged with confidence scores for monitoring
+- **Protection**: Prevents fuzzy Goodreads search results from associating wrong books with evaluations
