@@ -20,7 +20,7 @@ function normalizeText(text: string): string {
     .trim();
 }
 
-// Calculate string similarity (0-100%)
+// Calculate string similarity (0-100%) with subtitle awareness
 function calculateSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   
@@ -29,7 +29,22 @@ function calculateSimilarity(str1: string, str2: string): number {
   
   if (s1 === s2) return 100;
   
-  // Word overlap similarity
+  // Check if s1 is contained in s2 (or vice versa) - good for matching "The Alchemist" with "The Alchemist: Subtitle"
+  if (s2.includes(s1) || s1.includes(s2)) {
+    // If one is a substring of the other, consider it a high match
+    const shorterLength = Math.min(s1.length, s2.length);
+    const longerLength = Math.max(s1.length, s2.length);
+    // Give 100% if perfect substring, scale down based on length difference
+    return Math.round(100 - ((longerLength - shorterLength) / longerLength) * 20);
+  }
+  
+  // For titles with subtitles (e.g., "Title: Subtitle"), extract main title before colon
+  const s2MainTitle = s2.split(':')[0].trim();
+  if (s2MainTitle !== s2 && normalizeText(str1).includes(s2MainTitle)) {
+    return 95; // High confidence if matches main title before colon
+  }
+  
+  // Word overlap similarity (Jaccard)
   const words1 = new Set(s1.split(/\s+/).filter(w => w.length > 0));
   const words2 = new Set(s2.split(/\s+/).filter(w => w.length > 0));
   
@@ -41,7 +56,14 @@ function calculateSimilarity(str1: string, str2: string): number {
   if (union.size === 0) return 0;
   
   // Jaccard similarity percentage
-  return Math.round((intersection.size / union.size) * 100);
+  const jaccardScore = Math.round((intersection.size / union.size) * 100);
+  
+  // Boost score if all words from shorter string are in longer string
+  if (intersection.size === Math.min(words1.size, words2.size)) {
+    return Math.min(100, jaccardScore + 30);
+  }
+  
+  return jaccardScore;
 }
 
 export interface GoodreadsReview {
