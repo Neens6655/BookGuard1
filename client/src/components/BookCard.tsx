@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { BookOpen, Star, CheckCircle, Settings, Users } from 'lucide-react';
 import { type Evaluation } from '@/types/evaluation';
 import { EditBookDialog } from './EditBookDialog';
@@ -10,9 +11,12 @@ interface BookCardProps {
   book: Evaluation;
   onClick: () => void;
   onUpdate?: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: () => void;
 }
 
-export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
+export function BookCard({ book, onClick, onUpdate, selectionMode, isSelected, onToggleSelection }: BookCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const result = book.result;
   
@@ -94,11 +98,21 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
     }
   };
 
+  const handleCardClick = () => {
+    if (selectionMode && onToggleSelection) {
+      onToggleSelection();
+    } else {
+      onClick();
+    }
+  };
+
   return (
     <>
       <Card 
-        className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50 overflow-hidden"
-        onClick={onClick}
+        className={`cursor-pointer hover:shadow-lg transition-all overflow-hidden ${
+          selectionMode && isSelected ? 'border-primary border-2 shadow-xl' : 'hover:border-primary/50'
+        }`}
+        onClick={handleCardClick}
         data-testid={`card-book-${book.id}`}
       >
         {/* Book Cover */}
@@ -116,16 +130,30 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
             </div>
           )}
           
+          {/* Selection Checkbox */}
+          {selectionMode && (
+            <div className="absolute top-3 left-3 z-10">
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={onToggleSelection}
+                className="h-6 w-6 bg-white border-2"
+                data-testid={`checkbox-select-book-${book.id}`}
+              />
+            </div>
+          )}
+          
           {/* Edit Button */}
-          <Button
-            size="icon"
-            variant="secondary"
-            className="absolute top-3 left-3 z-10 bg-white/90 hover:bg-white shadow-md h-8 w-8"
-            onClick={handleEditClick}
-            data-testid={`button-edit-book-${book.id}`}
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
+          {!selectionMode && (
+            <Button
+              size="icon"
+              variant="secondary"
+              className="absolute top-3 left-3 z-10 bg-white/90 hover:bg-white shadow-md h-8 w-8"
+              onClick={handleEditClick}
+              data-testid={`button-edit-book-${book.id}`}
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+          )}
           
           {/* Goodreads Rating Badge (only show if data is available) */}
           {hasGoodreadsRating && rating && (

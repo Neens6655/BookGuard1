@@ -41,6 +41,8 @@ export default function Home() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedVerdicts, setSelectedVerdicts] = useState<string[]>([]);
   const [selectedNmcBands, setSelectedNmcBands] = useState<string[]>([]);
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
+  const [selectionMode, setSelectionMode] = useState(false);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -255,6 +257,83 @@ export default function Home() {
     setSelectedGenres([]);
     setSelectedVerdicts([]);
     setSelectedNmcBands([]);
+  };
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedBooks([]);
+  };
+
+  const toggleBookSelection = (bookId: string) => {
+    setSelectedBooks(prev => 
+      prev.includes(bookId) 
+        ? prev.filter(id => id !== bookId)
+        : [...prev, bookId]
+    );
+  };
+
+  const selectAllBooks = () => {
+    setSelectedBooks(filteredBooks.map(b => b.id));
+  };
+
+  const deselectAllBooks = () => {
+    setSelectedBooks([]);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedBooks.length === 0) return;
+
+    try {
+      await Promise.all(
+        selectedBooks.map(id => apiRequest('DELETE', `/api/evaluate/${id}`))
+      );
+
+      toast({
+        title: 'Books Deleted',
+        description: `Successfully deleted ${selectedBooks.length} ${selectedBooks.length === 1 ? 'book' : 'books'}.`,
+      });
+
+      setSelectedBooks([]);
+      setSelectionMode(false);
+      refetch();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Delete Failed',
+        description: 'Failed to delete selected books. Please try again.',
+      });
+    }
+  };
+
+  const handleBulkExportCSV = () => {
+    if (selectedBooks.length === 0) return;
+
+    const booksToExport = evaluations?.filter(e => selectedBooks.includes(e.id)) || [];
+    
+    const headers = ['Title', 'Author', 'Language', 'Age', 'Verdict', 'Score', 'NMC Band', 'Genres'];
+    const rows = booksToExport.map(book => {
+      const r = book.result;
+      if (!r) return [];
+      return [
+        r.title,
+        r.author || 'Unknown',
+        r.language || 'English',
+        r.recommended_minimum_age,
+        r.final_verdict || '',
+        r.whitelist_score || 0,
+        book.nmcAssessment?.finalAgeBand || 'N/A',
+        (r.genres || []).join('; ')
+      ];
+    });
+
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    downloadBlob(blob, `books_export_${new Date().toISOString().split('T')[0]}.csv`);
+
+    toast({
+      title: 'Export Complete',
+      description: `Exported ${selectedBooks.length} ${selectedBooks.length === 1 ? 'book' : 'books'} to CSV.`,
+    });
   };
 
   const parseAgeRange = (ageStr: string): { min: number; max: number } => {
@@ -670,6 +749,73 @@ export default function Home() {
 
                     {/* Books Grid */}
                     <div className="flex-1">
+                      {/* Bulk Actions Toolbar */}
+                      <div className="mb-4">
+                        {!selectionMode ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={toggleSelectionMode}
+                            data-testid="button-enable-selection"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Select Books
+                          </Button>
+                        ) : (
+                          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-medium">
+                              {selectedBooks.length} selected
+                            </p>
+                            <div className="flex gap-2 ml-auto">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={selectAllBooks}
+                                disabled={selectedBooks.length === filteredBooks.length}
+                                data-testid="button-select-all"
+                              >
+                                Select All ({filteredBooks.length})
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={deselectAllBooks}
+                                disabled={selectedBooks.length === 0}
+                                data-testid="button-deselect-all"
+                              >
+                                Deselect All
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleBulkExportCSV}
+                                disabled={selectedBooks.length === 0}
+                                data-testid="button-bulk-export"
+                              >
+                                <FileDown className="w-4 h-4 mr-2" />
+                                Export CSV
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleBulkDelete}
+                                disabled={selectedBooks.length === 0}
+                                data-testid="button-bulk-delete"
+                              >
+                                Delete ({selectedBooks.length})
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={toggleSelectionMode}
+                                data-testid="button-cancel-selection"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       <div className="flex justify-between items-center mb-6">
                         <p className="text-sm text-muted-foreground">
                           Showing <span className="font-semibold">{filteredBooks.length} books</span> 
@@ -690,6 +836,9 @@ export default function Home() {
                               book={book}
                               onClick={() => handleViewBook(book)}
                               onUpdate={refetch}
+                              selectionMode={selectionMode}
+                              isSelected={selectedBooks.includes(book.id)}
+                              onToggleSelection={() => toggleBookSelection(book.id)}
                             />
                           ))}
                         </div>
@@ -762,6 +911,9 @@ export default function Home() {
                       book={book}
                       onClick={() => handleViewBook(book)}
                       onUpdate={refetch}
+                      selectionMode={selectionMode}
+                      isSelected={selectedBooks.includes(book.id)}
+                      onToggleSelection={() => toggleBookSelection(book.id)}
                     />
                   ))}
                 </div>
