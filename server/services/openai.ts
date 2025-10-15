@@ -5,6 +5,44 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY 
 });
 
+// Retry utility with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelayMs: number = 1000,
+  operationName: string = 'Operation'
+): Promise<T> {
+  let lastError: Error | unknown;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      // Don't retry on certain errors (authentication, invalid input, etc.)
+      if (error instanceof OpenAI.APIError) {
+        if (error.status === 401 || error.status === 400) {
+          throw error;
+        }
+      }
+      
+      if (attempt === maxRetries) {
+        console.error(`${operationName} failed after ${maxRetries} attempts:`, error);
+        throw error;
+      }
+      
+      // Calculate exponential backoff delay: 1s, 2s, 4s
+      const delayMs = baseDelayMs * Math.pow(2, attempt - 1);
+      console.log(`${operationName} attempt ${attempt} failed, retrying in ${delayMs}ms...`);
+      
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+  
+  throw lastError;
+}
+
 export async function evaluateBook(bookText: string): Promise<EvaluationResult> {
   const evaluationPrompt = `
 You are a content and literacy evaluator for the UAE Ministry of Education.
@@ -210,21 +248,28 @@ Return complete JSON output only.
 `;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: evaluationPrompt
-        },
-        {
-          role: "user",
-          content: `BOOK TEXT:\n${bookText}`
-        }
-      ],
-      response_format: { type: "json_object" },
-      max_completion_tokens: 8192,
-    });
+    const response = await retryWithBackoff(
+      async () => {
+        return await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: evaluationPrompt
+            },
+            {
+              role: "user",
+              content: `BOOK TEXT:\n${bookText}`
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 8192,
+        });
+      },
+      3,
+      1000,
+      'OpenAI Book Evaluation'
+    );
 
     const content = response.choices[0].message.content;
     if (!content) {
@@ -408,21 +453,28 @@ Return complete JSON only.
 `;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: nmcPrompt
-        },
-        {
-          role: "user",
-          content: `BOOK TEXT:\n${bookText}`
-        }
-      ],
-      response_format: { type: "json_object" },
-      max_completion_tokens: 2000,
-    });
+    const response = await retryWithBackoff(
+      async () => {
+        return await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: nmcPrompt
+            },
+            {
+              role: "user",
+              content: `BOOK TEXT:\n${bookText}`
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 2000,
+        });
+      },
+      3,
+      1000,
+      'OpenAI NMC Evaluation'
+    );
 
     const content = response.choices[0].message.content;
     if (!content) {
@@ -597,21 +649,28 @@ Return complete JSON output only.
 `;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: deepAnalysisPrompt
-        },
-        {
-          role: "user",
-          content: `BOOK TEXT:\n${bookText}`
-        }
-      ],
-      response_format: { type: "json_object" },
-      max_completion_tokens: 8192,
-    });
+    const response = await retryWithBackoff(
+      async () => {
+        return await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: deepAnalysisPrompt
+            },
+            {
+              role: "user",
+              content: `BOOK TEXT:\n${bookText}`
+            }
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 8192,
+        });
+      },
+      3,
+      1000,
+      'OpenAI Deep Analysis'
+    );
 
     const content = response.choices[0].message.content;
     if (!content) {

@@ -21,21 +21,40 @@ export async function extractTextFromFile(filePath: string, filename: string): P
   const ext = path.extname(filename).toLowerCase();
   
   try {
+    let extractedText: string;
+    
     switch (ext) {
       case '.txt':
-        return await extractFromTxt(filePath);
+        extractedText = await extractFromTxt(filePath);
+        break;
       case '.pdf':
-        return await extractFromPdf(filePath);
+        extractedText = await extractFromPdf(filePath);
+        break;
       case '.doc':
       case '.docx':
-        return await extractFromWord(filePath);
+        extractedText = await extractFromWord(filePath);
+        break;
       case '.epub':
-        return await extractFromEpub(filePath);
+        extractedText = await extractFromEpub(filePath);
+        break;
       case '.rtf':
-        return await extractFromRtf(filePath);
+        extractedText = await extractFromRtf(filePath);
+        break;
       default:
         throw new Error(`Unsupported file type: ${ext}`);
     }
+    
+    // Validate extracted text
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new Error('No text content could be extracted from the file. The file may be empty or corrupted.');
+    }
+    
+    if (extractedText.trim().length < 100) {
+      throw new Error('Insufficient text content extracted (minimum 100 characters required). Please upload a complete book file.');
+    }
+    
+    return extractedText;
+    
   } catch (error) {
     console.error('File processing error:', error);
     throw error;

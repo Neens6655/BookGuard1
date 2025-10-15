@@ -69,6 +69,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error("Upload error:", error);
+      
+      // Cleanup uploaded file on error
+      if (req.file?.path) {
+        await fs.unlink(req.file.path).catch(console.error);
+      }
+      
       res.status(500).json({ 
         error: error instanceof Error ? error.message : "Upload failed" 
       });
@@ -578,9 +584,30 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
 
   } catch (error) {
     console.error("Processing error:", error);
+    
+    // Determine user-friendly error message
+    let errorMessage = "Processing failed";
+    
+    if (error instanceof Error) {
+      // Provide specific error messages based on error type
+      if (error.message.includes('No text content could be extracted')) {
+        errorMessage = 'Unable to extract text from file. The file may be empty, corrupted, or password-protected.';
+      } else if (error.message.includes('Insufficient text content')) {
+        errorMessage = 'The uploaded file contains too little text to analyze (minimum 100 characters required).';
+      } else if (error.message.includes('Unsupported file type')) {
+        errorMessage = 'Unsupported file format. Please upload PDF, Word, TXT, EPUB, or RTF files.';
+      } else if (error.message.includes('OpenAI') || error.message.includes('evaluation failed')) {
+        errorMessage = 'AI evaluation service temporarily unavailable. Please try again in a few moments.';
+      } else if (error.message.includes('API') || error.message.includes('rate limit')) {
+        errorMessage = 'Service temporarily busy. Please try again shortly.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
     await storage.updateEvaluation(evaluationId, { 
       status: "failed",
-      result: { error: error instanceof Error ? error.message : "Processing failed" } 
+      result: { error: errorMessage } 
     });
     
     // Cleanup uploaded file

@@ -4,6 +4,37 @@ const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
 
+// Retry utility with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelayMs: number = 1000,
+  operationName: string = 'Operation'
+): Promise<T> {
+  let lastError: Error | unknown;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      if (attempt === maxRetries) {
+        console.error(`${operationName} failed after ${maxRetries} attempts:`, error);
+        throw error;
+      }
+      
+      // Calculate exponential backoff delay: 1s, 2s, 4s
+      const delayMs = baseDelayMs * Math.pow(2, attempt - 1);
+      console.log(`${operationName} attempt ${attempt} failed, retrying in ${delayMs}ms...`);
+      
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+  
+  throw lastError;
+}
+
 // Normalize text for similarity comparison (Unicode-aware)
 function normalizeText(text: string): string {
   return text
@@ -115,9 +146,17 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       }
     };
 
-    const run = await client.actor("epctex/goodreads-scraper").call(input);
-    
-    const { items } = await client.dataset(run.defaultDatasetId).listItems();
+    // Use retry logic for Apify API calls
+    const { run, items } = await retryWithBackoff(
+      async () => {
+        const runResult = await client.actor("epctex/goodreads-scraper").call(input);
+        const { items: dataItems } = await client.dataset(runResult.defaultDatasetId).listItems();
+        return { run: runResult, items: dataItems };
+      },
+      3,
+      2000,
+      `Apify Goodreads search for "${searchQuery}"`
+    );
     
     if (!items || items.length === 0) {
       console.log(`No Goodreads results found for: ${searchQuery}`);
