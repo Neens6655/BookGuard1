@@ -262,11 +262,14 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
 
     // Step 2: Get detailed product information
     console.log(`Amazon details: Fetching product details for ASIN ${asin}...`);
+    console.log(`Amazon details: Product URL: ${amazonUrl}`);
     
     const detailsInput = {
       urls: [amazonUrl],
       country: "AE",
     };
+    
+    console.log(`Amazon details: Input to scraper:`, JSON.stringify(detailsInput));
 
     const detailsResults = await retryWithBackoff(
       async () => {
