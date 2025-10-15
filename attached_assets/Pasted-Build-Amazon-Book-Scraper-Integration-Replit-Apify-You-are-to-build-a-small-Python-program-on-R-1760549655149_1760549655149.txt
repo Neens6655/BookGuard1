@@ -1,0 +1,78 @@
+Build Amazon Book Scraper Integration (Replit + Apify)
+
+You are to build a small Python program on Replit that integrates with Apify actors to search for books on Amazon by keyword and then scrape full product metadata. Follow these steps exactly:
+
+Environment Setup
+
+Use Python 3.
+
+Install dependencies: requests and python-dotenv.
+
+Create a .env file and store one secret:
+
+APIFY_TOKEN=your_apify_api_token_here
+
+
+Helper Function
+
+Write a function that calls Apify actors using the REST API.
+
+Use the endpoint:
+https://api.apify.com/v2/acts/{actorId}/run-sync-get-dataset-items?token=APIFY_TOKEN
+
+Send JSON input.
+
+Return the dataset items as a Python list.
+
+Step 1: Search Actor
+
+Use the actor pintostudio~amazon-search-products-scraper.
+
+Input: a keyword (like "harry potter"), marketplace (like "US" or "AE"), and maximum number of items.
+
+Output: a list of products containing ASINs, URLs, and titles.
+
+Step 2: Detail Actor
+
+Take the ASINs/URLs from Step 1.
+
+Call the actor logical_scrapers~amazon-product-scraper.
+
+Input: a list of products with ASIN or URL.
+
+Output: full product metadata (title, author, ISBN, description, categories, price, rating, bestseller rank, images, etc.).
+
+One-Click Workflow
+
+Create a function books_by_keyword(keyword) that:
+
+Runs Step 1 to get product ASINs/URLs.
+
+Runs Step 2 to fetch detailed metadata for those products.
+
+Returns the combined result.
+
+Output
+
+Print results as pretty JSON so you can inspect them.
+
+Optionally, write a helper to export the data to CSV with fields:
+title, asin, isbn, author, price, rating, url, description.
+
+Run Example
+
+In main.py, run:
+
+data = books_by_keyword("harry potter")
+print(data[:2])  # show first 2 results
+
+
+Tips
+
+If you want to switch to amazon.ae, change the country field to "AE".
+
+Different actors may return slightly different field names; always check the first item to confirm and adjust.
+
+For larger workloads, consider switching from run-sync-get-dataset-items to the normal run-poll-fetch cycle.
+
+Respect Amazon and Apify’s usage terms.
