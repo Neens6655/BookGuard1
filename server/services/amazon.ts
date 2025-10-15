@@ -264,7 +264,7 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     console.log(`Amazon details: Fetching product details for ASIN ${asin}...`);
     
     const detailsInput = {
-      products: [{ asin }],
+      urls: [amazonUrl],
       country: "AE",
     };
 
