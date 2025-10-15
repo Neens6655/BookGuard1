@@ -1022,6 +1022,7 @@ export default function Home() {
             coverImage={evaluation.coverImage}
             nmcAssessment={evaluation.nmcAssessment}
             goodreadsData={evaluation.goodreadsData}
+            amazonData={evaluation.amazonData}
             onNewAssessment={() => changeView('upload')}
             onBackToLibrary={handleBackToHome}
             onDownload={handleDownload}

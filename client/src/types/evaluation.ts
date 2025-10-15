@@ -120,6 +120,20 @@ export interface GoodreadsData {
   lastFetched?: string;
 }
 
+export interface AmazonData {
+  status: 'ok' | 'unavailable' | 'error';
+  message?: string;
+  targetAge?: string;
+  readingAge?: string;
+  gradeLevel?: string;
+  asin?: string;
+  amazonUrl?: string;
+  marketplace?: string;
+  matchConfidence?: number;
+  matchedTitle?: string;
+  lastFetched?: string;
+}
+
 export interface Evaluation {
   id: string;
   filename: string;
@@ -129,6 +143,7 @@ export interface Evaluation {
   result: EvaluationResult | null;
   nmcAssessment?: NMCAssessment | null;
   goodreadsData?: GoodreadsData | null;
+  amazonData?: AmazonData | null;
   coverImage: string | null;
   createdAt: string;
   updatedAt: string;

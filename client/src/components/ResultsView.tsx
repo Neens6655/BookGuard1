@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { type EvaluationResult, type NMCAssessment, type GoodreadsData } from '@/types/evaluation';
+import { type EvaluationResult, type NMCAssessment, type GoodreadsData, type AmazonData } from '@/types/evaluation';
 
 interface ResultsViewProps {
   result: EvaluationResult;
@@ -13,12 +13,13 @@ interface ResultsViewProps {
   coverImage?: string | null;
   nmcAssessment?: NMCAssessment | null;
   goodreadsData?: GoodreadsData | null;
+  amazonData?: AmazonData | null;
   onNewAssessment: () => void;
   onBackToLibrary?: () => void;
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, coverImage, nmcAssessment, goodreadsData, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, coverImage, nmcAssessment, goodreadsData, amazonData, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Map score to risk level label
@@ -557,6 +558,56 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                   })}
                 </div>
               </div>
+
+              {/* Amazon Age Validation (if available) */}
+              {amazonData && amazonData.status === 'ok' && amazonData.targetAge && (
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Shield className="w-5 h-5 text-orange-600" />
+                    <h4 className="font-bold text-foreground">Age Validation</h4>
+                    <Badge variant="outline" className="ml-auto bg-white">
+                      Amazon UAE
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* AI Recommendation */}
+                    <div className="bg-white rounded-lg p-4 border-2 border-blue-300">
+                      <p className="text-xs text-blue-600 font-medium mb-1">AI Recommended Age</p>
+                      <p className="text-2xl font-bold text-blue-700">{result.recommended_minimum_age}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Based on content analysis</p>
+                    </div>
+                    
+                    {/* Amazon Target Age */}
+                    <div className="bg-white rounded-lg p-4 border-2 border-orange-300">
+                      <p className="text-xs text-orange-600 font-medium mb-1">Amazon Target Age</p>
+                      <p className="text-2xl font-bold text-orange-700">{amazonData.targetAge}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Publisher recommendation</p>
+                    </div>
+                  </div>
+                  
+                  {/* Match Indicator */}
+                  <div className="mt-4 flex items-center gap-2 text-sm">
+                    <Info className="w-4 h-4 text-blue-600" />
+                    <p className="text-muted-foreground">
+                      Compare AI analysis with publisher's age recommendation to validate accuracy
+                      {amazonData.matchConfidence && ` (${Math.round(amazonData.matchConfidence)}% match confidence)`}
+                    </p>
+                  </div>
+                  
+                  {amazonData.amazonUrl && (
+                    <a 
+                      href={amazonData.amazonUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700 hover:underline"
+                      data-testid="link-amazon-product"
+                    >
+                      View on Amazon <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              )}
 
               {/* Genre & Themes */}
               <div>
