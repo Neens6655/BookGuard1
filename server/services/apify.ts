@@ -4,6 +4,28 @@ const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
 
+// Calculate string similarity (0-100%)
+function calculateSimilarity(str1: string, str2: string): number {
+  if (!str1 || !str2) return 0;
+  
+  const s1 = str1.toLowerCase().trim();
+  const s2 = str2.toLowerCase().trim();
+  
+  if (s1 === s2) return 100;
+  
+  // Simple word overlap similarity
+  const words1 = new Set(s1.split(/\s+/));
+  const words2 = new Set(s2.split(/\s+/));
+  
+  const intersection = new Set([...words1].filter(x => words2.has(x)));
+  const union = new Set([...words1, ...words2]);
+  
+  if (union.size === 0) return 0;
+  
+  // Jaccard similarity percentage
+  return Math.round((intersection.size / union.size) * 100);
+}
+
 export interface GoodreadsReview {
   author: string;
   userUrl?: string;
@@ -28,6 +50,8 @@ export interface GoodreadsBookData {
   goodreadsUrl?: string;
   reviews?: GoodreadsReview[];
   lastFetched?: string;
+  matchConfidence?: number; // 0-100% similarity score
+  matchedTitle?: string; // Title that was matched from Goodreads
 }
 
 export async function searchGoodreadsBook(title: string, author?: string): Promise<GoodreadsBookData | null> {
@@ -65,6 +89,30 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
 
     const book: any = items[0];
     
+    // Calculate title similarity
+    const matchedTitle = String(book.title || '');
+    const titleSimilarity = calculateSimilarity(title, matchedTitle);
+    
+    // Calculate author similarity if author provided
+    let authorSimilarity = 100; // Default to perfect match if no author
+    if (author && book.authorName) {
+      authorSimilarity = calculateSimilarity(author, String(book.authorName));
+    }
+    
+    // Overall confidence is weighted average (title 70%, author 30%)
+    const matchConfidence = Math.round(titleSimilarity * 0.7 + authorSimilarity * 0.3);
+    
+    console.log(`Goodreads match for "${title}": "${matchedTitle}" (${matchConfidence}% confidence)`);
+    
+    // Reject low-confidence matches (below 40%)
+    if (matchConfidence < 40) {
+      console.log(`Rejecting Goodreads match due to low confidence: ${matchConfidence}%`);
+      return {
+        status: 'unavailable',
+        message: `No reliable match found (${matchConfidence}% confidence)`
+      };
+    }
+    
     // Process reviews - take top 10
     const reviews: GoodreadsReview[] = [];
     if (Array.isArray(book.reviews)) {
@@ -92,6 +140,8 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       goodreadsUrl: book.url ? String(book.url) : undefined,
       reviews: reviews.length > 0 ? reviews : undefined,
       lastFetched: new Date().toISOString(),
+      matchConfidence,
+      matchedTitle,
     };
 
   } catch (error: any) {
