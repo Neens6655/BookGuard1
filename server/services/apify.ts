@@ -11,8 +11,8 @@ function normalizeText(text: string): string {
     .trim()
     // Normalize Unicode to decomposed form
     .normalize('NFKD')
-    // Remove combining marks (accents) but keep base letters
-    .replace(/[\u0300-\u036f]/g, '')
+    // Remove ALL combining marks (accents, Arabic diacritics, etc.) across all scripts
+    .replace(/\p{M}/gu, '')
     // Remove punctuation and special chars but keep letters/numbers/spaces (Unicode-aware)
     .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     // Collapse multiple spaces
