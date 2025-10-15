@@ -565,9 +565,25 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                   <div className="flex items-center gap-2 mb-4">
                     <Shield className="w-5 h-5 text-orange-600" />
                     <h4 className="font-bold text-foreground">Age Validation</h4>
-                    <Badge variant="outline" className="ml-auto bg-white">
-                      Amazon UAE
-                    </Badge>
+                    <div className="ml-auto flex items-center gap-2">
+                      {/* Match Quality Badge */}
+                      {amazonData.matchQuality && (
+                        <Badge 
+                          className={`
+                            ${amazonData.matchQuality === 'high' ? 'bg-green-100 text-green-700 border-green-300' : ''}
+                            ${amazonData.matchQuality === 'medium' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' : ''}
+                            ${amazonData.matchQuality === 'low' ? 'bg-gray-100 text-gray-700 border-gray-300' : ''}
+                          `}
+                          variant="outline"
+                          data-testid="badge-match-quality"
+                        >
+                          {amazonData.matchQuality === 'high' ? '✓ High' : amazonData.matchQuality === 'medium' ? '~ Medium' : '⚠ Low'} Confidence
+                        </Badge>
+                      )}
+                      <Badge variant="outline" className="bg-white">
+                        Amazon UAE
+                      </Badge>
+                    </div>
                   </div>
                   
                   <div className="grid md:grid-cols-2 gap-4">
@@ -583,16 +599,51 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                       <p className="text-xs text-orange-600 font-medium mb-1">Amazon Target Age</p>
                       <p className="text-2xl font-bold text-orange-700">{amazonData.targetAge}</p>
                       <p className="text-xs text-muted-foreground mt-1">Publisher recommendation</p>
+                      {amazonData.format && (
+                        <p className="text-xs text-muted-foreground mt-1">Format: {amazonData.format}</p>
+                      )}
                     </div>
                   </div>
                   
-                  {/* Match Indicator */}
-                  <div className="mt-4 flex items-center gap-2 text-sm">
-                    <Info className="w-4 h-4 text-blue-600" />
-                    <p className="text-muted-foreground">
-                      Compare AI analysis with publisher's age recommendation to validate accuracy
-                      {amazonData.matchConfidence && ` (${Math.round(amazonData.matchConfidence)}% match confidence)`}
-                    </p>
+                  {/* Age Consensus from Multiple Editions */}
+                  {amazonData.ageConsensus && amazonData.editionsCompared && amazonData.editionsCompared > 1 && (
+                    <div className="mt-4 bg-white rounded-lg p-3 border border-orange-200">
+                      <p className="text-xs font-medium text-orange-700 mb-1">📚 Cross-Edition Consensus</p>
+                      <p className="text-sm text-foreground font-semibold">{amazonData.ageConsensus}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Verified across {amazonData.editionsCompared} editions</p>
+                    </div>
+                  )}
+                  
+                  {/* Match Details */}
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Info className="w-4 h-4 text-blue-600" />
+                      <p className="text-muted-foreground">
+                        Match method: {
+                          amazonData.matchMethod === 'isbn' ? 'ISBN (most accurate)' :
+                          amazonData.matchMethod === 'title_author' ? 'Title + Author' :
+                          amazonData.matchMethod === 'title_only' ? 'Title only' :
+                          'Partial match'
+                        }
+                        {amazonData.matchConfidence && ` • ${Math.round(amazonData.matchConfidence)}% similarity`}
+                      </p>
+                    </div>
+                    
+                    {/* Author/Publisher verification badges */}
+                    {(amazonData.authorMatch || amazonData.publisherMatch) && (
+                      <div className="flex gap-2">
+                        {amazonData.authorMatch && (
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            ✓ Author verified
+                          </Badge>
+                        )}
+                        {amazonData.publisherMatch && (
+                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                            ✓ Publisher verified
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   {amazonData.amazonUrl && (
