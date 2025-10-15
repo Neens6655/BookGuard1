@@ -53,3 +53,10 @@ Implemented intelligent title matching to prevent incorrect Goodreads associatio
 - **Match Transparency**: Returns `matchConfidence` (0-100%) and `matchedTitle` fields for debugging
 - **Console Logging**: All matches logged with confidence scores for monitoring
 - **Protection**: Prevents fuzzy Goodreads search results from associating wrong books with evaluations
+
+#### Goodreads Reviews & Ratings Display (Oct 2025)
+Added comprehensive Goodreads community insights to book evaluation pages:
+- **Overview Tab - Community Insights Section**: Consolidated display showing overall rating (with 5-star visualization), total ratings count, total reviews count, published year, Goodreads categories/genres, and featured review preview with quick link to full reviews tab
+- **Dedicated Reviews Tab**: Full list of top Goodreads reviews with author avatars, star ratings, review text (with line clamping), number of likes, and link to Goodreads
+- **Header Integration**: Rating displayed prominently in hero section and book analysis subtitle
+- **Automatic Display**: Goodreads data only shown when successfully fetched (status: 'ok')

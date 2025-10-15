@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe, ArrowLeft } from 'lucide-react';
+import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe, ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -581,6 +581,129 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                   ))}
                 </div>
               </div>
+
+              {/* Goodreads Community Insights */}
+              {goodreadsData && goodreadsData.status === 'ok' && (
+                <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-6 h-6 text-amber-600" />
+                      <h4 className="font-bold text-foreground text-xl">Goodreads Community Insights</h4>
+                    </div>
+                    {goodreadsData.goodreadsUrl && (
+                      <a 
+                        href={goodreadsData.goodreadsUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline flex items-center gap-1"
+                        data-testid="link-goodreads"
+                      >
+                        View on Goodreads
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Overall Rating */}
+                  <div className="bg-white rounded-lg p-5 mb-4">
+                    <div className="flex items-center gap-6">
+                      <div className="text-center">
+                        <div className="text-5xl font-bold text-amber-600 mb-1">
+                          {goodreadsData.rating?.toFixed(1) || 'N/A'}
+                        </div>
+                        <div className="flex items-center justify-center gap-0.5 mb-2">
+                          {[...Array(5)].map((_, i) => (
+                            <Star 
+                              key={i} 
+                              className={`w-5 h-5 ${i < Math.floor(goodreadsData.rating || 0) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} 
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Average Rating</p>
+                      </div>
+                      
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Total Ratings:</span>
+                          <span className="font-semibold text-foreground">
+                            {goodreadsData.ratingsCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Total Reviews:</span>
+                          <span className="font-semibold text-foreground">
+                            {goodreadsData.reviewsCount?.toLocaleString() || '0'}
+                          </span>
+                        </div>
+                        {goodreadsData.publishedYear && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">Published:</span>
+                            <span className="font-semibold text-foreground">{goodreadsData.publishedYear}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Goodreads Genres */}
+                  {goodreadsData.genres && goodreadsData.genres.length > 0 && (
+                    <div className="bg-white rounded-lg p-4 mb-4">
+                      <h6 className="font-medium text-sm mb-2 text-muted-foreground">Goodreads Categories</h6>
+                      <div className="flex flex-wrap gap-2">
+                        {goodreadsData.genres.slice(0, 6).map((genre, idx) => (
+                          <Badge 
+                            key={idx}
+                            variant="outline"
+                            className="bg-amber-50 text-amber-700 border-amber-300"
+                          >
+                            {genre}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Top Review Preview */}
+                  {goodreadsData.reviews && goodreadsData.reviews.length > 0 && (
+                    <div className="bg-white rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h6 className="font-medium text-sm text-muted-foreground">Featured Review</h6>
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300">
+                          {goodreadsData.reviews.length} reviews available
+                        </Badge>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                          {goodreadsData.reviews?.[0]?.author?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-sm">{goodreadsData.reviews?.[0]?.author}</p>
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star 
+                                  key={i} 
+                                  className={`w-3 h-3 ${i < (goodreadsData.reviews?.[0]?.rating || 0) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} 
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2 italic">
+                            "{goodreadsData.reviews?.[0]?.text}"
+                          </p>
+                          <button 
+                            onClick={() => setActiveTab('reviews')}
+                            className="text-xs text-primary hover:underline mt-2"
+                            data-testid="button-view-all-reviews"
+                          >
+                            View all {goodreadsData.reviews.length} reviews →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="safety" className="mt-6">
