@@ -9,6 +9,7 @@ import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSc
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
 import { searchGoodreadsBook } from "./services/apify";
+import { searchAmazonBook } from "./services/amazon";
 import { fromError } from "zod-validation-error";
 
 const upload = multer({
@@ -564,6 +565,12 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       result.author
     );
     
+    // Fetch Amazon age validation data (runs in parallel for UAE marketplace)
+    const amazonData = await searchAmazonBook(
+      result.title || 'Unknown',
+      result.author
+    );
+    
     // Update progress: Age Recommendations
     await storage.updateEvaluation(evaluationId, { progress: 95 });
     
@@ -576,6 +583,7 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       result: result,
       nmcAssessment: nmcAssessment,
       goodreadsData: goodreadsData,
+      amazonData: amazonData,
       coverImage: coverImage 
     });
 

@@ -204,11 +204,11 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     }
 
     // Find best matching result
-    let bestMatch = searchResults[0];
-    let bestScore = calculateSimilarity(title, bestMatch.title || '');
+    let bestMatch: any = searchResults[0];
+    let bestScore = calculateSimilarity(title, String(bestMatch.title || ''));
 
     for (const result of searchResults.slice(1)) {
-      const score = calculateSimilarity(title, result.title || '');
+      const score = calculateSimilarity(title, String(result.title || ''));
       if (score > bestScore) {
         bestScore = score;
         bestMatch = result;
@@ -227,8 +227,8 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       };
     }
 
-    const asin = bestMatch.asin;
-    const amazonUrl = bestMatch.url;
+    const asin = String(bestMatch.asin || '');
+    const amazonUrl = String(bestMatch.url || '');
 
     if (!asin) {
       console.log('Amazon search: No ASIN found in search result');
@@ -271,11 +271,11 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     const result: AmazonBookData = {
       status: 'ok',
       ...ageInfo,
-      asin,
-      amazonUrl,
+      asin: asin || undefined,
+      amazonUrl: amazonUrl || undefined,
       marketplace: 'AE',
       matchConfidence: bestScore,
-      matchedTitle: bestMatch.title,
+      matchedTitle: String(bestMatch.title || ''),
       lastFetched: new Date().toISOString(),
     };
 
