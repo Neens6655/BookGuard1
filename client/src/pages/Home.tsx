@@ -9,6 +9,16 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useQuery } from '@tanstack/react-query';
@@ -43,6 +53,7 @@ export default function Home() {
   const [selectedNmcBands, setSelectedNmcBands] = useState<string[]>([]);
   const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -280,12 +291,17 @@ export default function Home() {
     setSelectedBooks([]);
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
+    if (selectedBooks.length === 0) return;
+    setShowDeleteDialog(true);
+  };
+
+  const confirmBulkDelete = async () => {
     if (selectedBooks.length === 0) return;
 
     try {
       await Promise.all(
-        selectedBooks.map(id => apiRequest('DELETE', `/api/evaluate/${id}`))
+        selectedBooks.map(id => apiRequest('DELETE', `/api/evaluations/${id}`))
       );
 
       toast({
@@ -295,6 +311,7 @@ export default function Home() {
 
       setSelectedBooks([]);
       setSelectionMode(false);
+      setShowDeleteDialog(false);
       refetch();
     } catch (error) {
       toast({
@@ -302,6 +319,7 @@ export default function Home() {
         title: 'Delete Failed',
         description: 'Failed to delete selected books. Please try again.',
       });
+      setShowDeleteDialog(false);
     }
   };
 
@@ -1070,6 +1088,28 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Selected Books</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedBooks.length} {selectedBooks.length === 1 ? 'book' : 'books'}? 
+              This action cannot be undone and will permanently remove the selected books from your library.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
