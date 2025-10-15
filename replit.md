@@ -30,6 +30,16 @@ Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessme
 
 *   **OpenAI API**: Utilizes `GPT-4o` for book content analysis, configured for structured JSON outputs.
 *   **Neon Database**: Serverless PostgreSQL for persistent storage.
+*   **Apify Goodreads Scraper**: Enriches book data with Goodreads ratings, reviews, and cover images. Uses the `epctex/goodreads-scraper` actor with field name `image` for cover images.
 *   **File Processing Libraries**: `pdf-parse`, `mammoth`, `epub-parser`, `rtf-parser`, Node.js `fs`.
 *   **PDF Generation**: `Puppeteer` and `Chromium` (Nix package) for HTML-to-PDF conversion.
 *   **UI Component Libraries**: `Shadcn/ui`, `Radix UI`, `React Hook Form`, `Zod`, `TanStack Query`, `Wouter`, `Drizzle ORM`.
+
+## Recent Updates
+
+### Goodreads Cover Image Integration (Oct 2025)
+Fixed Goodreads cover image integration to properly display book covers from Goodreads API:
+- **Frontend**: BookCard and ResultsView components now prioritize Goodreads cover images (`goodreadsData?.coverImageUrl`) over uploaded covers (`coverImage`)
+- **Backend**: Apify service updated to use correct field name `book.image` from the Goodreads scraper response
+- **Fallback Chain**: Goodreads cover → Uploaded cover → BookOpen icon placeholder
+- Note: Books uploaded before this fix may need re-evaluation to fetch Goodreads cover images
