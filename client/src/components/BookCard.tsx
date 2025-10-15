@@ -19,8 +19,8 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
   if (!result) return null;
 
   // Only use Goodreads rating if status is 'ok'
-  const hasGoodreadsRating = book.goodreadsData?.status === 'ok' && book.goodreadsData.rating;
-  const rating = hasGoodreadsRating ? book.goodreadsData.rating : undefined;
+  const hasGoodreadsRating = book.goodreadsData?.status === 'ok' && book.goodreadsData?.rating;
+  const rating = hasGoodreadsRating ? book.goodreadsData?.rating : undefined;
   
   const genres = result.genres || result.key_drivers.slice(0, 2);
   const themes = result.themes || ['General'];
@@ -103,9 +103,9 @@ export function BookCard({ book, onClick, onUpdate }: BookCardProps) {
       >
         {/* Book Cover */}
         <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-200 via-yellow-100 to-orange-100">
-          {book.coverImage ? (
+          {(book.goodreadsData?.coverImageUrl || book.coverImage) ? (
             <img 
-              src={book.coverImage} 
+              src={book.goodreadsData?.coverImageUrl || book.coverImage || ''} 
               alt={result.title}
               className="absolute inset-0 w-full h-full object-cover"
               data-testid={`img-book-cover-${book.id}`}
