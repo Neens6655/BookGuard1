@@ -67,6 +67,7 @@ export default function ReportGeneration() {
   const [childSafetyFilter, setChildSafetyFilter] = useState<SafetyRating | "all">("all");
   const [themeComplexityFilter, setThemeComplexityFilter] = useState<string>("all");
   const [languageLevelFilter, setLanguageLevelFilter] = useState<string>("all");
+  const [nmcAgeBandFilter, setNmcAgeBandFilter] = useState<string>("all");
   
   // Selected books
   const [selectedBooks, setSelectedBooks] = useState<Set<string>>(new Set());
@@ -124,9 +125,16 @@ export default function ReportGeneration() {
         if (langLevel?.toLowerCase() !== languageLevelFilter.toLowerCase()) return false;
       }
 
+      // NMC Age Band filter
+      if (nmcAgeBandFilter !== "all") {
+        if (!evaluation.nmcAssessment?.enabled || evaluation.nmcAssessment.finalAgeBand !== nmcAgeBandFilter) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [evaluations, verdictFilter, ageGroupFilter, languageFilter, culturalValuesFilter, childSafetyFilter, themeComplexityFilter, languageLevelFilter]);
+  }, [evaluations, verdictFilter, ageGroupFilter, languageFilter, culturalValuesFilter, childSafetyFilter, themeComplexityFilter, languageLevelFilter, nmcAgeBandFilter]);
 
   const handleSelectAll = () => {
     const allIds = new Set(filteredEvaluations.map(e => e.id));
@@ -405,6 +413,26 @@ export default function ReportGeneration() {
                               />
                               <Label htmlFor={`language-level-${level}`} className="text-xs cursor-pointer capitalize">
                                 {level === "all" ? "All Levels" : level}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* NMC Age Band */}
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-indigo-700">NMC Age Band</Label>
+                        <div className="space-y-1">
+                          {["all", "Not Allowed", "6+", "10+", "13+", "17+", "21+"].map((band) => (
+                            <div key={band} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`nmc-${band}`}
+                                checked={nmcAgeBandFilter === band}
+                                onCheckedChange={() => setNmcAgeBandFilter(band)}
+                                data-testid={`checkbox-nmc-${band.toLowerCase().replace(/\s+/g, '-').replace(/\+/g, 'plus')}`}
+                              />
+                              <Label htmlFor={`nmc-${band}`} className="text-xs cursor-pointer">
+                                {band === "all" ? "All Age Bands" : band}
                               </Label>
                             </div>
                           ))}
