@@ -143,6 +143,10 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
     
     if (details['Reading age'] || details['reading age']) {
       result.readingAge = details['Reading age'] || details['reading age'];
+      // Use reading age as target age if no other target age found
+      if (!result.targetAge) {
+        result.targetAge = result.readingAge;
+      }
     }
     
     if (details['Grade level'] || details['grade level']) {
@@ -153,6 +157,14 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
       result.targetAge = details['Age Range'] || details['age range'] || details['Customer recommended age'];
     }
   }
+  
+  // If we have readingAge but no targetAge, use readingAge as targetAge
+  if (result.readingAge && !result.targetAge) {
+    result.targetAge = result.readingAge;
+  }
+  
+  // Debug log
+  console.log('Amazon age extraction result:', JSON.stringify(result, null, 2));
   
   return result;
 }
@@ -184,7 +196,7 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       country: "AE", // UAE Amazon marketplace
     };
 
-    const searchResults = await retryWithBackoff(
+    const searchResultsRaw = await retryWithBackoff(
       async () => {
         const runResult = await client.actor("pintostudio/amazon-search-products-scraper").call(searchInput);
         const { items } = await client.dataset(runResult.defaultDatasetId).listItems();
@@ -195,6 +207,16 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       `Amazon search for "${searchQuery}"`
     );
 
+    // Extract the results array from the nested structure
+    const searchResults = searchResultsRaw && searchResultsRaw[0]?.results && Array.isArray(searchResultsRaw[0].results)
+      ? searchResultsRaw[0].results.slice(0, 3) // Get top 3 results
+      : [];
+
+    console.log(`Amazon search: Extracted ${searchResults.length} products`);
+    if (searchResults.length > 0) {
+      console.log(`Amazon search: First product title: "${searchResults[0]?.title}"`);
+    }
+
     if (!searchResults || searchResults.length === 0) {
       console.log(`No Amazon results found for: ${searchQuery}`);
       return {
@@ -203,15 +225,12 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       };
     }
 
-    // Debug: Log the first result to see the structure
-    console.log('Amazon search result structure:', JSON.stringify(searchResults[0], null, 2));
-
     // Find best matching result
     let bestMatch: any = searchResults[0];
-    let bestScore = calculateSimilarity(title, String(bestMatch.title || bestMatch.name || bestMatch.productTitle || ''));
+    let bestScore = calculateSimilarity(title, String(bestMatch?.title || ''));
 
     for (const result of searchResults.slice(1)) {
-      const score = calculateSimilarity(title, String(result.title || result.name || result.productTitle || ''));
+      const score = calculateSimilarity(title, String(result.title || ''));
       if (score > bestScore) {
         bestScore = score;
         bestMatch = result;
