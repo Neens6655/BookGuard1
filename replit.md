@@ -9,124 +9,28 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-The frontend is built with **React** and **TypeScript** using **Vite**. It utilizes **Shadcn/ui** (New York style) with **Radix UI** for accessible components, styled with **Tailwind CSS** featuring a custom color palette. **TanStack Query** manages server state, while **Wouter** handles client-side routing. Typography uses **Inter** and **Noto Sans Arabic**. The **Fresh Garden Theme** features green-to-cyan gradients in hero sections with enhanced glassmorphism effects and interactive button UX. Key design decisions include a library-first interface with interactive book cards, real-time progress tracking for evaluations, and drag-and-drop file upload with a 100MB limit. The homepage features an **illustrative value proposition section** showcasing the 4-system evaluation framework with color-coded cards and parent-focused trust indicators. The application includes dedicated **About Us** (`/about`) and **How It Works** (`/how-it-works`) pages. Hero sections and the **AI Deep Assessment** (`/ai-assessment`) page feature **interactive back buttons** with glassmorphism styling.
+The frontend is built with React and TypeScript using Vite, utilizing Shadcn/ui (New York style) with Radix UI and Tailwind CSS for styling. TanStack Query manages server state, while Wouter handles client-side routing. Key design elements include a library-first interface with interactive book cards, real-time progress tracking, drag-and-drop file upload, and an illustrative value proposition section. The application includes dedicated About Us and How It Works pages, with interactive back buttons featuring glassmorphism styling. The Fresh Garden Theme incorporates green-to-cyan gradients and enhanced glassmorphism effects.
 
 ### Backend Architecture
-The backend uses **Node.js** with **Express.js** and **TypeScript**. It provides RESTful endpoints under `/api`. The file processing pipeline uses **Multer** for uploads, various libraries for text extraction, and **OpenAI API** for content analysis. Asynchronous processing with progress updates and automatic file cleanup are core features. A smart text extraction strategy samples longer books from the beginning, middle, and end.
+The backend uses Node.js with Express.js and TypeScript, providing RESTful endpoints. The file processing pipeline uses Multer for uploads, various libraries for text extraction, and OpenAI API for content analysis. Features include asynchronous processing with progress updates, automatic file cleanup, and a smart text extraction strategy that samples longer books from the beginning, middle, and end.
 
 ### Data Storage Solutions
-The application primarily uses a **PostgreSQL database** (Neon serverless) for permanent evaluation persistence, with an automatic fallback to in-memory storage if the database is unavailable. **Drizzle ORM** is used for type-safe CRUD operations. Evaluation records include UUID primary keys, file metadata, status, progress, structured JSONB results from AI analysis, and base64 encoded cover images.
+The application primarily uses a PostgreSQL database (Neon serverless) for permanent evaluation persistence, with an automatic fallback to in-memory storage. Drizzle ORM is used for type-safe CRUD operations. Evaluation records include UUID primary keys, file metadata, status, progress, structured JSONB results from AI analysis, and base64 encoded cover images. A dedicated `goodreads_cache` table stores Apify Goodreads API responses with a 7-day TTL.
 
 ### System Design Choices
-The core evaluation mechanism is a **4-System Evaluation Framework**:
-1.  **UAE/Islamic/Arab Cultural Values**: Red-line system for cultural alignment (Safe/Moderate/Severe).
-2.  **General Child Safety**: Red-line system for harmful content (Safe/Moderate/Severe).
-3.  **Theme Complexity**: Developmental readiness assessment (age-based).
-4.  **Language Complexity**: Reading level assessment (age-based).
+The core evaluation uses a **4-System Evaluation Framework**:
+1.  **UAE/Islamic/Arab Cultural Values**: Red-line system for cultural alignment.
+2.  **General Child Safety**: Red-line system for harmful content.
+3.  **Theme Complexity**: Developmental readiness assessment.
+4.  **Language Complexity**: Reading level assessment.
 
-Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. The assessment header displays age group recommendations and dynamic whitelist status (Whitelisted/Parent Guidance/Not Whitelisted) with appropriate icons and glassmorphism styling. Book catalog management includes metadata editing and deletion functionality with cover image extraction for various formats. The application supports batch uploads with sequential processing, real-time queue status, and progress visualization. A dedicated reports page (`/reports`) offers advanced multi-layer filtering for generating dynamic PDF reports for selected books. An enterprise-grade scoring configuration administration system (`/admin/scoring`) allows management of evaluation criteria, weights, thresholds, age mappings, and verdict rules with version control and audit trails. PDF reports are generated with a branded, visually appealing design, including card-based layouts and color-coded system breakdowns. The verdict system is consolidated into three statuses: Whitelisted, Parent Guidance, and Not Whitelisted. **NMC age band filtering** is available on both the landing page (FilterSidebar) and Report Generation page (Scoring Criteria accordion), allowing users to filter books by National Media Council age bands (Not Allowed, 6+, 10+, 13+, 17+, 21+). Note that NMC age bands and display ages (recommended_minimum_age) are separate assessments and may differ for the same book.
+Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessment" page provides evidence-based analysis, detailing narrative structure, language metrics, cultural assessment, educational insights, and safety analysis with textual quotes and page references. The assessment header displays age group recommendations and dynamic whitelist status (Whitelisted/Parent Guidance/Not Whitelisted). Book catalog management includes metadata editing and deletion. Batch uploads support sequential processing, real-time queue status, and progress visualization. A dedicated reports page (`/reports`) offers advanced multi-layer filtering for generating dynamic PDF reports. An enterprise-grade scoring configuration administration system (`/admin/scoring`) allows management of evaluation criteria, weights, thresholds, age mappings, and verdict rules with version control and audit trails. PDF reports are generated with a branded design. NMC age band filtering is available on the landing page and Report Generation page. Goodreads integration provides community insights, including overall rating stats, categories, and categorized reviews (Most Helpful, Parent & Educator, Critical Perspectives). Smart similarity matching uses Unicode-aware normalization and Jaccard Similarity to accurately associate books with Goodreads data. Text extraction capacity is increased to 100,000 characters, with a research-backed sampling strategy (35% beginning, 30% middle, 35% end) for longer books, incorporating overlapping chunks and contextual separators. The system supports bulk operations (selection, delete, CSV export) and includes an Analytics Dashboard displaying evaluation metrics, verdict breakdowns, language distribution, top genres, and age group distribution. API resilience includes retry logic with exponential backoff for external calls.
 
 ## External Dependencies
 
-*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis, configured for structured JSON outputs.
+*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis.
 *   **Neon Database**: Serverless PostgreSQL for persistent storage.
-*   **Apify Goodreads Scraper**: Enriches book data with Goodreads ratings, reviews, and cover images. Uses the `epctex/goodreads-scraper` actor with field name `image` for cover images.
+*   **Apify Goodreads Scraper**: Enriches book data with ratings, reviews, and cover images using `epctex/goodreads-scraper`.
 *   **File Processing Libraries**: `pdf-parse`, `mammoth`, `epub-parser`, `rtf-parser`, Node.js `fs`.
 *   **PDF Generation**: `Puppeteer` and `Chromium` (Nix package) for HTML-to-PDF conversion.
 *   **UI Component Libraries**: `Shadcn/ui`, `Radix UI`, `React Hook Form`, `Zod`, `TanStack Query`, `Wouter`, `Drizzle ORM`.
-
-## Recent Updates
-
-### Goodreads Integration & Similarity Matching (Oct 2025)
-
-#### Cover Image Integration
-Fixed Goodreads cover image integration to properly display book covers from Goodreads API:
-- **Frontend**: BookCard and ResultsView components now prioritize Goodreads cover images (`goodreadsData?.coverImageUrl`) over uploaded covers (`coverImage`)
-- **Backend**: Apify service updated to use correct field name `book.image` from the Goodreads scraper response
-- **Fallback Chain**: Goodreads cover → Uploaded cover → BookOpen icon placeholder
-
-#### Smart Similarity Matching
-Implemented intelligent title matching to prevent incorrect Goodreads associations:
-- **Unicode-Aware Normalization**: Handles Arabic titles with diacritics (tashkeel), Latin accents, and multilingual content using NFKD normalization and `\p{M}` regex
-- **Jaccard Similarity Algorithm**: Calculates word-based similarity between book titles and author names
-- **Confidence Scoring**: Weighted average (70% title + 30% author) with 40% threshold to reject low-confidence matches
-- **Match Transparency**: Returns `matchConfidence` (0-100%) and `matchedTitle` fields for debugging
-- **Console Logging**: All matches logged with confidence scores for monitoring
-- **Protection**: Prevents fuzzy Goodreads search results from associating wrong books with evaluations
-
-#### Goodreads Community Tab with Review Categories (Oct 2025)
-Added comprehensive Goodreads community insights as a dedicated tab on book evaluation pages:
-- **Community Tab**: Dedicated tab displaying Goodreads data only when successfully fetched (status: 'ok')
-- **Overall Rating Stats**: Large rating display with 5-star visualization, total ratings count, total reviews count, and published year
-- **Goodreads Categories**: Display of up to 8 Goodreads genres/categories with amber-themed badges
-- **Review Categories for Better Organization**:
-  - **Most Helpful Reviews** (green theme): Top 2 reviews sorted by likes with like counts displayed
-  - **Parent & Educator Perspectives** (blue theme): Reviews from parents/educators (2 reviews)
-  - **Critical Perspectives** (orange theme): Lower-rated reviews (≤3 stars) to show balanced feedback
-- **Review Display Features**: Author avatars with gradient backgrounds, star ratings, review text with line clamping, dates, and like counts
-- **Direct Goodreads Link**: Link to full Goodreads page in tab header
-- **Header Integration**: Rating still displayed prominently in hero section and book analysis subtitle
-
-### Phase 1 Reliability Improvements (Oct 2025)
-Implemented comprehensive reliability enhancements to improve system stability and error handling:
-
-#### API Resilience
-- **Retry Logic with Exponential Backoff**: Added retry mechanism (3 attempts, 1s/2s/4s intervals) to all OpenAI API calls (evaluateBook, evaluateNMCStandards, deepAnalyzeBook) and Apify Goodreads searches
-- **Smart Error Handling**: Early abort for non-retryable errors (400/401) to avoid unnecessary retries
-- **Detailed Logging**: Console logging of retry attempts and final failures for debugging
-
-#### File Processing Robustness
-- **Text Validation**: Enforces minimum 100 character threshold after extraction with targeted error messages
-- **Empty File Detection**: Catches corrupted, password-protected, or empty files with user-friendly feedback
-- **Automatic Cleanup**: Uploaded files deleted after processing (success or failure) preventing disk bloat
-- **Error Recovery**: File cleanup guaranteed in all error scenarios including early upload failures
-
-#### Enhanced User Experience
-- **Contextual Error Messages**: Maps failure modes to actionable user guidance:
-  - Empty/corrupted files: "Unable to extract text from file. The file may be empty, corrupted, or password-protected."
-  - Insufficient content: "The uploaded file contains too little text to analyze (minimum 100 characters required)."
-  - API failures: "AI evaluation service temporarily unavailable. Please try again in a few moments."
-  - Rate limiting: "Service temporarily busy. Please try again shortly."
-- **Evaluation Status Tracking**: Failed evaluations properly marked with descriptive error payloads for frontend display
-
-#### Code Quality
-- **Removed PDF Cover Extraction**: Eliminated problematic canvas-based PDF rendering that caused errors
-- **TypeScript Compatibility**: Fixed Unicode regex patterns for broader platform support
-- **Centralized Retry Logic**: Reusable exponential backoff helper prevents code duplication
-
-### Phase 2 Performance Enhancements (Oct 2025)
-Implemented performance optimizations to accelerate batch processing and reduce external API calls:
-
-#### Goodreads Data Caching
-- **PostgreSQL Cache Layer**: Dedicated `goodreads_cache` table stores Apify Goodreads API responses with 7-day TTL
-- **Normalized Cache Keys**: Uses normalized "title:author" format for reliable cache hits across similar queries
-- **Automatic Cache Integration**: `apify.ts` service transparently checks cache before making API calls
-- **Freshness Check**: 7-day TTL ensures data stays reasonably current while reducing API load
-- **Performance Impact**: Eliminates redundant Apify calls for previously evaluated books
-
-#### Parallel Batch Processing
-- **Concurrent Upload Processing**: UploadQueue component processes up to 3 files simultaneously (MAX_CONCURRENT = 3)
-- **Dynamic Queue Management**: Automatically starts next pending file when active count drops below limit
-- **Active Count Tracking**: Maintains accurate state of concurrent evaluations with proper cleanup on success/failure
-- **Real-time Progress Display**: UI shows parallel processing status with visual indicators for uploading/processing/completed states
-- **Error Resilience**: Failed files don't block other parallel evaluations; activeCount decrements correctly in all error paths
-- **Retry Functionality**: Existing retry button allows re-processing of failed evaluations without re-uploading
-
-### Phase 3: Advanced Features (Oct 2025)
-Implemented productivity and analytics features to enhance user workflows and data insights:
-
-#### Bulk Operations
-- **Bulk Selection Mode**: Toggle selection mode to choose multiple books with visual checkboxes on book cards
-- **Batch Actions**: Select All/Deselect All functionality for efficient multi-book selection
-- **Bulk Delete**: Remove multiple books simultaneously with confirmation
-- **CSV Export**: Export selected books to CSV with comprehensive metadata (title, author, language, age, verdict, score, NMC band, genres)
-- **Selection UI**: Visual indicators with border highlights and checkbox overlays when selection mode is active
-
-#### Analytics Dashboard
-- **Dedicated Analytics Page**: New `/analytics` route with comprehensive evaluation metrics
-- **Key Metrics**: Total evaluations, success rate percentage, average processing time, whitelisted books count
-- **Verdict Breakdown**: Visual bar charts showing distribution across Whitelisted/Parent Guidance/Not Whitelisted categories
-- **Language Distribution**: Chart showing evaluation counts by language with percentage breakdowns
-- **Top Genres**: Badge display of most frequent genres across evaluated books
-- **Age Group Distribution**: Breakdown of books by recommended minimum age ranges
-- **Header Navigation**: Quick access to Analytics from main header navigation
