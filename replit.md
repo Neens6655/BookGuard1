@@ -54,9 +54,15 @@ Implemented intelligent title matching to prevent incorrect Goodreads associatio
 - **Console Logging**: All matches logged with confidence scores for monitoring
 - **Protection**: Prevents fuzzy Goodreads search results from associating wrong books with evaluations
 
-#### Goodreads Reviews & Ratings Display (Oct 2025)
-Added comprehensive Goodreads community insights to book evaluation pages:
-- **Overview Tab - Community Insights Section**: Consolidated display showing overall rating (with 5-star visualization), total ratings count, total reviews count, published year, Goodreads categories/genres, and featured review preview with quick link to full reviews tab
-- **Dedicated Reviews Tab**: Full list of top Goodreads reviews with author avatars, star ratings, review text (with line clamping), number of likes, and link to Goodreads
-- **Header Integration**: Rating displayed prominently in hero section and book analysis subtitle
-- **Automatic Display**: Goodreads data only shown when successfully fetched (status: 'ok')
+#### Goodreads Community Tab with Review Categories (Oct 2025)
+Added comprehensive Goodreads community insights as a dedicated tab on book evaluation pages:
+- **Community Tab**: Dedicated tab displaying Goodreads data only when successfully fetched (status: 'ok')
+- **Overall Rating Stats**: Large rating display with 5-star visualization, total ratings count, total reviews count, and published year
+- **Goodreads Categories**: Display of up to 8 Goodreads genres/categories with amber-themed badges
+- **Review Categories for Better Organization**:
+  - **Most Helpful Reviews** (green theme): Top 2 reviews sorted by likes with like counts displayed
+  - **Parent & Educator Perspectives** (blue theme): Reviews from parents/educators (2 reviews)
+  - **Critical Perspectives** (orange theme): Lower-rated reviews (≤3 stars) to show balanced feedback
+- **Review Display Features**: Author avatars with gradient backgrounds, star ratings, review text with line clamping, dates, and like counts
+- **Direct Goodreads Link**: Link to full Goodreads page in tab header
+- **Header Integration**: Rating still displayed prominently in hero section and book analysis subtitle
