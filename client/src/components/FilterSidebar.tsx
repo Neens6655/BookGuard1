@@ -7,10 +7,12 @@ interface FilterSidebarProps {
   selectedLanguages: string[];
   selectedGenres: string[];
   selectedVerdicts: string[];
+  selectedNmcBands: string[];
   onAgeGroupChange: (ageGroup: string) => void;
   onLanguageChange: (language: string) => void;
   onGenreChange: (genre: string) => void;
   onVerdictChange: (verdict: string) => void;
+  onNmcBandChange: (nmcBand: string) => void;
   onClearFilters: () => void;
 }
 
@@ -47,18 +49,29 @@ const GENRES = [
   { value: 'Interactive', label: 'Interactive', icon: '🎮' },
 ];
 
+const NMC_BANDS = [
+  { value: 'Not Allowed', label: 'Not Allowed', emoji: '🚫' },
+  { value: '6+', label: '6+', emoji: '👶' },
+  { value: '10+', label: '10+', emoji: '🧒' },
+  { value: '13+', label: '13+', emoji: '👦' },
+  { value: '17+', label: '17+', emoji: '👨' },
+  { value: '21+', label: '21+', emoji: '🧑' },
+];
+
 export function FilterSidebar({
   selectedAgeGroups,
   selectedLanguages,
   selectedGenres,
   selectedVerdicts,
+  selectedNmcBands,
   onAgeGroupChange,
   onLanguageChange,
   onGenreChange,
   onVerdictChange,
+  onNmcBandChange,
   onClearFilters,
 }: FilterSidebarProps) {
-  const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0;
+  const hasActiveFilters = selectedAgeGroups.length > 0 || selectedLanguages.length > 0 || selectedGenres.length > 0 || selectedVerdicts.length > 0 || selectedNmcBands.length > 0;
 
   return (
     <Card className="sticky top-4 border-2 border-emerald-200 shadow-lg bg-white">
@@ -178,6 +191,33 @@ export function FilterSidebar({
               >
                 <span className="text-base">{genre.icon}</span>
                 <span>{genre.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Separator className="bg-emerald-100" />
+
+        {/* NMC Standards Filter */}
+        <div>
+          <h3 className="font-bold text-sm text-gray-900 mb-3">NMC Age Band</h3>
+          <div className="flex flex-wrap gap-2">
+            {NMC_BANDS.map((band) => (
+              <button
+                key={band.value}
+                onClick={() => onNmcBandChange(band.value)}
+                className={`
+                  inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold
+                  transition-all duration-200 border-2
+                  ${selectedNmcBands.includes(band.value) 
+                    ? 'bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-600 text-white shadow-md' 
+                    : 'bg-white border-gray-300 text-gray-700 hover:border-purple-400 hover:bg-purple-50'
+                  }
+                `}
+                data-testid={`checkbox-nmc-${band.value.toLowerCase().replace(/\s+/g, '-').replace(/\+/g, 'plus')}`}
+              >
+                <span className="text-base">{band.emoji}</span>
+                <span>{band.label}</span>
               </button>
             ))}
           </div>
