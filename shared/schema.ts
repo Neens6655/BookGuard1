@@ -44,6 +44,19 @@ export const evaluations = pgTable("evaluations", {
     }>;
     lastFetched?: string;
   }>(),
+  amazonData: jsonb("amazon_data").$type<{
+    status: 'ok' | 'unavailable' | 'error';
+    message?: string;
+    targetAge?: string;
+    readingAge?: string;
+    gradeLevel?: string;
+    asin?: string;
+    amazonUrl?: string;
+    marketplace?: string;
+    matchConfidence?: number;
+    matchedTitle?: string;
+    lastFetched?: string;
+  }>(),
   coverImage: text("cover_image"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
@@ -76,6 +89,28 @@ export const goodreadsCache = pgTable("goodreads_cache", {
       date: string;
       numOfLikes?: number;
     }>;
+    matchConfidence?: number;
+    matchedTitle?: string;
+  }>().notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  expiresAt: timestamp("expires_at").notNull(), // 7 days default
+});
+
+// Amazon cache table for age validation performance optimization
+export const amazonCache = pgTable("amazon_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  cacheKey: text("cache_key").notNull().unique(), // normalized "title|author"
+  title: text("title").notNull(),
+  author: text("author"),
+  data: jsonb("data").$type<{
+    status: 'ok' | 'unavailable' | 'error';
+    message?: string;
+    targetAge?: string;
+    readingAge?: string;
+    gradeLevel?: string;
+    asin?: string;
+    amazonUrl?: string;
+    marketplace?: string;
     matchConfidence?: number;
     matchedTitle?: string;
   }>().notNull(),
