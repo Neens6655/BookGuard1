@@ -40,6 +40,7 @@ export default function Home() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedVerdicts, setSelectedVerdicts] = useState<string[]>([]);
+  const [selectedNmcBands, setSelectedNmcBands] = useState<string[]>([]);
   const { toast } = useToast();
   
   const { data: evaluations, isLoading, refetch } = useQuery<Evaluation[]>({
@@ -240,11 +241,20 @@ export default function Home() {
     );
   };
 
+  const handleNmcBandToggle = (nmcBand: string) => {
+    setSelectedNmcBands(prev => 
+      prev.includes(nmcBand) 
+        ? prev.filter(b => b !== nmcBand)
+        : [...prev, nmcBand]
+    );
+  };
+
   const handleClearFilters = () => {
     setSelectedAgeGroups([]);
     setSelectedLanguages([]);
     setSelectedGenres([]);
     setSelectedVerdicts([]);
+    setSelectedNmcBands([]);
   };
 
   const parseAgeRange = (ageStr: string): { min: number; max: number } => {
@@ -300,7 +310,10 @@ export default function Home() {
     const matchesVerdict = selectedVerdicts.length === 0 || 
       selectedVerdicts.includes(result.final_verdict || '');
 
-    return matchesSearch && matchesAgeGroup && matchesLanguage && matchesGenre && matchesVerdict;
+    const matchesNmcBand = selectedNmcBands.length === 0 || 
+      (book.nmcAssessment?.enabled && selectedNmcBands.includes(book.nmcAssessment.finalAgeBand));
+
+    return matchesSearch && matchesAgeGroup && matchesLanguage && matchesGenre && matchesVerdict && matchesNmcBand;
   });
 
   return (
@@ -645,10 +658,12 @@ export default function Home() {
                         selectedLanguages={selectedLanguages}
                         selectedGenres={selectedGenres}
                         selectedVerdicts={selectedVerdicts}
+                        selectedNmcBands={selectedNmcBands}
                         onAgeGroupChange={handleAgeGroupToggle}
                         onLanguageChange={handleLanguageToggle}
                         onGenreChange={handleGenreToggle}
                         onVerdictChange={handleVerdictToggle}
+                        onNmcBandChange={handleNmcBandToggle}
                         onClearFilters={handleClearFilters}
                       />
                     </div>
