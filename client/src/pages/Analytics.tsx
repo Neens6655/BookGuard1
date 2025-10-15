@@ -3,7 +3,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, CheckCircle, XCircle, Clock, TrendingUp, BarChart3, PieChart } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, XCircle, Clock, TrendingUp, BarChart3, PieChart, Shield } from 'lucide-react';
 import { type Evaluation } from '@/types/evaluation';
 import { Link } from 'wouter';
 
@@ -68,6 +68,33 @@ export default function Analytics() {
     acc[age] = (acc[age] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  // Amazon Age Validation Metrics
+  const evalsWithAmazon = completedEvals.filter(e => e.amazonData && e.amazonData.status === 'ok' && e.amazonData.targetAge);
+  const amazonCoverage = totalEvals > 0 ? (evalsWithAmazon.length / completedEvals.length) * 100 : 0;
+  
+  // Calculate match rate (comparing AI age with Amazon target age)
+  const ageMatches = evalsWithAmazon.filter(e => {
+    const aiAge = e.result?.recommended_minimum_age || '';
+    const amazonAge = e.amazonData?.targetAge || '';
+    
+    // Extract numeric values for comparison
+    const extractAge = (ageStr: string) => {
+      const match = ageStr.match(/\d+/);
+      return match ? parseInt(match[0]) : null;
+    };
+    
+    const aiAgeNum = extractAge(aiAge);
+    const amazonAgeNum = extractAge(amazonAge);
+    
+    // Consider a match if within 2 years
+    if (aiAgeNum && amazonAgeNum) {
+      return Math.abs(aiAgeNum - amazonAgeNum) <= 2;
+    }
+    return false;
+  });
+  
+  const ageMatchRate = evalsWithAmazon.length > 0 ? (ageMatches.length / evalsWithAmazon.length) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -146,6 +173,56 @@ export default function Analytics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Amazon Age Validation Section */}
+        {evalsWithAmazon.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-orange-600" />
+              Amazon Age Validation Quality Assurance
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card data-testid="metric-amazon-coverage">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Amazon Data Coverage</CardTitle>
+                  <BookOpen className="w-4 h-4 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-orange-600">{amazonCoverage.toFixed(1)}%</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {evalsWithAmazon.length} of {completedEvals.length} books
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card data-testid="metric-age-match-rate">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">AI Age Accuracy</CardTitle>
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{ageMatchRate.toFixed(1)}%</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {ageMatches.length} matches within ±2 years
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card data-testid="metric-age-discrepancies">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Age Discrepancies</CardTitle>
+                  <XCircle className="w-4 h-4 text-red-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-red-600">{evalsWithAmazon.length - ageMatches.length}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Requires manual review
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
