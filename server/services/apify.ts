@@ -4,18 +4,32 @@ const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
 });
 
+// Normalize text for similarity comparison
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    // Remove punctuation and special characters
+    .replace(/[^\w\s]/g, ' ')
+    // Collapse multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // Calculate string similarity (0-100%)
 function calculateSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   
-  const s1 = str1.toLowerCase().trim();
-  const s2 = str2.toLowerCase().trim();
+  const s1 = normalizeText(str1);
+  const s2 = normalizeText(str2);
   
   if (s1 === s2) return 100;
   
-  // Simple word overlap similarity
-  const words1 = new Set(s1.split(/\s+/));
-  const words2 = new Set(s2.split(/\s+/));
+  // Word overlap similarity
+  const words1 = new Set(s1.split(/\s+/).filter(w => w.length > 0));
+  const words2 = new Set(s2.split(/\s+/).filter(w => w.length > 0));
+  
+  if (words1.size === 0 || words2.size === 0) return 0;
   
   const intersection = new Set(Array.from(words1).filter(x => words2.has(x)));
   const union = new Set([...Array.from(words1), ...Array.from(words2)]);
