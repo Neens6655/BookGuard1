@@ -11,10 +11,10 @@ function normalizeText(text: string): string {
     .trim()
     // Normalize Unicode to decomposed form
     .normalize('NFKD')
-    // Remove ALL combining marks (accents, Arabic diacritics, etc.) across all scripts
-    .replace(/\p{M}/gu, '')
-    // Remove punctuation and special chars but keep letters/numbers/spaces (Unicode-aware)
-    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    // Remove combining marks (accents, Arabic diacritics U+0300-U+036F)
+    .replace(/[\u0300-\u036f]/g, '')
+    // Remove punctuation and special chars but keep letters/numbers/spaces
+    .replace(/[^\w\s\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g, ' ')
     // Collapse multiple spaces
     .replace(/\s+/g, ' ')
     .trim();
