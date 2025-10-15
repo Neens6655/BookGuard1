@@ -24,8 +24,10 @@ interface UploadQueueProps {
 
 export function UploadQueue({ files, onComplete, onCancel, className }: UploadQueueProps) {
   const [queueFiles, setQueueFiles] = useState<QueueFile[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isProcessing, setIsProcessing] = useState(true);
+  const [activeCount, setActiveCount] = useState(0);
+  
+  const MAX_CONCURRENT = 3; // Process 3 files at once
 
   // Initialize queue
   useEffect(() => {
@@ -38,24 +40,28 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
     setQueueFiles(initialQueue);
   }, [files]);
 
-  // Process files sequentially
+  // Process files in parallel with concurrency limit
   useEffect(() => {
-    if (!isProcessing || currentIndex >= queueFiles.length) {
-      if (currentIndex >= queueFiles.length && queueFiles.length > 0) {
-        // All files processed
-        const allCompleted = queueFiles.every(f => f.status === 'completed');
-        if (allCompleted) {
-          setTimeout(onComplete, 1000);
-        }
-      }
-      return;
-    }
+    if (!isProcessing) return;
 
-    const currentFile = queueFiles[currentIndex];
-    if (currentFile && currentFile.status === 'pending') {
-      processFile(currentIndex);
+    const pendingFiles = queueFiles.filter(f => f.status === 'pending');
+    const activeFiles = queueFiles.filter(f => f.status === 'uploading' || f.status === 'processing');
+    const canStartNew = activeFiles.length < MAX_CONCURRENT && pendingFiles.length > 0;
+
+    if (canStartNew) {
+      // Start processing next pending file
+      const nextIndex = queueFiles.findIndex(f => f.status === 'pending');
+      if (nextIndex !== -1) {
+        processFile(nextIndex);
+      }
+    } else if (activeFiles.length === 0 && pendingFiles.length === 0 && queueFiles.length > 0) {
+      // All files processed
+      const allCompleted = queueFiles.every(f => f.status === 'completed');
+      if (allCompleted) {
+        setTimeout(onComplete, 1000);
+      }
     }
-  }, [currentIndex, queueFiles, isProcessing]);
+  }, [queueFiles, isProcessing, activeCount]);
 
   const processFile = async (index: number) => {
     const queueFile = queueFiles[index];
@@ -63,6 +69,7 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
     try {
       // Upload file
       updateFileStatus(index, 'uploading', 0);
+      setActiveCount(prev => prev + 1);
       
       const formData = new FormData();
       formData.append('file', queueFile.file);
@@ -80,8 +87,7 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
       updateFileStatus(index, 'failed', 0, undefined, 
         error instanceof Error ? error.message : 'Upload failed'
       );
-      // Move to next file even if this one failed
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 1000);
+      setActiveCount(prev => prev - 1);
     }
   };
 
@@ -94,10 +100,9 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
 
       if (data.status === 'completed') {
         updateFileStatus(index, 'completed', 100, evaluationId);
-        // Move to next file
-        setTimeout(() => setCurrentIndex(prev => prev + 1), 500);
+        setActiveCount(prev => prev - 1);
       } else if (data.status === 'failed') {
-        throw new Error('Processing failed');
+        throw new Error(data.result?.error || 'Processing failed');
       } else {
         // Continue polling
         setTimeout(() => pollProgress(index, evaluationId), 2000);
@@ -106,7 +111,7 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
       updateFileStatus(index, 'failed', 0, evaluationId,
         error instanceof Error ? error.message : 'Processing failed'
       );
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 1000);
+      setActiveCount(prev => prev - 1);
     }
   };
 
@@ -132,16 +137,10 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
 
   const retryFile = (index: number) => {
     updateFileStatus(index, 'pending', 0, undefined, undefined);
-    if (index < currentIndex) {
-      setCurrentIndex(index);
-    }
   };
 
   const removeFile = (index: number) => {
     setQueueFiles(prev => prev.filter((_, i) => i !== index));
-    if (index < currentIndex) {
-      setCurrentIndex(prev => prev - 1);
-    }
   };
 
   const getFileIcon = (type: string) => {
@@ -271,7 +270,7 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
                         <RotateCcw className="w-4 h-4" />
                       </Button>
                     )}
-                    {queueFile.status === 'pending' && index > currentIndex && (
+                    {queueFile.status === 'pending' && (
                       <Button
                         variant="ghost"
                         size="sm"

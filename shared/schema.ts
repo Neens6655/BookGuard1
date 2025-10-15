@@ -49,6 +49,40 @@ export const evaluations = pgTable("evaluations", {
   updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });
 
+// Goodreads cache table for performance optimization
+export const goodreadsCache = pgTable("goodreads_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  cacheKey: text("cache_key").notNull().unique(), // normalized "title|author"
+  title: text("title").notNull(),
+  author: text("author"),
+  data: jsonb("data").$type<{
+    status: 'ok' | 'unavailable' | 'error';
+    message?: string;
+    rating?: number;
+    ratingsCount?: number;
+    reviewsCount?: number;
+    genres?: string[];
+    publishedYear?: number;
+    description?: string;
+    coverImageUrl?: string;
+    isbn?: string;
+    pageCount?: number;
+    goodreadsUrl?: string;
+    reviews?: Array<{
+      author: string;
+      userUrl?: string;
+      rating: number;
+      text: string;
+      date: string;
+      numOfLikes?: number;
+    }>;
+    matchConfidence?: number;
+    matchedTitle?: string;
+  }>().notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+  expiresAt: timestamp("expires_at").notNull(), // 7 days default
+});
+
 export const insertEvaluationSchema = createInsertSchema(evaluations).omit({
   id: true,
   createdAt: true,

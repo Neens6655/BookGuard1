@@ -1,4 +1,5 @@
 import { ApifyClient } from 'apify-client';
+import { getCachedGoodreadsData, setCachedGoodreadsData } from './goodreadsCache';
 
 const client = new ApifyClient({
   token: process.env.APIFY_API_TOKEN,
@@ -135,6 +136,12 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       };
     }
 
+    // Check cache first
+    const cachedData = await getCachedGoodreadsData(title, author);
+    if (cachedData) {
+      return cachedData;
+    }
+
     const searchQuery = author ? `${title} ${author}` : title;
     
     const input = {
@@ -205,7 +212,7 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       })));
     }
     
-    return {
+    const goodreadsData: GoodreadsBookData = {
       status: 'ok',
       rating: book.rating ? parseFloat(String(book.rating)) : undefined,
       ratingsCount: book.ratingsCount ? parseInt(String(book.ratingsCount).replace(/,/g, '')) : undefined,
@@ -222,6 +229,11 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       matchConfidence,
       matchedTitle,
     };
+    
+    // Store in cache for future requests
+    await setCachedGoodreadsData(title, author, goodreadsData);
+    
+    return goodreadsData;
 
   } catch (error: any) {
     console.error("Apify Goodreads search error:", error);
