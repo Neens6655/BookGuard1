@@ -66,3 +66,30 @@ Added comprehensive Goodreads community insights as a dedicated tab on book eval
 - **Review Display Features**: Author avatars with gradient backgrounds, star ratings, review text with line clamping, dates, and like counts
 - **Direct Goodreads Link**: Link to full Goodreads page in tab header
 - **Header Integration**: Rating still displayed prominently in hero section and book analysis subtitle
+
+### Phase 1 Reliability Improvements (Oct 2025)
+Implemented comprehensive reliability enhancements to improve system stability and error handling:
+
+#### API Resilience
+- **Retry Logic with Exponential Backoff**: Added retry mechanism (3 attempts, 1s/2s/4s intervals) to all OpenAI API calls (evaluateBook, evaluateNMCStandards, deepAnalyzeBook) and Apify Goodreads searches
+- **Smart Error Handling**: Early abort for non-retryable errors (400/401) to avoid unnecessary retries
+- **Detailed Logging**: Console logging of retry attempts and final failures for debugging
+
+#### File Processing Robustness
+- **Text Validation**: Enforces minimum 100 character threshold after extraction with targeted error messages
+- **Empty File Detection**: Catches corrupted, password-protected, or empty files with user-friendly feedback
+- **Automatic Cleanup**: Uploaded files deleted after processing (success or failure) preventing disk bloat
+- **Error Recovery**: File cleanup guaranteed in all error scenarios including early upload failures
+
+#### Enhanced User Experience
+- **Contextual Error Messages**: Maps failure modes to actionable user guidance:
+  - Empty/corrupted files: "Unable to extract text from file. The file may be empty, corrupted, or password-protected."
+  - Insufficient content: "The uploaded file contains too little text to analyze (minimum 100 characters required)."
+  - API failures: "AI evaluation service temporarily unavailable. Please try again in a few moments."
+  - Rate limiting: "Service temporarily busy. Please try again shortly."
+- **Evaluation Status Tracking**: Failed evaluations properly marked with descriptive error payloads for frontend display
+
+#### Code Quality
+- **Removed PDF Cover Extraction**: Eliminated problematic canvas-based PDF rendering that caused errors
+- **TypeScript Compatibility**: Fixed Unicode regex patterns for broader platform support
+- **Centralized Retry Logic**: Reusable exponential backoff helper prevents code duplication
