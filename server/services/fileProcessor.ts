@@ -166,7 +166,8 @@ export async function extractCoverImage(filePath: string, filename: string): Pro
   try {
     switch (ext) {
       case '.pdf':
-        return await extractCoverFromPdf(filePath);
+        // PDF cover extraction removed - rely on Goodreads covers instead
+        return null;
       case '.epub':
         return await extractCoverFromEpub(filePath);
       case '.doc':
@@ -185,45 +186,8 @@ export async function extractCoverImage(filePath: string, filename: string): Pro
   }
 }
 
-async function extractCoverFromPdf(filePath: string): Promise<string | null> {
-  try {
-    const dataBuffer = await fs.readFile(filePath);
-    
-    // Convert Buffer to Uint8Array for pdfjs-dist
-    const uint8Array = new Uint8Array(dataBuffer);
-    
-    // Load PDF document
-    const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
-    const pdfDocument = await loadingTask.promise;
-    
-    // Get first page
-    const page = await pdfDocument.getPage(1);
-    
-    // Set scale for quality (1.5 = good balance between quality and size)
-    const scale = 1.5;
-    const viewport = page.getViewport({ scale });
-    
-    // Create canvas
-    const canvas = createCanvas(viewport.width, viewport.height);
-    const context = canvas.getContext('2d');
-    
-    // Render page to canvas
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport,
-    };
-    
-    await page.render(renderContext).promise;
-    
-    // Convert to base64 data URL (JPEG for smaller size)
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    
-    return dataUrl;
-  } catch (error) {
-    console.error('PDF cover extraction error:', error);
-    return null;
-  }
-}
+// PDF cover extraction removed - causes rendering errors
+// Users will see Goodreads covers when available, or placeholder icons
 
 async function extractCoverFromEpub(filePath: string): Promise<string | null> {
   try {
