@@ -203,12 +203,15 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       };
     }
 
+    // Debug: Log the first result to see the structure
+    console.log('Amazon search result structure:', JSON.stringify(searchResults[0], null, 2));
+
     // Find best matching result
     let bestMatch: any = searchResults[0];
-    let bestScore = calculateSimilarity(title, String(bestMatch.title || ''));
+    let bestScore = calculateSimilarity(title, String(bestMatch.title || bestMatch.name || bestMatch.productTitle || ''));
 
     for (const result of searchResults.slice(1)) {
-      const score = calculateSimilarity(title, String(result.title || ''));
+      const score = calculateSimilarity(title, String(result.title || result.name || result.productTitle || ''));
       if (score > bestScore) {
         bestScore = score;
         bestMatch = result;
