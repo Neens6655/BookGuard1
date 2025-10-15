@@ -111,3 +111,22 @@ Implemented performance optimizations to accelerate batch processing and reduce 
 - **Real-time Progress Display**: UI shows parallel processing status with visual indicators for uploading/processing/completed states
 - **Error Resilience**: Failed files don't block other parallel evaluations; activeCount decrements correctly in all error paths
 - **Retry Functionality**: Existing retry button allows re-processing of failed evaluations without re-uploading
+
+### Phase 3: Advanced Features (Oct 2025)
+Implemented productivity and analytics features to enhance user workflows and data insights:
+
+#### Bulk Operations
+- **Bulk Selection Mode**: Toggle selection mode to choose multiple books with visual checkboxes on book cards
+- **Batch Actions**: Select All/Deselect All functionality for efficient multi-book selection
+- **Bulk Delete**: Remove multiple books simultaneously with confirmation
+- **CSV Export**: Export selected books to CSV with comprehensive metadata (title, author, language, age, verdict, score, NMC band, genres)
+- **Selection UI**: Visual indicators with border highlights and checkbox overlays when selection mode is active
+
+#### Analytics Dashboard
+- **Dedicated Analytics Page**: New `/analytics` route with comprehensive evaluation metrics
+- **Key Metrics**: Total evaluations, success rate percentage, average processing time, whitelisted books count
+- **Verdict Breakdown**: Visual bar charts showing distribution across Whitelisted/Parent Guidance/Not Whitelisted categories
+- **Language Distribution**: Chart showing evaluation counts by language with percentage breakdowns
+- **Top Genres**: Badge display of most frequent genres across evaluated books
+- **Age Group Distribution**: Breakdown of books by recommended minimum age ranges
+- **Header Navigation**: Quick access to Analytics from main header navigation

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, FileDown } from 'lucide-react';
+import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, FileDown, BarChart3 } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
 import { UploadQueue } from '@/components/UploadQueue';
 import { ProcessingView } from '@/components/ProcessingView';
@@ -444,6 +444,16 @@ export default function Home() {
               >
                 <BookPlus className="w-4 h-4 mr-2" />
                 Add books
+              </Button>
+              <Button 
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation('/analytics')}
+                className="text-gray-600 hover:text-green-600 hover:bg-green-50 gap-2"
+                data-testid="button-analytics"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Analytics
               </Button>
               <Button 
                 variant="ghost"

@@ -9,6 +9,7 @@ import { AboutUs } from "@/pages/AboutUs";
 import { HowItWorks } from "@/pages/HowItWorks";
 import ScoringAdmin from "@/pages/ScoringAdmin";
 import ReportGeneration from "@/pages/ReportGeneration";
+import Analytics from "@/pages/Analytics";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/admin/scoring" component={ScoringAdmin} />
       <Route path="/reports" component={ReportGeneration} />
+      <Route path="/analytics" component={Analytics} />
       <Route component={NotFound} />
     </Switch>
   );
