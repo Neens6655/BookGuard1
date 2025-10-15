@@ -1,4 +1,5 @@
 import { ApifyClient } from 'apify-client';
+import { compareTwoStrings } from 'string-similarity';
 import { getCachedAmazonData, setCachedAmazonData } from './amazonCache';
 
 const client = new ApifyClient({
@@ -25,7 +26,6 @@ async function retryWithBackoff<T>(
         throw error;
       }
       
-      // Calculate exponential backoff delay: 1s, 2s, 4s
       const delayMs = baseDelayMs * Math.pow(2, attempt - 1);
       console.log(`${operationName} attempt ${attempt} failed, retrying in ${delayMs}ms...`);
       
@@ -36,7 +36,7 @@ async function retryWithBackoff<T>(
   throw lastError;
 }
 
-// Normalize text for similarity comparison (Unicode-aware)
+// Normalize text for comparison (Unicode-aware)
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
@@ -48,7 +48,7 @@ function normalizeText(text: string): string {
     .trim();
 }
 
-// Calculate string similarity (0-100%)
+// IMPROVEMENT 1: Enhanced similarity with fuzzy matching
 function calculateSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   
@@ -57,34 +57,109 @@ function calculateSimilarity(str1: string, str2: string): number {
   
   if (s1 === s2) return 100;
   
+  // Use string-similarity for fuzzy matching
+  const fuzzyScore = compareTwoStrings(s1, s2) * 100;
+  
+  // Boost score if one contains the other
   if (s2.includes(s1) || s1.includes(s2)) {
-    const shorterLength = Math.min(s1.length, s2.length);
-    const longerLength = Math.max(s1.length, s2.length);
-    return Math.round(100 - ((longerLength - shorterLength) / longerLength) * 20);
+    return Math.min(100, fuzzyScore + 15);
   }
   
-  const s2MainTitle = s2.split(':')[0].trim();
+  // Handle subtitle variations (e.g., "Title: Subtitle")
+  const s2MainTitle = s2.split(/[:\(]/)[0].trim();
   if (s2MainTitle !== s2 && normalizeText(str1).includes(s2MainTitle)) {
-    return 95;
+    return Math.min(100, fuzzyScore + 20);
   }
   
-  const words1 = new Set(s1.split(/\s+/).filter(w => w.length > 0));
-  const words2 = new Set(s2.split(/\s+/).filter(w => w.length > 0));
+  return Math.round(fuzzyScore);
+}
+
+// IMPROVEMENT 1: Author and publisher verification
+function verifyAuthor(searchAuthor: string | undefined, productAuthor: string | undefined): boolean {
+  if (!searchAuthor || !productAuthor) return false;
   
-  if (words1.size === 0 || words2.size === 0) return 0;
+  const s1 = normalizeText(searchAuthor);
+  const s2 = normalizeText(productAuthor);
   
-  const intersection = new Set(Array.from(words1).filter(x => words2.has(x)));
-  const union = new Set([...Array.from(words1), ...Array.from(words2)]);
+  // Check if either contains the other (handles "J.K. Rowling" vs "Rowling, J.K.")
+  if (s1.includes(s2) || s2.includes(s1)) return true;
   
-  if (union.size === 0) return 0;
+  // Last name matching
+  const lastName1 = s1.split(' ').pop() || '';
+  const lastName2 = s2.split(' ').pop() || '';
   
-  const jaccardScore = Math.round((intersection.size / union.size) * 100);
+  return lastName1.length > 0 && lastName1 === lastName2;
+}
+
+function verifyPublisher(searchPublisher: string | undefined, productPublisher: string | undefined): boolean {
+  if (!searchPublisher || !productPublisher) return false;
   
-  if (intersection.size === Math.min(words1.size, words2.size)) {
-    return Math.min(100, jaccardScore + 30);
+  const similarity = calculateSimilarity(searchPublisher, productPublisher);
+  return similarity >= 70; // 70% threshold for publisher match
+}
+
+// IMPROVEMENT 1: ISBN extraction from text
+function extractISBN(text: string): string | null {
+  if (!text) return null;
+  
+  // Match ISBN-13 (978/979 prefix)
+  const isbn13Match = text.match(/(?:ISBN[-:]?\s*(?:13)?[:\/\s]?)?((?:978|979)[\d\s-]{10,17}\d)/i);
+  if (isbn13Match) {
+    return isbn13Match[1].replace(/[\s-]/g, '');
   }
   
-  return jaccardScore;
+  // Match ISBN-10
+  const isbn10Match = text.match(/(?:ISBN[-:]?\s*(?:10)?[:\/\s]?)?(\d{9}[\dXx])/i);
+  if (isbn10Match) {
+    return isbn10Match[1].replace(/[\s-]/g, '');
+  }
+  
+  return null;
+}
+
+// IMPROVEMENT 4: Format detection and scoring
+function getFormatScore(format: string): number {
+  const normalizedFormat = format.toLowerCase();
+  
+  // Prioritize physical books
+  if (normalizedFormat.includes('hardcover') || normalizedFormat.includes('hardback')) return 100;
+  if (normalizedFormat.includes('paperback')) return 95;
+  if (normalizedFormat.includes('board book')) return 90;
+  
+  // Lower priority for digital
+  if (normalizedFormat.includes('kindle') || normalizedFormat.includes('ebook')) return 30;
+  if (normalizedFormat.includes('audiobook') || normalizedFormat.includes('audio')) return 20;
+  
+  return 50; // Unknown format
+}
+
+function detectFormat(productDetails: any): string {
+  // Try to detect from binding/format field
+  const binding = productDetails.info_table?.['Binding'] || 
+                  productDetails.info_table?.['Format'] ||
+                  productDetails.binding ||
+                  productDetails.format;
+  
+  if (binding) return String(binding);
+  
+  // Detect from title
+  const title = String(productDetails.name || productDetails.title || '').toLowerCase();
+  if (title.includes('kindle') || title.includes('ebook')) return 'Kindle Edition';
+  if (title.includes('hardcover')) return 'Hardcover';
+  if (title.includes('paperback')) return 'Paperback';
+  if (title.includes('audiobook')) return 'Audiobook';
+  
+  return 'Unknown';
+}
+
+export interface AmazonEdition {
+  asin: string;
+  title: string;
+  format: string;
+  readingAge?: string;
+  gradeLevel?: string;
+  amazonUrl: string;
+  publisher?: string;
 }
 
 export interface AmazonBookData {
@@ -99,29 +174,37 @@ export interface AmazonBookData {
   matchConfidence?: number;
   matchedTitle?: string;
   lastFetched?: string;
+  // IMPROVEMENT 5: Quality signals
+  isbn?: string;
+  matchQuality?: 'high' | 'medium' | 'low';
+  matchMethod?: 'isbn' | 'title_author' | 'title_only' | 'partial';
+  authorMatch?: boolean;
+  publisherMatch?: boolean;
+  format?: string;
+  // IMPROVEMENT 2: Multiple editions
+  alternativeEditions?: AmazonEdition[];
+  editionsCompared?: number;
+  ageConsensus?: string;
 }
 
 // Extract age-related information from Amazon product details
-function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?: string; gradeLevel?: string } {
-  const result: { targetAge?: string; readingAge?: string; gradeLevel?: string } = {};
+function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?: string; gradeLevel?: string; publisher?: string } {
+  const result: { targetAge?: string; readingAge?: string; gradeLevel?: string; publisher?: string } = {};
   
-  // Check product features array for age information
+  // Check product features array
   if (productDetails.features && Array.isArray(productDetails.features)) {
     for (const feature of productDetails.features) {
       const featureText = feature.toLowerCase();
       
-      // Match patterns like "Ages 8-12", "Age 5 and up", "5-7 years"
       const ageMatch = featureText.match(/(?:ages?|for)\s*(\d+)\s*(?:-|to|and up|\+|years?)/i);
       if (ageMatch && !result.targetAge) {
         result.targetAge = feature.trim();
       }
       
-      // Match reading age patterns
       if (featureText.includes('reading age') || featureText.includes('reading level')) {
         result.readingAge = feature.trim();
       }
       
-      // Match grade level patterns
       if (featureText.includes('grade') && (featureText.includes('level') || /grade\s*\d/.test(featureText))) {
         result.gradeLevel = feature.trim();
       }
@@ -137,12 +220,11 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
     }
   }
   
-  // Check details/specifications object (check both 'details' and 'info_table' fields)
+  // Check info_table (most reliable)
   const detailsObj = productDetails.details || productDetails.info_table;
   if (detailsObj) {
     if (detailsObj['Reading age'] || detailsObj['reading age']) {
       result.readingAge = detailsObj['Reading age'] || detailsObj['reading age'];
-      // Use reading age as target age if no other target age found
       if (!result.targetAge) {
         result.targetAge = result.readingAge;
       }
@@ -155,9 +237,13 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
     if (detailsObj['Age Range'] || detailsObj['age range'] || detailsObj['Customer recommended age']) {
       result.targetAge = detailsObj['Age Range'] || detailsObj['age range'] || detailsObj['Customer recommended age'];
     }
+    
+    // Extract publisher
+    if (detailsObj['Publisher'] || detailsObj['publisher']) {
+      result.publisher = detailsObj['Publisher'] || detailsObj['publisher'];
+    }
   }
   
-  // If we have readingAge but no targetAge, use readingAge as targetAge
   if (result.readingAge && !result.targetAge) {
     result.targetAge = result.readingAge;
   }
@@ -165,7 +251,44 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
   return result;
 }
 
-export async function searchAmazonBook(title: string, author?: string): Promise<AmazonBookData | null> {
+// IMPROVEMENT 2: Compare ages across multiple editions
+function findAgeConsensus(editions: AmazonEdition[]): string | undefined {
+  const ages = editions
+    .map(e => e.readingAge)
+    .filter((age): age is string => !!age);
+  
+  if (ages.length === 0) return undefined;
+  
+  // Count occurrences
+  const ageCounts = new Map<string, number>();
+  ages.forEach(age => {
+    ageCounts.set(age, (ageCounts.get(age) || 0) + 1);
+  });
+  
+  // Find most common
+  let maxCount = 0;
+  let consensus: string | undefined;
+  ageCounts.forEach((count, age) => {
+    if (count > maxCount) {
+      maxCount = count;
+      consensus = age;
+    }
+  });
+  
+  // Return consensus if at least 2 editions agree
+  if (maxCount >= 2) {
+    return `${consensus} (${maxCount}/${ages.length} editions)`;
+  }
+  
+  return undefined;
+}
+
+export async function searchAmazonBook(
+  title: string, 
+  author?: string,
+  publisher?: string,
+  isbn?: string
+): Promise<AmazonBookData | null> {
   try {
     if (!process.env.APIFY_API_TOKEN) {
       console.warn("APIFY_API_TOKEN not configured, skipping Amazon lookup");
@@ -181,126 +304,180 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       return cachedData;
     }
 
-    const searchQuery = author ? `${title} ${author}` : title;
+    // IMPROVEMENT 3: Better search strategy - try ISBN first
+    let searchResults: any[] = [];
+    let searchMethod: 'isbn' | 'title_author' | 'title_only' = 'title_author';
     
-    // Step 1: Search for the book to get ASIN
-    console.log(`Amazon search: Looking for "${searchQuery}"...`);
+    if (isbn) {
+      console.log(`Amazon search: Trying ISBN "${isbn}" first...`);
+      const isbnResults = await searchByQuery(isbn, 3);
+      if (isbnResults.length > 0) {
+        searchResults = isbnResults;
+        searchMethod = 'isbn';
+        console.log(`Amazon search: Found ${searchResults.length} results via ISBN`);
+      }
+    }
     
-    const searchInput = {
-      query: searchQuery,
-      maxItems: 3, // Get top 3 results for better matching
-      country: "AE", // UAE Amazon marketplace
-    };
-
-    const searchResultsRaw = await retryWithBackoff(
-      async () => {
-        const runResult = await client.actor("pintostudio/amazon-search-products-scraper").call(searchInput);
-        const { items } = await client.dataset(runResult.defaultDatasetId).listItems();
-        return items;
-      },
-      3,
-      2000,
-      `Amazon search for "${searchQuery}"`
-    );
-
-    // Extract the results array from the nested structure
-    const searchResults = searchResultsRaw && searchResultsRaw[0]?.results && Array.isArray(searchResultsRaw[0].results)
-      ? searchResultsRaw[0].results.slice(0, 3) // Get top 3 results
-      : [];
-
-    console.log(`Amazon search: Extracted ${searchResults.length} products`);
-    if (searchResults.length > 0) {
-      console.log(`Amazon search: First product title: "${searchResults[0]?.title}"`);
+    // Fallback: Search with title + author
+    if (searchResults.length === 0 && author) {
+      const query = `${title} ${author}`;
+      console.log(`Amazon search: Looking for "${query}"...`);
+      searchResults = await searchByQuery(query, 5); // Get more results for better matching
+      searchMethod = 'title_author';
+    }
+    
+    // Fallback: Search with title only
+    if (searchResults.length === 0) {
+      console.log(`Amazon search: Trying title only "${title}"...`);
+      searchResults = await searchByQuery(title, 5);
+      searchMethod = 'title_only';
     }
 
-    if (!searchResults || searchResults.length === 0) {
-      console.log(`No Amazon results found for: ${searchQuery}`);
+    if (searchResults.length === 0) {
+      console.log(`No Amazon results found for: ${title}`);
       return {
         status: 'unavailable',
         message: 'No results found on Amazon'
       };
     }
 
-    // Find best matching result
-    let bestMatch: any = searchResults[0];
-    let bestScore = calculateSimilarity(title, String(bestMatch?.title || ''));
+    // IMPROVEMENT 1 & 4: Smart matching with author verification and format preference
+    let bestMatch: any = null;
+    let bestScore = 0;
+    let authorMatches = false;
+    let publisherMatches = false;
 
-    for (const result of searchResults.slice(1)) {
-      const score = calculateSimilarity(title, String(result.title || ''));
+    for (const result of searchResults) {
+      let score = calculateSimilarity(title, String(result.title || ''));
+      
+      // IMPROVEMENT 1: Boost score for author match
+      const resultAuthor = result.author || result.by;
+      if (author && verifyAuthor(author, resultAuthor)) {
+        score = Math.min(100, score + 20);
+        authorMatches = true;
+      }
+      
+      // IMPROVEMENT 4: Format preference - physical books get priority
+      const format = detectFormat(result);
+      const formatScore = getFormatScore(format);
+      
+      // Apply format boost for high-quality matches
+      if (score >= 60 && formatScore > 50) {
+        score = Math.min(100, score + (formatScore / 10));
+      }
+      
       if (score > bestScore) {
         bestScore = score;
         bestMatch = result;
       }
     }
 
-    console.log(`Amazon search: Best match "${bestMatch.title}" (${bestScore}% similarity)`);
+    console.log(`Amazon search: Best match "${bestMatch?.title}" (${bestScore}% similarity)`);
 
-    // Require at least 40% confidence
-    if (bestScore < 40) {
+    // Require minimum confidence based on search method
+    const minConfidence = searchMethod === 'isbn' ? 30 : 40;
+    if (bestScore < minConfidence) {
       console.log(`Amazon search: Match confidence too low (${bestScore}%), skipping`);
       return {
         status: 'unavailable',
         message: 'No reliable match found on Amazon',
         matchConfidence: bestScore,
+        matchMethod: searchMethod === 'isbn' ? 'isbn' : searchMethod === 'title_author' ? 'title_author' : 'partial',
+        matchQuality: 'low'
       };
     }
 
     const asin = String(bestMatch.asin || '');
     const amazonUrl = String(bestMatch.url || '');
 
-    if (!asin) {
-      console.log('Amazon search: No ASIN found in search result');
-      return {
-        status: 'error',
-        message: 'Product found but missing ASIN'
-      };
+    // IMPROVEMENT 2: Fetch multiple editions
+    const allEditions: AmazonEdition[] = [];
+    
+    // Fetch details for top matches (up to 5 different formats/editions)
+    const editionsToCheck = searchResults
+      .slice(0, 5)
+      .filter(r => calculateSimilarity(title, String(r.title || '')) >= 70);
+    
+    for (const edition of editionsToCheck) {
+      try {
+        const editionDetails = await fetchProductDetails(String(edition.url || ''), String(edition.asin || ''));
+        if (editionDetails) {
+          const ageInfo = extractAgeInfo(editionDetails);
+          allEditions.push({
+            asin: String(edition.asin || ''),
+            title: String(edition.title || ''),
+            format: detectFormat(editionDetails),
+            readingAge: ageInfo.readingAge,
+            gradeLevel: ageInfo.gradeLevel,
+            amazonUrl: String(edition.url || ''),
+            publisher: ageInfo.publisher
+          });
+          
+          // Check publisher match
+          if (publisher && ageInfo.publisher && verifyPublisher(publisher, ageInfo.publisher)) {
+            publisherMatches = true;
+          }
+        }
+      } catch (error) {
+        console.log(`Failed to fetch edition ${edition.asin}:`, error);
+      }
     }
 
-    // Step 2: Get detailed product information
-    console.log(`Amazon details: Fetching product details for ASIN ${asin}...`);
-    console.log(`Amazon details: Product URL: ${amazonUrl}`);
-    
-    const detailsInput = {
-      urls: [amazonUrl],
-      country: "AE",
-    };
-    
-    console.log(`Amazon details: Input to scraper:`, JSON.stringify(detailsInput));
-
-    const detailsResults = await retryWithBackoff(
-      async () => {
-        const runResult = await client.actor("logical_scrapers/amazon-product-scraper").call(detailsInput);
-        const { items } = await client.dataset(runResult.defaultDatasetId).listItems();
-        return items;
-      },
-      3,
-      2000,
-      `Amazon details for ASIN ${asin}`
-    );
-
-    if (!detailsResults || detailsResults.length === 0) {
-      console.log('Amazon details: No details found');
+    // Get primary edition details (best match)
+    const primaryDetails = await fetchProductDetails(amazonUrl, asin);
+    if (!primaryDetails) {
       return {
         status: 'error',
         message: 'Product found but details unavailable'
       };
     }
 
-    const productDetails = detailsResults[0];
-    const ageInfo = extractAgeInfo(productDetails);
+    const primaryAgeInfo = extractAgeInfo(primaryDetails);
+    const primaryFormat = detectFormat(primaryDetails);
+    
+    // IMPROVEMENT 2: Calculate age consensus
+    const ageConsensus = findAgeConsensus(allEditions);
+
+    // IMPROVEMENT 5: Determine match quality
+    let matchQuality: 'high' | 'medium' | 'low' = 'medium';
+    if (searchMethod === 'isbn' || (bestScore >= 90 && authorMatches)) {
+      matchQuality = 'high';
+    } else if (bestScore >= 70 && authorMatches) {
+      matchQuality = 'high';
+    } else if (bestScore >= 60) {
+      matchQuality = 'medium';
+    } else {
+      matchQuality = 'low';
+    }
 
     const result: AmazonBookData = {
       status: 'ok',
-      ...ageInfo,
+      ...primaryAgeInfo,
       asin: asin || undefined,
       amazonUrl: amazonUrl || undefined,
       marketplace: 'AE',
       matchConfidence: bestScore,
       matchedTitle: String(bestMatch.title || ''),
       lastFetched: new Date().toISOString(),
+      // IMPROVEMENT 5: Quality signals
+      isbn: isbn,
+      matchQuality,
+      matchMethod: searchMethod === 'isbn' ? 'isbn' : searchMethod === 'title_author' ? 'title_author' : 'title_only',
+      authorMatch: authorMatches,
+      publisherMatch: publisherMatches,
+      format: primaryFormat,
+      // IMPROVEMENT 2: Multiple editions
+      alternativeEditions: allEditions.length > 1 ? allEditions.slice(0, 5) : undefined,
+      editionsCompared: allEditions.length,
+      ageConsensus: ageConsensus,
     };
 
-    console.log(`Amazon lookup complete: ${JSON.stringify(ageInfo)}`);
+    console.log(`Amazon lookup complete: ${JSON.stringify({
+      readingAge: result.readingAge,
+      matchQuality: result.matchQuality,
+      editionsCompared: result.editionsCompared,
+      ageConsensus: result.ageConsensus
+    })}`);
 
     // Cache the result
     await setCachedAmazonData(title, author, result);
@@ -329,4 +506,56 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
       message: error?.message || 'Failed to fetch Amazon data'
     };
   }
+}
+
+// Helper: Search Amazon by query
+async function searchByQuery(query: string, maxItems: number = 5): Promise<any[]> {
+  const searchInput = {
+    query: query,
+    maxItems: maxItems,
+    country: "AE",
+  };
+
+  const searchResultsRaw = await retryWithBackoff(
+    async () => {
+      const runResult = await client.actor("pintostudio/amazon-search-products-scraper").call(searchInput);
+      const { items } = await client.dataset(runResult.defaultDatasetId).listItems();
+      return items;
+    },
+    3,
+    2000,
+    `Amazon search for "${query}"`
+  );
+
+  const searchResults = searchResultsRaw && searchResultsRaw[0]?.results && Array.isArray(searchResultsRaw[0].results)
+    ? searchResultsRaw[0].results.slice(0, maxItems)
+    : [];
+
+  console.log(`Amazon search: Extracted ${searchResults.length} products`);
+  return searchResults;
+}
+
+// Helper: Fetch product details
+async function fetchProductDetails(url: string, asin: string): Promise<any | null> {
+  const detailsInput = {
+    urls: [url],
+    country: "AE",
+  };
+
+  const detailsResults = await retryWithBackoff(
+    async () => {
+      const runResult = await client.actor("logical_scrapers/amazon-product-scraper").call(detailsInput);
+      const { items } = await client.dataset(runResult.defaultDatasetId).listItems();
+      return items;
+    },
+    3,
+    2000,
+    `Amazon details for ASIN ${asin}`
+  );
+
+  if (!detailsResults || detailsResults.length === 0) {
+    return null;
+  }
+
+  return detailsResults[0];
 }

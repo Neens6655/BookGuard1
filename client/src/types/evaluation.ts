@@ -120,6 +120,16 @@ export interface GoodreadsData {
   lastFetched?: string;
 }
 
+export interface AmazonEdition {
+  asin: string;
+  title: string;
+  format: string;
+  readingAge?: string;
+  gradeLevel?: string;
+  amazonUrl: string;
+  publisher?: string;
+}
+
 export interface AmazonData {
   status: 'ok' | 'unavailable' | 'error';
   message?: string;
@@ -132,6 +142,16 @@ export interface AmazonData {
   matchConfidence?: number;
   matchedTitle?: string;
   lastFetched?: string;
+  // New fields for improvements
+  isbn?: string;
+  matchQuality?: 'high' | 'medium' | 'low';
+  matchMethod?: 'isbn' | 'title_author' | 'title_only' | 'partial';
+  authorMatch?: boolean;
+  publisherMatch?: boolean;
+  format?: string;
+  alternativeEditions?: AmazonEdition[];
+  editionsCompared?: number;
+  ageConsensus?: string;
 }
 
 export interface Evaluation {
