@@ -560,7 +560,7 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
               </div>
 
               {/* Amazon Age Validation (if available) */}
-              {amazonData && amazonData.status === 'ok' && amazonData.targetAge && (
+              {amazonData && amazonData.status === 'ok' && (amazonData.targetAge || amazonData.amazonUrl) && (
                 <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Shield className="w-5 h-5 text-orange-600" />
@@ -586,7 +586,7 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                     </div>
                   </div>
                   
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className={`grid ${amazonData.targetAge ? 'md:grid-cols-2' : 'md:grid-cols-1'} gap-4`}>
                     {/* AI Recommendation */}
                     <div className="bg-white rounded-lg p-4 border-2 border-blue-300">
                       <p className="text-xs text-blue-600 font-medium mb-1">AI Recommended Age</p>
@@ -594,15 +594,28 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                       <p className="text-xs text-muted-foreground mt-1">Based on content analysis</p>
                     </div>
                     
-                    {/* Amazon Target Age */}
-                    <div className="bg-white rounded-lg p-4 border-2 border-orange-300">
-                      <p className="text-xs text-orange-600 font-medium mb-1">Amazon Target Age</p>
-                      <p className="text-2xl font-bold text-orange-700">{amazonData.targetAge}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Publisher recommendation</p>
-                      {amazonData.format && (
-                        <p className="text-xs text-muted-foreground mt-1">Format: {amazonData.format}</p>
-                      )}
-                    </div>
+                    {/* Amazon Target Age - only show if available */}
+                    {amazonData.targetAge && (
+                      <div className="bg-white rounded-lg p-4 border-2 border-orange-300">
+                        <p className="text-xs text-orange-600 font-medium mb-1">Amazon Target Age</p>
+                        <p className="text-2xl font-bold text-orange-700">{amazonData.targetAge}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Publisher recommendation</p>
+                        {amazonData.format && (
+                          <p className="text-xs text-muted-foreground mt-1">Format: {amazonData.format}</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* If no target age but we have Amazon link, show match info */}
+                    {!amazonData.targetAge && amazonData.amazonUrl && (
+                      <div className="bg-white rounded-lg p-4 border-2 border-gray-300">
+                        <p className="text-xs text-gray-600 font-medium mb-1">Amazon Product Found</p>
+                        <p className="text-sm text-muted-foreground">Age information not available on Amazon listing</p>
+                        {amazonData.format && (
+                          <p className="text-xs text-muted-foreground mt-1">Format: {amazonData.format}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Age Consensus from Multiple Editions */}
