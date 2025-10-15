@@ -18,6 +18,25 @@ const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.mjs');
 // 100,000 chars ≈ 25,000 words ≈ 200 pages (uses ~40% of GPT-4o capacity)
 const MAX_CHARS = 100000;
 
+// Extract ISBN from text content
+export function extractISBN(text: string): string | undefined {
+  if (!text) return undefined;
+  
+  // Match ISBN-13 (978/979 prefix)
+  const isbn13Match = text.match(/(?:ISBN[-:]?\s*(?:13)?[:\/\s]?)?((?:978|979)[\d\s-]{10,17}\d)/i);
+  if (isbn13Match) {
+    return isbn13Match[1].replace(/[\s-]/g, '');
+  }
+  
+  // Match ISBN-10
+  const isbn10Match = text.match(/(?:ISBN[-:]?\s*(?:10)?[:\/\s]?)?(\d{9}[\dXx])/i);
+  if (isbn10Match) {
+    return isbn10Match[1].replace(/[\s-]/g, '');
+  }
+  
+  return undefined;
+}
+
 export async function extractTextFromFile(filePath: string, filename: string): Promise<string> {
   const ext = path.extname(filename).toLowerCase();
   

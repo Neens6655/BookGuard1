@@ -7,7 +7,7 @@ import puppeteer from "puppeteer";
 import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
-import { extractTextFromFile, extractCoverImage } from "./services/fileProcessor";
+import { extractTextFromFile, extractCoverImage, extractISBN } from "./services/fileProcessor";
 import { searchGoodreadsBook } from "./services/apify";
 import { searchAmazonBook } from "./services/amazon";
 import { fromError } from "zod-validation-error";
@@ -559,6 +559,12 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     // Evaluate against NMC Standards (parallel system)
     const nmcAssessment = await evaluateNMCStandards(bookText);
     
+    // Extract ISBN from book text for improved Amazon matching
+    const isbn = extractISBN(bookText);
+    if (isbn) {
+      console.log(`Extracted ISBN: ${isbn}`);
+    }
+    
     // Fetch Goodreads data if available
     const goodreadsData = await searchGoodreadsBook(
       result.title || 'Unknown', 
@@ -566,9 +572,12 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     );
     
     // Fetch Amazon age validation data (runs in parallel for UAE marketplace)
+    // Pass ISBN, publisher for improved matching accuracy
     const amazonData = await searchAmazonBook(
       result.title || 'Unknown',
-      result.author
+      result.author,
+      result.publisher,
+      isbn
     );
     
     // Update progress: Age Recommendations
