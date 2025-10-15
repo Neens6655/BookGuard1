@@ -25,7 +25,6 @@ interface UploadQueueProps {
 export function UploadQueue({ files, onComplete, onCancel, className }: UploadQueueProps) {
   const [queueFiles, setQueueFiles] = useState<QueueFile[]>([]);
   const [isProcessing, setIsProcessing] = useState(true);
-  const [activeCount, setActiveCount] = useState(0);
   
   const MAX_CONCURRENT = 3; // Process 3 files at once
 
@@ -55,24 +54,27 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
         processFile(nextIndex);
       }
     } else if (activeFiles.length === 0 && pendingFiles.length === 0 && queueFiles.length > 0) {
-      // All files processed
-      const allCompleted = queueFiles.every(f => f.status === 'completed');
-      if (allCompleted) {
+      // All files processed (completed or failed)
+      const allTerminal = queueFiles.every(f => f.status === 'completed' || f.status === 'failed');
+      if (allTerminal) {
         setTimeout(onComplete, 1000);
       }
     }
-  }, [queueFiles, isProcessing, activeCount]);
+  }, [queueFiles, isProcessing]);
 
   const processFile = async (index: number) => {
-    const queueFile = queueFiles[index];
+    // Re-check status to prevent duplicate processing from stale closures
+    const currentFile = queueFiles[index];
+    if (!currentFile || currentFile.status !== 'pending') {
+      return;
+    }
     
     try {
       // Upload file
       updateFileStatus(index, 'uploading', 0);
-      setActiveCount(prev => prev + 1);
       
       const formData = new FormData();
-      formData.append('file', queueFile.file);
+      formData.append('file', currentFile.file);
 
       const response = await apiRequest('POST', '/api/evaluate', formData);
       const data = await response.json();
@@ -87,7 +89,6 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
       updateFileStatus(index, 'failed', 0, undefined, 
         error instanceof Error ? error.message : 'Upload failed'
       );
-      setActiveCount(prev => prev - 1);
     }
   };
 
@@ -100,7 +101,6 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
 
       if (data.status === 'completed') {
         updateFileStatus(index, 'completed', 100, evaluationId);
-        setActiveCount(prev => prev - 1);
       } else if (data.status === 'failed') {
         throw new Error(data.result?.error || 'Processing failed');
       } else {
@@ -111,7 +111,6 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
       updateFileStatus(index, 'failed', 0, evaluationId,
         error instanceof Error ? error.message : 'Processing failed'
       );
-      setActiveCount(prev => prev - 1);
     }
   };
 

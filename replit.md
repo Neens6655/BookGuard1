@@ -93,3 +93,21 @@ Implemented comprehensive reliability enhancements to improve system stability a
 - **Removed PDF Cover Extraction**: Eliminated problematic canvas-based PDF rendering that caused errors
 - **TypeScript Compatibility**: Fixed Unicode regex patterns for broader platform support
 - **Centralized Retry Logic**: Reusable exponential backoff helper prevents code duplication
+
+### Phase 2 Performance Enhancements (Oct 2025)
+Implemented performance optimizations to accelerate batch processing and reduce external API calls:
+
+#### Goodreads Data Caching
+- **PostgreSQL Cache Layer**: Dedicated `goodreads_cache` table stores Apify Goodreads API responses with 7-day TTL
+- **Normalized Cache Keys**: Uses normalized "title:author" format for reliable cache hits across similar queries
+- **Automatic Cache Integration**: `apify.ts` service transparently checks cache before making API calls
+- **Freshness Check**: 7-day TTL ensures data stays reasonably current while reducing API load
+- **Performance Impact**: Eliminates redundant Apify calls for previously evaluated books
+
+#### Parallel Batch Processing
+- **Concurrent Upload Processing**: UploadQueue component processes up to 3 files simultaneously (MAX_CONCURRENT = 3)
+- **Dynamic Queue Management**: Automatically starts next pending file when active count drops below limit
+- **Active Count Tracking**: Maintains accurate state of concurrent evaluations with proper cleanup on success/failure
+- **Real-time Progress Display**: UI shows parallel processing status with visual indicators for uploading/processing/completed states
+- **Error Resilience**: Failed files don't block other parallel evaluations; activeCount decrements correctly in all error paths
+- **Retry Functionality**: Existing retry button allows re-processing of failed evaluations without re-uploading
