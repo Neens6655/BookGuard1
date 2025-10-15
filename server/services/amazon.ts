@@ -179,7 +179,7 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     console.log(`Amazon search: Looking for "${searchQuery}"...`);
     
     const searchInput = {
-      keyword: searchQuery,
+      query: searchQuery,
       maxItems: 3, // Get top 3 results for better matching
       country: "AE", // UAE Amazon marketplace
     };
