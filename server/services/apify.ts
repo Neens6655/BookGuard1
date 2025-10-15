@@ -17,8 +17,8 @@ function calculateSimilarity(str1: string, str2: string): number {
   const words1 = new Set(s1.split(/\s+/));
   const words2 = new Set(s2.split(/\s+/));
   
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
-  const union = new Set([...words1, ...words2]);
+  const intersection = new Set(Array.from(words1).filter(x => words2.has(x)));
+  const union = new Set([...Array.from(words1), ...Array.from(words2)]);
   
   if (union.size === 0) return 0;
   
