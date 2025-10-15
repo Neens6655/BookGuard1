@@ -437,16 +437,6 @@ export default function Home() {
                       <Sparkles className="w-5 h-5 mr-2" />
                       Deep AI
                     </Button>
-                    <Button 
-                      size="lg"
-                      variant="outline"
-                      className="bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-emerald-600 hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300"
-                      onClick={handleDownloadWhitelistedReport}
-                      data-testid="button-download-report"
-                    >
-                      <FileDown className="w-5 h-5 mr-2" />
-                      Download Report
-                    </Button>
                   </div>
 
                   {/* Trust Indicators - Minimal */}
