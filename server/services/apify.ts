@@ -86,7 +86,7 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       genres: Array.isArray(book.genres) ? book.genres : [],
       publishedYear: book.publishedYear ? parseInt(String(book.publishedYear)) : undefined,
       description: book.description ? String(book.description) : undefined,
-      coverImageUrl: book.coverImageUrl || book.imageUrl ? String(book.coverImageUrl || book.imageUrl) : undefined,
+      coverImageUrl: book.image || book.coverImageUrl || book.imageUrl ? String(book.image || book.coverImageUrl || book.imageUrl) : undefined,
       isbn: book.isbn ? String(book.isbn) : undefined,
       pageCount: book.pageCount || book.pages ? parseInt(String(book.pageCount || book.pages)) : undefined,
       goodreadsUrl: book.url ? String(book.url) : undefined,
