@@ -162,9 +162,6 @@ function extractAgeInfo(productDetails: any): { targetAge?: string; readingAge?:
     result.targetAge = result.readingAge;
   }
   
-  // Debug log
-  console.log('Amazon age extraction result:', JSON.stringify(result, null, 2));
-  
   return result;
 }
 
@@ -290,10 +287,6 @@ export async function searchAmazonBook(title: string, author?: string): Promise<
     }
 
     const productDetails = detailsResults[0];
-    
-    // Debug: Log the actual product details structure
-    console.log('Amazon product details structure:', JSON.stringify(productDetails, null, 2));
-    
     const ageInfo = extractAgeInfo(productDetails);
 
     const result: AmazonBookData = {
