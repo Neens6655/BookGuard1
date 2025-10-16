@@ -585,6 +585,25 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    // IMPROVEMENT: Multi-source cover image fallback
+    // Priority: Extracted file cover > Goodreads (confidence >50%) > Amazon > Placeholder
+    let finalCoverImage = coverImage; // From extracted file
+    
+    if (!finalCoverImage && goodreadsData?.status === 'ok') {
+      // Use Goodreads cover if confidence is reasonable (>50%)
+      const goodreadsConfidence = goodreadsData.matchConfidence || 0;
+      if (goodreadsConfidence > 50 && goodreadsData.imageUrl) {
+        finalCoverImage = goodreadsData.imageUrl;
+        console.log(`Using Goodreads cover image (${goodreadsConfidence}% confidence)`);
+      }
+    }
+    
+    if (!finalCoverImage && amazonData?.status === 'ok' && amazonData.coverImageUrl) {
+      // Use Amazon cover as fallback
+      finalCoverImage = amazonData.coverImageUrl;
+      console.log(`Using Amazon cover image as fallback`);
+    }
+    
     // Update progress: Report Generation & Complete
     await storage.updateEvaluation(evaluationId, { 
       progress: 100, 
@@ -593,7 +612,7 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       nmcAssessment: nmcAssessment,
       goodreadsData: goodreadsData,
       amazonData: amazonData,
-      coverImage: coverImage 
+      coverImage: finalCoverImage 
     });
 
     // Cleanup uploaded file
