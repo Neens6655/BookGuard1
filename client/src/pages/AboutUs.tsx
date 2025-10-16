@@ -1,7 +1,8 @@
-import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft, Brain, AlertTriangle, Layers, Type, XCircle, Languages } from 'lucide-react';
+import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft, Brain, AlertTriangle, Layers, Type, XCircle, Languages, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,6 +19,11 @@ interface ScoringConfig {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        safe: string[];
+        moderate: string[];
+        severe: string[];
+      };
     }>;
   };
   system2Config: {
@@ -27,6 +33,11 @@ interface ScoringConfig {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        safe: string[];
+        moderate: string[];
+        severe: string[];
+      };
     }>;
   };
   system3Config: {
@@ -36,6 +47,11 @@ interface ScoringConfig {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        simple: string[];
+        moderate: string[];
+        high: string[];
+      };
     }>;
   };
   system4Config: {
@@ -45,6 +61,11 @@ interface ScoringConfig {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        easy: string[];
+        moderate: string[];
+        advanced: string[];
+      };
     }>;
   };
 }
@@ -235,17 +256,65 @@ export function AboutUs() {
                       Red-line system ensuring books align with Islamic principles, Arab heritage, and UAE national identity.
                     </p>
                     
-                    <div className="bg-green-50 rounded-lg p-4 space-y-2">
+                    <div className="bg-green-50 rounded-lg p-4">
                       <h4 className="font-semibold text-sm text-green-900 mb-3">Evaluation Criteria:</h4>
-                      {activeConfig.system1Config.criteria.map((criterion, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-green-900">{criterion.name}</p>
-                            <p className="text-xs text-green-700">{criterion.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <Accordion type="multiple" className="space-y-2">
+                        {activeConfig.system1Config.criteria.map((criterion, idx) => (
+                          <AccordionItem key={idx} value={`s1-${idx}`} className="border-none">
+                            <AccordionTrigger className="bg-white rounded-lg px-3 py-2 hover:no-underline hover:bg-green-100 transition-colors">
+                              <div className="flex items-start gap-2 text-left">
+                                <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-green-900">{criterion.name}</p>
+                                  <p className="text-xs text-green-700">{criterion.description}</p>
+                                </div>
+                              </div>
+                            </AccordionTrigger>
+                            {criterion.subGuidelines && (
+                              <AccordionContent className="px-3 pt-2 pb-3">
+                                <div className="space-y-3">
+                                  <div className="bg-green-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-green-900 mb-2 flex items-center gap-1">
+                                      <CheckCircle className="w-3 h-3" /> Safe Content:
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-green-800">
+                                      {criterion.subGuidelines.safe.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-yellow-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-yellow-900 mb-2 flex items-center gap-1">
+                                      <AlertTriangle className="w-3 h-3" /> Moderate Concern:
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-yellow-800">
+                                      {criterion.subGuidelines.moderate.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-red-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-red-900 mb-2 flex items-center gap-1">
+                                      <XCircle className="w-3 h-3" /> Severe Concern (Auto-Reject):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-red-800">
+                                      {criterion.subGuidelines.severe.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            )}
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
                     </div>
                     
                     <div className="flex items-center gap-2 pt-2">
@@ -278,17 +347,65 @@ export function AboutUs() {
                       Red-line system screening for age-inappropriate content, psychological harm, and safety concerns.
                     </p>
                     
-                    <div className="bg-red-50 rounded-lg p-4 space-y-2">
+                    <div className="bg-red-50 rounded-lg p-4">
                       <h4 className="font-semibold text-sm text-red-900 mb-3">Evaluation Criteria:</h4>
-                      {activeConfig.system2Config.criteria.map((criterion, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-red-900">{criterion.name}</p>
-                            <p className="text-xs text-red-700">{criterion.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <Accordion type="multiple" className="space-y-2">
+                        {activeConfig.system2Config.criteria.map((criterion, idx) => (
+                          <AccordionItem key={idx} value={`s2-${idx}`} className="border-none">
+                            <AccordionTrigger className="bg-white rounded-lg px-3 py-2 hover:no-underline hover:bg-red-100 transition-colors">
+                              <div className="flex items-start gap-2 text-left">
+                                <CheckCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-red-900">{criterion.name}</p>
+                                  <p className="text-xs text-red-700">{criterion.description}</p>
+                                </div>
+                              </div>
+                            </AccordionTrigger>
+                            {criterion.subGuidelines && (
+                              <AccordionContent className="px-3 pt-2 pb-3">
+                                <div className="space-y-3">
+                                  <div className="bg-green-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-green-900 mb-2 flex items-center gap-1">
+                                      <CheckCircle className="w-3 h-3" /> Safe Content:
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-green-800">
+                                      {criterion.subGuidelines.safe.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-yellow-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-yellow-900 mb-2 flex items-center gap-1">
+                                      <AlertTriangle className="w-3 h-3" /> Moderate Concern:
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-yellow-800">
+                                      {criterion.subGuidelines.moderate.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-red-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-red-900 mb-2 flex items-center gap-1">
+                                      <XCircle className="w-3 h-3" /> Severe Concern (Auto-Reject):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-red-800">
+                                      {criterion.subGuidelines.severe.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            )}
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
                     </div>
                     
                     <div className="flex items-center gap-2 pt-2">
@@ -321,17 +438,65 @@ export function AboutUs() {
                       Assesses whether themes and concepts match the child's cognitive development stage.
                     </p>
                     
-                    <div className="bg-purple-50 rounded-lg p-4 space-y-2">
+                    <div className="bg-purple-50 rounded-lg p-4">
                       <h4 className="font-semibold text-sm text-purple-900 mb-3">Evaluation Criteria:</h4>
-                      {activeConfig.system3Config.criteria.map((criterion, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-purple-900">{criterion.name}</p>
-                            <p className="text-xs text-purple-700">{criterion.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <Accordion type="multiple" className="space-y-2">
+                        {activeConfig.system3Config.criteria.map((criterion, idx) => (
+                          <AccordionItem key={idx} value={`s3-${idx}`} className="border-none">
+                            <AccordionTrigger className="bg-white rounded-lg px-3 py-2 hover:no-underline hover:bg-purple-100 transition-colors">
+                              <div className="flex items-start gap-2 text-left">
+                                <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-purple-900">{criterion.name}</p>
+                                  <p className="text-xs text-purple-700">{criterion.description}</p>
+                                </div>
+                              </div>
+                            </AccordionTrigger>
+                            {criterion.subGuidelines && (
+                              <AccordionContent className="px-3 pt-2 pb-3">
+                                <div className="space-y-3">
+                                  <div className="bg-green-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-green-900 mb-2 flex items-center gap-1">
+                                      <CheckCircle className="w-3 h-3" /> Simple (Ages 3-7):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-green-800">
+                                      {criterion.subGuidelines.simple.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-yellow-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-yellow-900 mb-2 flex items-center gap-1">
+                                      <AlertTriangle className="w-3 h-3" /> Moderate (Ages 8-12):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-yellow-800">
+                                      {criterion.subGuidelines.moderate.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-purple-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-purple-900 mb-2 flex items-center gap-1">
+                                      <Brain className="w-3 h-3" /> High Complexity (Ages 13+):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-purple-800">
+                                      {criterion.subGuidelines.high.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            )}
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
                     </div>
                     
                     <div className="flex items-center gap-2 pt-2">
@@ -364,17 +529,65 @@ export function AboutUs() {
                       Evaluates vocabulary, sentence structure, and reading fluency demands for age appropriateness.
                     </p>
                     
-                    <div className="bg-blue-50 rounded-lg p-4 space-y-2">
+                    <div className="bg-blue-50 rounded-lg p-4">
                       <h4 className="font-semibold text-sm text-blue-900 mb-3">Evaluation Criteria:</h4>
-                      {activeConfig.system4Config.criteria.map((criterion, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm font-medium text-blue-900">{criterion.name}</p>
-                            <p className="text-xs text-blue-700">{criterion.description}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <Accordion type="multiple" className="space-y-2">
+                        {activeConfig.system4Config.criteria.map((criterion, idx) => (
+                          <AccordionItem key={idx} value={`s4-${idx}`} className="border-none">
+                            <AccordionTrigger className="bg-white rounded-lg px-3 py-2 hover:no-underline hover:bg-blue-100 transition-colors">
+                              <div className="flex items-start gap-2 text-left">
+                                <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="text-sm font-medium text-blue-900">{criterion.name}</p>
+                                  <p className="text-xs text-blue-700">{criterion.description}</p>
+                                </div>
+                              </div>
+                            </AccordionTrigger>
+                            {criterion.subGuidelines && (
+                              <AccordionContent className="px-3 pt-2 pb-3">
+                                <div className="space-y-3">
+                                  <div className="bg-green-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-green-900 mb-2 flex items-center gap-1">
+                                      <CheckCircle className="w-3 h-3" /> Easy (Ages 3-7):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-green-800">
+                                      {criterion.subGuidelines.easy.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-yellow-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-yellow-900 mb-2 flex items-center gap-1">
+                                      <AlertTriangle className="w-3 h-3" /> Moderate (Ages 8-12):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-yellow-800">
+                                      {criterion.subGuidelines.moderate.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div className="bg-blue-100 rounded-lg p-3">
+                                    <p className="text-xs font-semibold text-blue-900 mb-2 flex items-center gap-1">
+                                      <Type className="w-3 h-3" /> Advanced (Ages 13+):
+                                    </p>
+                                    <ul className="space-y-1 text-xs text-blue-800">
+                                      {criterion.subGuidelines.advanced.map((item, i) => (
+                                        <li key={i} className="pl-4 relative before:content-['•'] before:absolute before:left-0">
+                                          {item}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </AccordionContent>
+                            )}
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
                     </div>
                     
                     <div className="flex items-center gap-2 pt-2">
