@@ -185,6 +185,8 @@ export interface AmazonBookData {
   alternativeEditions?: AmazonEdition[];
   editionsCompared?: number;
   ageConsensus?: string;
+  // IMPROVEMENT: Cover image fallback
+  coverImageUrl?: string;
 }
 
 // Extract age-related information from Amazon product details
@@ -435,6 +437,15 @@ export async function searchAmazonBook(
     const primaryAgeInfo = extractAgeInfo(primaryDetails);
     const primaryFormat = detectFormat(primaryDetails);
     
+    // IMPROVEMENT: Extract cover image URL
+    const coverImageUrl = primaryDetails.thumbnail || 
+                          primaryDetails.image || 
+                          primaryDetails.images?.[0] || 
+                          primaryDetails.mainImage ||
+                          bestMatch.thumbnail ||
+                          bestMatch.image ||
+                          undefined;
+    
     // IMPROVEMENT 2: Calculate age consensus
     const ageConsensus = findAgeConsensus(allEditions);
 
@@ -470,6 +481,8 @@ export async function searchAmazonBook(
       alternativeEditions: allEditions.length > 1 ? allEditions.slice(0, 5) : undefined,
       editionsCompared: allEditions.length,
       ageConsensus: ageConsensus,
+      // IMPROVEMENT: Cover image fallback
+      coverImageUrl: coverImageUrl,
     };
 
     console.log(`Amazon lookup complete: ${JSON.stringify({

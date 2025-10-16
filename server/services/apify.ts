@@ -146,7 +146,7 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
     
     const input = {
       search: searchQuery,
-      maxItems: 1,
+      maxItems: 5, // IMPROVEMENT: Fetch top 5 results for better matching
       includeReviews: true,
       proxy: {
         useApifyProxy: true,
@@ -173,25 +173,50 @@ export async function searchGoodreadsBook(title: string, author?: string): Promi
       };
     }
 
-    const book: any = items[0];
+    // IMPROVEMENT: Evaluate all results and pick the best match
+    let bestMatch: any = null;
+    let bestConfidence = 0;
     
-    // Calculate title similarity
-    const matchedTitle = String(book.title || '');
-    const titleSimilarity = calculateSimilarity(title, matchedTitle);
-    
-    // Calculate author similarity if author provided
-    let authorSimilarity = 100; // Default to perfect match if no author
-    if (author && book.authorName) {
-      authorSimilarity = calculateSimilarity(author, String(book.authorName));
+    for (const item of items) {
+      const matchedTitle = String(item.title || '');
+      const matchedAuthor = String(item.authorName || '');
+      
+      // Calculate title similarity
+      const titleSimilarity = calculateSimilarity(title, matchedTitle);
+      
+      // Calculate author similarity if author provided
+      let authorSimilarity = 100; // Default to perfect match if no author
+      if (author && matchedAuthor) {
+        authorSimilarity = calculateSimilarity(author, matchedAuthor);
+      }
+      
+      // Overall confidence is weighted average (title 70%, author 30%)
+      const confidence = Math.round(titleSimilarity * 0.7 + authorSimilarity * 0.3);
+      
+      console.log(`  - Candidate: "${matchedTitle}" by ${matchedAuthor} (${confidence}% confidence)`);
+      
+      if (confidence > bestConfidence) {
+        bestConfidence = confidence;
+        bestMatch = item;
+      }
     }
     
-    // Overall confidence is weighted average (title 70%, author 30%)
-    const matchConfidence = Math.round(titleSimilarity * 0.7 + authorSimilarity * 0.3);
+    if (!bestMatch) {
+      console.log(`No suitable Goodreads match found for: ${searchQuery}`);
+      return {
+        status: 'unavailable',
+        message: 'No results found on Goodreads'
+      };
+    }
+    
+    const book: any = bestMatch;
+    const matchedTitle = String(book.title || '');
+    const matchConfidence = bestConfidence;
     
     console.log(`Goodreads match for "${title}": "${matchedTitle}" (${matchConfidence}% confidence)`);
     
-    // Reject low-confidence matches (below 40%)
-    if (matchConfidence < 40) {
+    // IMPROVEMENT: Lower threshold to 30% for better coverage
+    if (matchConfidence < 30) {
       console.log(`Rejecting Goodreads match due to low confidence: ${matchConfidence}%`);
       return {
         status: 'unavailable',
