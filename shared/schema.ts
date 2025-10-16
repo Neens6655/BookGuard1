@@ -259,6 +259,11 @@ export const scoringConfigs = pgTable("scoring_configs", {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        safe: string[];
+        moderate: string[];
+        severe: string[];
+      };
     }>;
   }>(),
   
@@ -274,6 +279,11 @@ export const scoringConfigs = pgTable("scoring_configs", {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        safe: string[];
+        moderate: string[];
+        severe: string[];
+      };
     }>;
   }>(),
   
@@ -290,6 +300,11 @@ export const scoringConfigs = pgTable("scoring_configs", {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        simple: string[];
+        moderate: string[];
+        high: string[];
+      };
     }>;
   }>(),
   
@@ -306,6 +321,11 @@ export const scoringConfigs = pgTable("scoring_configs", {
       name: string;
       weight: number;
       description: string;
+      subGuidelines?: {
+        easy: string[];
+        moderate: string[];
+        advanced: string[];
+      };
     }>;
   }>(),
   
