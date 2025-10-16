@@ -64,7 +64,7 @@ export function AboutUs() {
             <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition" data-testid="link-home">
               <Shield className="text-primary w-8 h-8" />
               <div>
-                <h1 className="font-bold text-foreground text-lg">Emirates BookGuard</h1>
+                <h1 className="font-bold text-foreground text-lg">UAE BookGuard</h1>
                 <p className="text-xs text-muted-foreground">Powered by AI</p>
               </div>
             </Link>
@@ -100,7 +100,7 @@ export function AboutUs() {
           <div className="text-center max-w-4xl mx-auto">
             <Badge variant="outline" className="mb-6 border-white/30 text-white bg-white/10 backdrop-blur-md">
               <Globe className="w-3 h-3 mr-2" />
-              About Emirates BookGuard
+              About UAE BookGuard
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight" data-testid="about-title">
               Protecting Values,<br />Empowering Literacy
@@ -121,7 +121,7 @@ export function AboutUs() {
               Our Mission
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-              Why Emirates BookGuard Exists
+              Why UAE BookGuard Exists
             </h2>
           </div>
 
@@ -138,7 +138,7 @@ export function AboutUs() {
             <div className="bg-gradient-to-br from-green-50 to-cyan-50 rounded-2xl p-8">
               <h3 className="text-2xl font-bold text-foreground mb-4">Our Solution</h3>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                Emirates BookGuard was created to solve this challenge. Our mission is to provide a trusted evaluation framework that ensures every book is reviewed against UAE cultural values, Islamic ethics, child protection standards, and educational appropriateness.
+                UAE BookGuard was created to solve this challenge. Our mission is to provide a trusted evaluation framework that ensures every book is reviewed against UAE cultural values, Islamic ethics, child protection standards, and educational appropriateness.
               </p>
               <div className="flex items-center text-green-600 font-medium">
                 <CheckCircle className="w-5 h-5 mr-2" />
@@ -467,7 +467,7 @@ export function AboutUs() {
 
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center">
               <p className="text-xl font-semibold">
-                Emirates BookGuard bridges the gap between cultural values and global literature, ensuring that every book consumed by children in the UAE enriches, educates, and empowers.
+                UAE BookGuard bridges the gap between cultural values and global literature, ensuring that every book consumed by children in the UAE enriches, educates, and empowers.
               </p>
             </div>
           </div>

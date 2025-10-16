@@ -14,7 +14,7 @@ export function HowItWorks() {
             <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition" data-testid="link-home">
               <Shield className="text-primary w-8 h-8" />
               <div>
-                <h1 className="font-bold text-foreground text-lg">Emirates BookGuard</h1>
+                <h1 className="font-bold text-foreground text-lg">UAE BookGuard</h1>
                 <p className="text-xs text-muted-foreground">Powered by AI</p>
               </div>
             </Link>

@@ -425,7 +425,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent" data-testid="app-title">
-                  Emirates BookGuard
+                  UAE BookGuard
                 </h1>
                 <p className="text-xs text-muted-foreground font-medium">Protecting Young Minds</p>
               </div>
@@ -692,7 +692,7 @@ export default function Home() {
 
                 {/* Parent Value Props */}
                 <div className="bg-gradient-to-br from-green-50 to-cyan-50 rounded-2xl p-8 md:p-12">
-                  <h4 className="text-2xl font-bold text-foreground mb-8 text-center">Why Parents Trust Emirates BookGuard</h4>
+                  <h4 className="text-2xl font-bold text-foreground mb-8 text-center">Why Parents Trust UAE BookGuard</h4>
                   <div className="grid md:grid-cols-3 gap-8">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
@@ -1041,7 +1041,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                    Emirates BookGuard
+                    UAE BookGuard
                   </h3>
                   <p className="text-xs text-muted-foreground font-medium">Powered by AI</p>
                 </div>
@@ -1084,7 +1084,7 @@ export default function Home() {
 
           <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-              © 2024 Emirates BookGuard. All rights reserved. Ministry of Education UAE
+              © 2024 UAE BookGuard. All rights reserved. Ministry of Education UAE
             </p>
           </div>
         </div>
