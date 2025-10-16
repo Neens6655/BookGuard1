@@ -117,9 +117,9 @@ export function BookCard({ book, onClick, onUpdate, selectionMode, isSelected, o
       >
         {/* Book Cover */}
         <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-200 via-yellow-100 to-orange-100">
-          {(book.goodreadsData?.coverImageUrl || book.coverImage) ? (
+          {(book.goodreadsData?.coverImageUrl || book.amazonData?.coverImageUrl || book.coverImage) ? (
             <img 
-              src={book.goodreadsData?.coverImageUrl || book.coverImage || ''} 
+              src={book.goodreadsData?.coverImageUrl || book.amazonData?.coverImageUrl || book.coverImage || ''} 
               alt={result.title}
               className="absolute inset-0 w-full h-full object-cover"
               data-testid={`img-book-cover-${book.id}`}

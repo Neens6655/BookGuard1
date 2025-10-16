@@ -79,9 +79,9 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
             <div className="md:col-span-1">
               <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-3 transform hover:scale-105 transition-transform duration-300">
                 <div className="bg-gradient-to-br from-orange-200 to-yellow-100 rounded-xl w-full aspect-[3/4] overflow-hidden relative">
-                  {(goodreadsData?.coverImageUrl || coverImage) ? (
+                  {(goodreadsData?.coverImageUrl || amazonData?.coverImageUrl || coverImage) ? (
                     <img 
-                      src={goodreadsData?.coverImageUrl || coverImage || ''} 
+                      src={goodreadsData?.coverImageUrl || amazonData?.coverImageUrl || coverImage || ''} 
                       alt={result.title}
                       className="w-full h-full object-cover"
                       data-testid="img-book-cover-detail"

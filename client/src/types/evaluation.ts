@@ -152,6 +152,8 @@ export interface AmazonData {
   alternativeEditions?: AmazonEdition[];
   editionsCompared?: number;
   ageConsensus?: string;
+  // Cover image fallback
+  coverImageUrl?: string;
 }
 
 export interface Evaluation {
