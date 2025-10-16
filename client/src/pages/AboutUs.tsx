@@ -1,10 +1,60 @@
-import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft } from 'lucide-react';
+import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft, Brain, AlertTriangle, Layers, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface ScoringConfig {
+  id: string;
+  version: string;
+  name: string;
+  description?: string;
+  system1Config: {
+    enabled: boolean;
+    weight: number;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  };
+  system2Config: {
+    enabled: boolean;
+    weight: number;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  };
+  system3Config: {
+    enabled: boolean;
+    weight: number;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  };
+  system4Config: {
+    enabled: boolean;
+    weight: number;
+    criteria: Array<{
+      name: string;
+      weight: number;
+      description: string;
+    }>;
+  };
+}
 
 export function AboutUs() {
+  // Fetch active scoring configuration
+  const { data: activeConfig, isLoading } = useQuery<ScoringConfig>({
+    queryKey: ['/api/scoring-configs/active'],
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -134,6 +184,227 @@ export function AboutUs() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Evaluation Framework */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <Badge variant="outline" className="mb-4 border-purple-200 text-purple-700">
+              <Brain className="w-3 h-3 mr-2" />
+              4-System Evaluation Framework
+            </Badge>
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+              Our Comprehensive Review Process
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Every book undergoes evaluation across four interconnected systems, ensuring thorough assessment of cultural alignment, safety, and educational appropriateness.
+            </p>
+          </div>
+
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="p-6">
+                  <Skeleton className="h-8 w-3/4 mb-4" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </Card>
+              ))}
+            </div>
+          ) : activeConfig ? (
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* System 1: UAE/Islamic/Arab Values */}
+              <Card className="border-2 hover:border-green-300 transition-all duration-300 hover:shadow-xl" data-testid="card-system1">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">System 1: Cultural Values</h3>
+                      <p className="text-sm text-muted-foreground">UAE / Islamic / Arab Alignment</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Red-line system ensuring books align with Islamic principles, Arab heritage, and UAE national identity.
+                    </p>
+                    
+                    <div className="bg-green-50 rounded-lg p-4 space-y-2">
+                      <h4 className="font-semibold text-sm text-green-900 mb-3">Evaluation Criteria:</h4>
+                      {activeConfig.system1Config.criteria.map((criterion, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-green-900">{criterion.name}</p>
+                            <p className="text-xs text-green-700">{criterion.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-2">
+                      <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                        Auto-Reject on Severe
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                        Weight: {activeConfig.system1Config.weight}%
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* System 2: Child Safety */}
+              <Card className="border-2 hover:border-red-300 transition-all duration-300 hover:shadow-xl" data-testid="card-system2">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-red-400 to-rose-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">System 2: Child Safety</h3>
+                      <p className="text-sm text-muted-foreground">Protection & Well-being</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Red-line system screening for age-inappropriate content, psychological harm, and safety concerns.
+                    </p>
+                    
+                    <div className="bg-red-50 rounded-lg p-4 space-y-2">
+                      <h4 className="font-semibold text-sm text-red-900 mb-3">Evaluation Criteria:</h4>
+                      {activeConfig.system2Config.criteria.map((criterion, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-red-900">{criterion.name}</p>
+                            <p className="text-xs text-red-700">{criterion.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-2">
+                      <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                        Auto-Reject on Severe
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                        Weight: {activeConfig.system2Config.weight}%
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* System 3: Theme Complexity */}
+              <Card className="border-2 hover:border-purple-300 transition-all duration-300 hover:shadow-xl" data-testid="card-system3">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-violet-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <Layers className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">System 3: Theme Complexity</h3>
+                      <p className="text-sm text-muted-foreground">Developmental Readiness</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Assesses whether themes and concepts match the child's cognitive development stage.
+                    </p>
+                    
+                    <div className="bg-purple-50 rounded-lg p-4 space-y-2">
+                      <h4 className="font-semibold text-sm text-purple-900 mb-3">Evaluation Criteria:</h4>
+                      {activeConfig.system3Config.criteria.map((criterion, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-purple-900">{criterion.name}</p>
+                            <p className="text-xs text-purple-700">{criterion.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-2">
+                      <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                        Age Mapping System
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                        Weight: {activeConfig.system3Config.weight}%
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* System 4: Language Complexity */}
+              <Card className="border-2 hover:border-blue-300 transition-all duration-300 hover:shadow-xl" data-testid="card-system4">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <Type className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">System 4: Language Complexity</h3>
+                      <p className="text-sm text-muted-foreground">Reading Level Assessment</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Evaluates vocabulary, sentence structure, and reading fluency demands for age appropriateness.
+                    </p>
+                    
+                    <div className="bg-blue-50 rounded-lg p-4 space-y-2">
+                      <h4 className="font-semibold text-sm text-blue-900 mb-3">Evaluation Criteria:</h4>
+                      {activeConfig.system4Config.criteria.map((criterion, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-blue-900">{criterion.name}</p>
+                            <p className="text-xs text-blue-700">{criterion.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-2">
+                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                        Age Mapping System
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                        Weight: {activeConfig.system4Config.weight}%
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No active scoring configuration found.</p>
+            </div>
+          )}
+
+          <div className="mt-12 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border-2 border-amber-200">
+            <div className="flex items-start gap-4">
+              <AlertTriangle className="w-8 h-8 text-amber-600 flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="text-xl font-bold text-foreground mb-2">Integrated Evaluation Process</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  All four systems work together to provide a comprehensive assessment. Books must pass both red-line systems (Cultural Values & Child Safety) to be considered safe. Theme and Language Complexity systems then determine age appropriateness. The final verdict combines all factors to produce a <span className="font-semibold text-foreground">Whitelisted</span>, <span className="font-semibold text-foreground">Parent Guidance</span>, or <span className="font-semibold text-foreground">Not Whitelisted</span> recommendation.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
