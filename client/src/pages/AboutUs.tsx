@@ -1,4 +1,4 @@
-import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft, Brain, AlertTriangle, Layers, Type } from 'lucide-react';
+import { Shield, Heart, Users, BookOpen, Target, Sparkles, CheckCircle, Globe, ArrowLeft, Brain, AlertTriangle, Layers, Type, XCircle, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -392,6 +392,251 @@ export function AboutUs() {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No active scoring configuration found.</p>
+            </div>
+          )}
+
+          {/* Detailed Rating Scales */}
+          {activeConfig && (
+            <div className="mt-16 space-y-12">
+              <div className="text-center mb-12">
+                <h3 className="text-2xl md:text-4xl font-bold text-foreground mb-4">
+                  Detailed Evaluation Breakdown
+                </h3>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                  Understanding how each criterion is assessed with specific rating scales and examples
+                </p>
+              </div>
+
+              {/* System 1 Detailed Breakdown */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">System 1: Cultural Values - Rating Scale</h3>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-white rounded-xl p-4 border-2 border-green-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <h4 className="font-bold text-green-900">Safe</h4>
+                    </div>
+                    <p className="text-sm text-green-800">
+                      Content aligns with Islamic values, respects Arab culture, promotes family bonds, and upholds modesty standards
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 border-2 border-yellow-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                      <h4 className="font-bold text-yellow-900">Moderate</h4>
+                    </div>
+                    <p className="text-sm text-yellow-800">
+                      Contains fantasy elements, mild Western influences, or themes requiring parental discussion and cultural context
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 border-2 border-red-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <XCircle className="w-5 h-5 text-red-600" />
+                      <h4 className="font-bold text-red-900">Severe</h4>
+                    </div>
+                    <p className="text-sm text-red-800">
+                      Mocks religion, promotes harmful values, contains inappropriate cultural content (automatic rejection)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {activeConfig.system1Config.criteria.map((criterion, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
+                      <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        {criterion.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">{criterion.description}</p>
+                      <div className="text-xs text-green-700 bg-green-50 rounded p-2">
+                        <strong>Assessment Focus:</strong> {
+                          criterion.name.includes('Islamic') ? 'Respect for Islamic teachings, prophets, practices, and beliefs' :
+                          criterion.name.includes('Arab') ? 'Positive portrayal of Arab culture, traditions, language, and heritage' :
+                          criterion.name.includes('UAE') ? 'Alignment with UAE national values, leadership respect, and civic pride' :
+                          'Family structure, parental respect, community bonds, and moral teachings'
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* System 2 Detailed Breakdown */}
+              <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-8 border-2 border-red-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">System 2: Child Safety - Rating Scale</h3>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-white rounded-xl p-4 border-2 border-green-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <h4 className="font-bold text-green-900">Safe</h4>
+                    </div>
+                    <p className="text-sm text-green-800">
+                      Age-appropriate content, positive emotional modeling, promotes safety awareness, and supports healthy development
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 border-2 border-yellow-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                      <h4 className="font-bold text-yellow-900">Moderate</h4>
+                    </div>
+                    <p className="text-sm text-yellow-800">
+                      Mild suspense, minor conflicts, or themes that may need adult guidance to process appropriately
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 border-2 border-red-300">
+                    <div className="flex items-center gap-2 mb-3">
+                      <XCircle className="w-5 h-5 text-red-600" />
+                      <h4 className="font-bold text-red-900">Severe</h4>
+                    </div>
+                    <p className="text-sm text-red-800">
+                      Violence, frightening imagery, psychological harm, or inappropriate social messaging (automatic rejection)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {activeConfig.system2Config.criteria.map((criterion, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-red-200">
+                      <h4 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        {criterion.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">{criterion.description}</p>
+                      <div className="text-xs text-red-700 bg-red-50 rounded p-2">
+                        <strong>Assessment Focus:</strong> {
+                          criterion.name.includes('Age-Appropriate') ? 'Content maturity matching developmental stage, avoiding premature exposure' :
+                          criterion.name.includes('Psychological') ? 'Emotional impact, fear triggers, anxiety prevention, and mental well-being' :
+                          criterion.name.includes('Physical') ? 'Safety messages, risk awareness, injury prevention, and protective behaviors' :
+                          criterion.name.includes('Emotional') ? 'Healthy emotional expression, coping mechanisms, and resilience building' :
+                          'Positive peer relationships, stranger safety, bullying prevention, and social boundaries'
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* System 3 Detailed Breakdown */}
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-8 border-2 border-purple-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                    <Layers className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">System 3: Theme Complexity - Age Mapping</h3>
+                </div>
+                
+                <div className="bg-white rounded-xl p-6 mb-6 border-2 border-purple-200">
+                  <h4 className="font-bold text-purple-900 mb-3">Developmental Stage Assessment</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    This system doesn't use Safe/Moderate/Severe ratings. Instead, it maps theme complexity to appropriate age ranges based on cognitive development stages.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-purple-50 rounded-lg p-3">
+                      <p className="text-sm font-semibold text-purple-900 mb-1">Ages 3-5: Early Readers</p>
+                      <p className="text-xs text-purple-700">Simple plots, clear morals, concrete concepts</p>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-3">
+                      <p className="text-sm font-semibold text-purple-900 mb-1">Ages 6-8: Emerging Readers</p>
+                      <p className="text-xs text-purple-700">Basic conflicts, character growth, problem-solving</p>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-3">
+                      <p className="text-sm font-semibold text-purple-900 mb-1">Ages 9-12: Intermediate</p>
+                      <p className="text-xs text-purple-700">Complex plots, moral dilemmas, abstract themes</p>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-3">
+                      <p className="text-sm font-semibold text-purple-900 mb-1">Ages 13+: Young Adult</p>
+                      <p className="text-xs text-purple-700">Sophisticated themes, multiple perspectives, nuanced messages</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {activeConfig.system3Config.criteria.map((criterion, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-purple-200">
+                      <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+                        <Brain className="w-4 h-4" />
+                        {criterion.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">{criterion.description}</p>
+                      <div className="text-xs text-purple-700 bg-purple-50 rounded p-2">
+                        <strong>Evaluation Method:</strong> {
+                          criterion.name.includes('Narrative') ? 'Plot structure complexity, story layers, pacing, and narrative techniques required to follow the story' :
+                          criterion.name.includes('Character') ? 'Character depth, motivation complexity, relationship dynamics, and emotional intelligence needed' :
+                          criterion.name.includes('Thematic') ? 'Abstract thinking requirements, moral complexity, symbolic understanding, and conceptual depth' :
+                          'Cognitive prerequisites, inference skills, critical thinking demands, and comprehension level'
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* System 4 Detailed Breakdown */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border-2 border-blue-200">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                    <Type className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">System 4: Language Complexity - Reading Levels</h3>
+                </div>
+                
+                <div className="bg-white rounded-xl p-6 mb-6 border-2 border-blue-200">
+                  <h4 className="font-bold text-blue-900 mb-3">Reading Proficiency Mapping</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Language complexity is assessed through linguistic analysis and mapped to reading ability levels, not safety ratings.
+                  </p>
+                  <div className="grid md:grid-cols-4 gap-3">
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <p className="text-sm font-semibold text-blue-900 mb-1">Beginner</p>
+                      <p className="text-xs text-blue-700">Simple words, short sentences</p>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <p className="text-sm font-semibold text-blue-900 mb-1">Elementary</p>
+                      <p className="text-xs text-blue-700">Common vocabulary, basic grammar</p>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <p className="text-sm font-semibold text-blue-900 mb-1">Intermediate</p>
+                      <p className="text-xs text-blue-700">Varied vocabulary, complex sentences</p>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-3 text-center">
+                      <p className="text-sm font-semibold text-blue-900 mb-1">Advanced</p>
+                      <p className="text-xs text-blue-700">Rich vocabulary, sophisticated structure</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {activeConfig.system4Config.criteria.map((criterion, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-blue-200">
+                      <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                        <Languages className="w-4 h-4" />
+                        {criterion.name}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">{criterion.description}</p>
+                      <div className="text-xs text-blue-700 bg-blue-50 rounded p-2">
+                        <strong>Assessment Method:</strong> {
+                          criterion.name.includes('Vocabulary') ? 'Word difficulty, frequency analysis, academic vs. conversational language, and lexical diversity' :
+                          criterion.name.includes('Sentence') ? 'Sentence length, grammatical complexity, clause types, and syntactic patterns' :
+                          criterion.name.includes('Fluency') ? 'Reading pace requirements, comprehension load, decoding demands, and text flow' :
+                          'Language clarity, cultural vocabulary, idiomatic expressions, and linguistic accessibility for target audience'
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
