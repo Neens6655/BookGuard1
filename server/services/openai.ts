@@ -385,46 +385,46 @@ Return JSON with this structure:
 {
   "gambling": {
     "detected": true/false,
-    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "ageBand": "Safe | 13+ | 17+ | 21+",
     "evidence": "Direct quote if detected, or 'No gambling content detected'"
   },
   "language": {
     "detected": true/false,
-    "ageBand": "Not Allowed | 10+ | 13+ | 17+ | 21+",
+    "ageBand": "Safe | 10+ | 13+ | 17+ | 21+",
     "evidence": "Direct quote or 'No profanity detected'"
   },
   "violence": {
     "detected": true/false,
-    "ageBand": "Not Allowed | 6+ | 10+ | 13+ | 17+ | 21+",
+    "ageBand": "Safe | 6+ | 10+ | 13+ | 17+ | 21+",
     "evidence": "Direct quote or 'No violence detected'"
   },
   "substanceUse": {
     "detected": true/false,
-    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "ageBand": "Safe | 13+ | 17+ | 21+",
     "evidence": "Direct quote or 'No substance use detected'"
   },
   "sexualContent": {
     "detected": true/false,
-    "ageBand": "Not Allowed | 13+ | 17+ | 21+",
+    "ageBand": "Safe | 13+ | 17+ | 21+",
     "evidence": "Direct quote or 'No sexual content detected'"
   }
 }
 
 🎰 GAMBLING CATEGORY:
-- Not Allowed (0-12): No gambling references (casinos, betting, cards for money)
-- 13+: Gambling only if cautionary/educational (shows consequences)
+- Safe (0+): No gambling references (casinos, betting, cards for money)
+- 13+: Gambling only if cautionary/educational (shows consequences) OR minor references
 - 17+: Historical/contextual gambling (Victorian betting houses, etc.)
 - 21+: Casual/positive gambling portrayals
 
 📝 LANGUAGE & PROFANITY:
-- Not Allowed (0-9): No profanity, rude words, or insults
+- Safe (0+): No profanity, rude words, or insults
 - 10+: Mild insults only ("stupid," "dumb," "shut up")
 - 13+: Moderate slang/insults ("jerk," name-calling)
 - 17+: Strong profanity if contextualized (f***, s*** for emotional realism)
 - 21+: Explicit profanity fully permissible
 
 ⚔️ VIOLENCE & TERROR:
-- Not Allowed (0-5): No violence (hitting, fighting, weapons)
+- Safe (0+): No violence (hitting, fighting, weapons)
 - 6+: Cartoon/fantasy violence only (non-realistic, no blood)
 - 10+: Mild peril/fantasy battles (minor injuries, positive resolution)
 - 13+: Moderate/realistic violence (crime, detective, suspense, no gore)
@@ -432,22 +432,23 @@ Return JSON with this structure:
 - 21+: Graphic violence permissible
 
 🍺 ALCOHOL, SMOKING & DRUGS:
-- Not Allowed (0-12): No references to alcohol, cigarettes, drugs
-- 13+: Mentions allowed if negative/cautionary
+- Safe (0+): No references to alcohol, cigarettes, drugs
+- 13+: Brief/historical mentions if negative/cautionary OR minor contextual references (e.g., adult drinking wine at dinner, historical context)
 - 17+: Realistic depictions if not glamorized (addiction, recovery)
 - 21+: Substance use without restriction
 
 💕 SEX & NUDITY:
-- Not Allowed (0-12): No sexual content or romantic intimacy
+- Safe (0+): No sexual content or romantic intimacy
 - 13+: Light romance (hand-holding, blushing, innocent crush)
 - 17+: Non-explicit intimacy (kissing, implied romance)
 - 21+: Explicit sexual content permissible
 
 EVALUATION RULES:
 1. For each category, determine the MINIMUM age band that would allow this content
-2. If no problematic content exists in a category, mark as "Not Allowed" (safest)
-3. Provide exact quotes (2-3 lines) as evidence when content is detected
-4. Be specific about which threshold the content crosses
+2. If no problematic content exists in a category, mark as "Safe" (permitted for all ages)
+3. Be LENIENT with minor contextual references - only restrict if content is clearly inappropriate
+4. Provide exact quotes (2-3 lines) as evidence when content is detected
+5. Use "13+" for minor references that don't warrant full restriction (e.g., brief wine mention in context)
 
 Return complete JSON only.
 `;
@@ -485,7 +486,7 @@ Return complete JSON only.
     
     // Calculate final age band as the HIGHEST across all categories
     const ageBandPriority: Record<string, number> = {
-      "Not Allowed": 0,
+      "Safe": 0,
       "6+": 6,
       "10+": 10,
       "13+": 13,
@@ -505,7 +506,7 @@ Return complete JSON only.
       const currentPriority = ageBandPriority[current] || 0;
       const highestPriority = ageBandPriority[highest] || 0;
       return currentPriority > highestPriority ? current : highest;
-    }, "Not Allowed");
+    }, "Safe");
     
     return {
       enabled: true,
@@ -524,13 +525,13 @@ Return complete JSON only.
     // Return safe default on error
     return {
       enabled: false,
-      finalAgeBand: "Not Allowed",
+      finalAgeBand: "Safe",
       categories: {
-        gambling: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
-        language: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
-        violence: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
-        substanceUse: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" },
-        sexualContent: { detected: false, ageBand: "Not Allowed", evidence: "Error during evaluation" }
+        gambling: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
+        language: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
+        violence: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
+        substanceUse: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
+        sexualContent: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" }
       }
     };
   }
