@@ -1251,12 +1251,32 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                               <p className="text-xs text-muted-foreground">Betting, casinos, games of chance</p>
                             </div>
                           </div>
-                          <Badge className={nmcAssessment.categories.gambling.detected ? 'bg-purple-600 text-white' : 'bg-green-600 text-white'}>
-                            {nmcAssessment.categories.gambling.ageBand}
-                          </Badge>
+                          <div className="text-right">
+                            <Badge className={nmcAssessment.categories.gambling.detected ? 'bg-purple-600 text-white' : 'bg-green-600 text-white'}>
+                              {nmcAssessment.categories.gambling.ageBand}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {nmcAssessment.categories.gambling.detected ? 'Content Detected' : 'No Issues'}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.gambling.detected ? 'bg-purple-50 border-purple-200' : 'bg-green-50 border-green-200'}`}>
-                          <p className="text-sm italic">{nmcAssessment.categories.gambling.evidence}</p>
+                        <div className={`rounded-lg p-4 border ${nmcAssessment.categories.gambling.detected ? 'bg-white border-purple-300' : 'bg-white border-green-200'}`}>
+                          {nmcAssessment.categories.gambling.detected ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-purple-600" />
+                                <span className="text-xs font-semibold text-purple-900">Evidence Found:</span>
+                              </div>
+                              <p className="text-sm text-purple-900 leading-relaxed pl-6 border-l-2 border-purple-300 italic">
+                                "{nmcAssessment.categories.gambling.evidence || 'Gambling content detected in the book'}"
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <p className="text-sm text-green-800">{nmcAssessment.categories.gambling.evidence || 'No gambling content found'}</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -1274,12 +1294,32 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                               <p className="text-xs text-muted-foreground">Inappropriate language, insults</p>
                             </div>
                           </div>
-                          <Badge className={nmcAssessment.categories.language.detected ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}>
-                            {nmcAssessment.categories.language.ageBand}
-                          </Badge>
+                          <div className="text-right">
+                            <Badge className={nmcAssessment.categories.language.detected ? 'bg-yellow-600 text-white' : 'bg-green-600 text-white'}>
+                              {nmcAssessment.categories.language.ageBand}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {nmcAssessment.categories.language.detected ? 'Content Detected' : 'No Issues'}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.language.detected ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
-                          <p className="text-sm italic">{nmcAssessment.categories.language.evidence}</p>
+                        <div className={`rounded-lg p-4 border ${nmcAssessment.categories.language.detected ? 'bg-white border-yellow-300' : 'bg-white border-green-200'}`}>
+                          {nmcAssessment.categories.language.detected ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                                <span className="text-xs font-semibold text-yellow-900">Evidence Found:</span>
+                              </div>
+                              <p className="text-sm text-yellow-900 leading-relaxed pl-6 border-l-2 border-yellow-300 italic">
+                                "{nmcAssessment.categories.language.evidence || 'Inappropriate language detected in the book'}"
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <p className="text-sm text-green-800">{nmcAssessment.categories.language.evidence || 'No inappropriate language found'}</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -1297,12 +1337,32 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                               <p className="text-xs text-muted-foreground">Physical conflict, scary themes</p>
                             </div>
                           </div>
-                          <Badge className={nmcAssessment.categories.violence.detected ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}>
-                            {nmcAssessment.categories.violence.ageBand}
-                          </Badge>
+                          <div className="text-right">
+                            <Badge className={nmcAssessment.categories.violence.detected ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}>
+                              {nmcAssessment.categories.violence.ageBand}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {nmcAssessment.categories.violence.detected ? 'Content Detected' : 'No Issues'}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.violence.detected ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
-                          <p className="text-sm italic">{nmcAssessment.categories.violence.evidence}</p>
+                        <div className={`rounded-lg p-4 border ${nmcAssessment.categories.violence.detected ? 'bg-white border-red-300' : 'bg-white border-green-200'}`}>
+                          {nmcAssessment.categories.violence.detected ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-red-600" />
+                                <span className="text-xs font-semibold text-red-900">Evidence Found:</span>
+                              </div>
+                              <p className="text-sm text-red-900 leading-relaxed pl-6 border-l-2 border-red-300 italic">
+                                "{nmcAssessment.categories.violence.evidence || 'Violent content detected in the book'}"
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <p className="text-sm text-green-800">{nmcAssessment.categories.violence.evidence || 'No violent content found'}</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -1320,12 +1380,32 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                               <p className="text-xs text-muted-foreground">Substance use references</p>
                             </div>
                           </div>
-                          <Badge className={nmcAssessment.categories.substanceUse.detected ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'}>
-                            {nmcAssessment.categories.substanceUse.ageBand}
-                          </Badge>
+                          <div className="text-right">
+                            <Badge className={nmcAssessment.categories.substanceUse.detected ? 'bg-orange-600 text-white' : 'bg-green-600 text-white'}>
+                              {nmcAssessment.categories.substanceUse.ageBand}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {nmcAssessment.categories.substanceUse.detected ? 'Content Detected' : 'No Issues'}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.substanceUse.detected ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200'}`}>
-                          <p className="text-sm italic">{nmcAssessment.categories.substanceUse.evidence}</p>
+                        <div className={`rounded-lg p-4 border ${nmcAssessment.categories.substanceUse.detected ? 'bg-white border-orange-300' : 'bg-white border-green-200'}`}>
+                          {nmcAssessment.categories.substanceUse.detected ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-orange-600" />
+                                <span className="text-xs font-semibold text-orange-900">Evidence Found:</span>
+                              </div>
+                              <p className="text-sm text-orange-900 leading-relaxed pl-6 border-l-2 border-orange-300 italic">
+                                "{nmcAssessment.categories.substanceUse.evidence || 'Substance use content detected in the book'}"
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <p className="text-sm text-green-800">{nmcAssessment.categories.substanceUse.evidence || 'No substance use content found'}</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -1343,12 +1423,32 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                               <p className="text-xs text-muted-foreground">Romantic intimacy, sexual content</p>
                             </div>
                           </div>
-                          <Badge className={nmcAssessment.categories.sexualContent.detected ? 'bg-pink-600 text-white' : 'bg-green-600 text-white'}>
-                            {nmcAssessment.categories.sexualContent.ageBand}
-                          </Badge>
+                          <div className="text-right">
+                            <Badge className={nmcAssessment.categories.sexualContent.detected ? 'bg-pink-600 text-white' : 'bg-green-600 text-white'}>
+                              {nmcAssessment.categories.sexualContent.ageBand}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {nmcAssessment.categories.sexualContent.detected ? 'Content Detected' : 'No Issues'}
+                            </p>
+                          </div>
                         </div>
-                        <div className={`rounded-lg p-3 border ${nmcAssessment.categories.sexualContent.detected ? 'bg-pink-50 border-pink-200' : 'bg-green-50 border-green-200'}`}>
-                          <p className="text-sm italic">{nmcAssessment.categories.sexualContent.evidence}</p>
+                        <div className={`rounded-lg p-4 border ${nmcAssessment.categories.sexualContent.detected ? 'bg-white border-pink-300' : 'bg-white border-green-200'}`}>
+                          {nmcAssessment.categories.sexualContent.detected ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4 text-pink-600" />
+                                <span className="text-xs font-semibold text-pink-900">Evidence Found:</span>
+                              </div>
+                              <p className="text-sm text-pink-900 leading-relaxed pl-6 border-l-2 border-pink-300 italic">
+                                "{nmcAssessment.categories.sexualContent.evidence || 'Sexual content detected in the book'}"
+                              </p>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <p className="text-sm text-green-800">{nmcAssessment.categories.sexualContent.evidence || 'No sexual content found'}</p>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
