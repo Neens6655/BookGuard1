@@ -853,13 +853,483 @@ export function AboutUs() {
             </div>
           )}
 
+          {/* NMC Standards Section */}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="mb-4 border-orange-200 text-orange-700">
+                <Shield className="w-3 h-3 mr-2" />
+                NMC Standards Framework
+              </Badge>
+              <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+                National Media Council Standards
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Additional age-based content rating system evaluating books across 5 critical categories with specific thresholds
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-8 border-2 border-slate-200 mb-8">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-slate-600 to-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">How NMC Standards Work</h3>
+                  <p className="text-muted-foreground">
+                    Each book is evaluated across 5 content categories. The <span className="font-semibold text-foreground">final age rating</span> is determined by the <span className="font-semibold text-foreground">highest</span> (most restrictive) age band detected across all categories.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-6 gap-2 mb-4">
+                <div className="bg-green-100 rounded-lg p-2 text-center border-2 border-green-300">
+                  <p className="text-xs font-bold text-green-900">Safe</p>
+                  <p className="text-xs text-green-700">All Ages</p>
+                </div>
+                <div className="bg-blue-100 rounded-lg p-2 text-center border-2 border-blue-300">
+                  <p className="text-xs font-bold text-blue-900">6+</p>
+                  <p className="text-xs text-blue-700">Mild Content</p>
+                </div>
+                <div className="bg-indigo-100 rounded-lg p-2 text-center border-2 border-indigo-300">
+                  <p className="text-xs font-bold text-indigo-900">10+</p>
+                  <p className="text-xs text-indigo-700">Light Themes</p>
+                </div>
+                <div className="bg-yellow-100 rounded-lg p-2 text-center border-2 border-yellow-400">
+                  <p className="text-xs font-bold text-yellow-900">13+</p>
+                  <p className="text-xs text-yellow-700">Teen Content</p>
+                </div>
+                <div className="bg-orange-100 rounded-lg p-2 text-center border-2 border-orange-400">
+                  <p className="text-xs font-bold text-orange-900">17+</p>
+                  <p className="text-xs text-orange-700">Mature</p>
+                </div>
+                <div className="bg-red-100 rounded-lg p-2 text-center border-2 border-red-400">
+                  <p className="text-xs font-bold text-red-900">21+</p>
+                  <p className="text-xs text-red-700">Adult Only</p>
+                </div>
+              </div>
+            </div>
+
+            {/* NMC Categories */}
+            <Accordion type="multiple" className="space-y-4">
+              {/* Category 1: Gambling */}
+              <AccordionItem value="nmc-gambling" className="border-2 border-amber-200 rounded-xl bg-white overflow-hidden">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-amber-50 transition-colors">
+                  <div className="flex items-center gap-4 text-left w-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">🎰</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-foreground">Gambling Content</h4>
+                      <p className="text-sm text-muted-foreground">Casinos, betting, games of chance</p>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-4">
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-green-600">Safe (0-12)</Badge>
+                      </div>
+                      <p className="text-sm text-green-900 font-medium mb-2">No gambling references</p>
+                      <ul className="text-sm text-green-800 space-y-1 ml-4">
+                        <li className="list-disc">No casinos, betting, or gambling activities</li>
+                        <li className="list-disc">No card games played for money</li>
+                        <li className="list-disc">No lottery or chance-based monetary rewards</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-yellow-600">13+</Badge>
+                      </div>
+                      <p className="text-sm text-yellow-900 font-medium mb-2">Cautionary or educational context</p>
+                      <ul className="text-sm text-yellow-800 space-y-1 ml-4">
+                        <li className="list-disc">Gambling shown with negative consequences</li>
+                        <li className="list-disc">Educational discussion about gambling risks</li>
+                        <li className="list-disc">Minor contextual references</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-orange-600">17+</Badge>
+                      </div>
+                      <p className="text-sm text-orange-900 font-medium mb-2">Historical or contextual gambling</p>
+                      <ul className="text-sm text-orange-800 space-y-1 ml-4">
+                        <li className="list-disc">Victorian-era betting houses in historical fiction</li>
+                        <li className="list-disc">Cultural gambling traditions (historical context)</li>
+                        <li className="list-disc">Background casino settings without focus</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-red-50 rounded-lg p-4 border border-red-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-red-600">21+</Badge>
+                      </div>
+                      <p className="text-sm text-red-900 font-medium mb-2">Casual or positive gambling portrayals</p>
+                      <ul className="text-sm text-red-800 space-y-1 ml-4">
+                        <li className="list-disc">Gambling shown as entertainment or glamorous</li>
+                        <li className="list-disc">Detailed casino scenes or poker games</li>
+                        <li className="list-disc">Characters who gamble without consequences</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Category 2: Language & Profanity */}
+              <AccordionItem value="nmc-language" className="border-2 border-purple-200 rounded-xl bg-white overflow-hidden">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-purple-50 transition-colors">
+                  <div className="flex items-center gap-4 text-left w-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">📝</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-foreground">Language & Profanity</h4>
+                      <p className="text-sm text-muted-foreground">Offensive language, insults, profanity</p>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-4">
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-green-600">Safe (0-9)</Badge>
+                      </div>
+                      <p className="text-sm text-green-900 font-medium mb-2">No profanity or rude language</p>
+                      <ul className="text-sm text-green-800 space-y-1 ml-4">
+                        <li className="list-disc">Clean, appropriate language throughout</li>
+                        <li className="list-disc">No insults, name-calling, or mean language</li>
+                        <li className="list-disc">Respectful dialogue and narration</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-blue-600">10+</Badge>
+                      </div>
+                      <p className="text-sm text-blue-900 font-medium mb-2">Mild insults only</p>
+                      <ul className="text-sm text-blue-800 space-y-1 ml-4">
+                        <li className="list-disc">Words like "stupid," "dumb," or "shut up"</li>
+                        <li className="list-disc">Light teasing between characters</li>
+                        <li className="list-disc">Mild frustration expressions</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-yellow-600">13+</Badge>
+                      </div>
+                      <p className="text-sm text-yellow-900 font-medium mb-2">Moderate slang and insults</p>
+                      <ul className="text-sm text-yellow-800 space-y-1 ml-4">
+                        <li className="list-disc">Words like "jerk," "idiot," name-calling</li>
+                        <li className="list-disc">Teen slang and informal language</li>
+                        <li className="list-disc">Occasional mild exclamations</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-orange-600">17+</Badge>
+                      </div>
+                      <p className="text-sm text-orange-900 font-medium mb-2">Strong language for emotional realism</p>
+                      <ul className="text-sm text-orange-800 space-y-1 ml-4">
+                        <li className="list-disc">Strong profanity if contextually justified</li>
+                        <li className="list-disc">Realistic teen/young adult dialogue</li>
+                        <li className="list-disc">Words like f***, s*** in emotional moments</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-red-50 rounded-lg p-4 border border-red-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-red-600">21+</Badge>
+                      </div>
+                      <p className="text-sm text-red-900 font-medium mb-2">Explicit profanity permitted</p>
+                      <ul className="text-sm text-red-800 space-y-1 ml-4">
+                        <li className="list-disc">Unrestricted use of profanity</li>
+                        <li className="list-disc">Explicit or crude language</li>
+                        <li className="list-disc">No language limitations</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Category 3: Violence & Terror */}
+              <AccordionItem value="nmc-violence" className="border-2 border-red-200 rounded-xl bg-white overflow-hidden">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-red-50 transition-colors">
+                  <div className="flex items-center gap-4 text-left w-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-rose-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">⚔️</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-foreground">Violence & Terror</h4>
+                      <p className="text-sm text-muted-foreground">Physical violence, scary content, weapons</p>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-4">
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-green-600">Safe (0-5)</Badge>
+                      </div>
+                      <p className="text-sm text-green-900 font-medium mb-2">No violence depicted</p>
+                      <ul className="text-sm text-green-800 space-y-1 ml-4">
+                        <li className="list-disc">No hitting, fighting, or weapons</li>
+                        <li className="list-disc">No scary or frightening scenarios</li>
+                        <li className="list-disc">Peaceful conflict resolution only</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-blue-600">6+</Badge>
+                      </div>
+                      <p className="text-sm text-blue-900 font-medium mb-2">Cartoon/fantasy violence only</p>
+                      <ul className="text-sm text-blue-800 space-y-1 ml-4">
+                        <li className="list-disc">Non-realistic, slapstick violence</li>
+                        <li className="list-disc">No blood or realistic injuries</li>
+                        <li className="list-disc">Fantasy battles (e.g., good vs. evil wizards)</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-indigo-600">10+</Badge>
+                      </div>
+                      <p className="text-sm text-indigo-900 font-medium mb-2">Mild peril and fantasy battles</p>
+                      <ul className="text-sm text-indigo-800 space-y-1 ml-4">
+                        <li className="list-disc">Adventure sequences with minor injuries</li>
+                        <li className="list-disc">Fantasy battles with positive resolution</li>
+                        <li className="list-disc">Mild suspense and perilous situations</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-yellow-600">13+</Badge>
+                      </div>
+                      <p className="text-sm text-yellow-900 font-medium mb-2">Moderate realistic violence</p>
+                      <ul className="text-sm text-yellow-800 space-y-1 ml-4">
+                        <li className="list-disc">Crime, detective, suspense themes</li>
+                        <li className="list-disc">Realistic but limited violence</li>
+                        <li className="list-disc">No graphic gore or extreme brutality</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-orange-600">17+</Badge>
+                      </div>
+                      <p className="text-sm text-orange-900 font-medium mb-2">War, crime, terror themes</p>
+                      <ul className="text-sm text-orange-800 space-y-1 ml-4">
+                        <li className="list-disc">War narratives with battle scenes</li>
+                        <li className="list-disc">Intense violence but limited gore</li>
+                        <li className="list-disc">Terror or horror themes for mature readers</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-red-50 rounded-lg p-4 border border-red-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-red-600">21+</Badge>
+                      </div>
+                      <p className="text-sm text-red-900 font-medium mb-2">Graphic violence permitted</p>
+                      <ul className="text-sm text-red-800 space-y-1 ml-4">
+                        <li className="list-disc">Detailed violent descriptions</li>
+                        <li className="list-disc">Gore and extreme brutality allowed</li>
+                        <li className="list-disc">No violence restrictions</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Category 4: Substance Use */}
+              <AccordionItem value="nmc-substances" className="border-2 border-cyan-200 rounded-xl bg-white overflow-hidden">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-cyan-50 transition-colors">
+                  <div className="flex items-center gap-4 text-left w-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">🍺</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-foreground">Alcohol, Smoking & Drugs</h4>
+                      <p className="text-sm text-muted-foreground">Substance use and references</p>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-4">
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-green-600">Safe (0+)</Badge>
+                      </div>
+                      <p className="text-sm text-green-900 font-medium mb-2">No substance references</p>
+                      <ul className="text-sm text-green-800 space-y-1 ml-4">
+                        <li className="list-disc">No alcohol, cigarettes, or drugs</li>
+                        <li className="list-disc">No smoking or substance use depictions</li>
+                        <li className="list-disc">Completely substance-free content</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-yellow-600">13+</Badge>
+                      </div>
+                      <p className="text-sm text-yellow-900 font-medium mb-2">Minor contextual references</p>
+                      <ul className="text-sm text-yellow-800 space-y-1 ml-4">
+                        <li className="list-disc">Brief/historical mentions if cautionary</li>
+                        <li className="list-disc">Adult characters with wine at dinner (background)</li>
+                        <li className="list-disc">Educational content about substance risks</li>
+                        <li className="list-disc">Minor contextual references (e.g., historical settings)</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-orange-600">17+</Badge>
+                      </div>
+                      <p className="text-sm text-orange-900 font-medium mb-2">Realistic depictions if not glamorized</p>
+                      <ul className="text-sm text-orange-800 space-y-1 ml-4">
+                        <li className="list-disc">Addiction and recovery storylines</li>
+                        <li className="list-disc">Realistic substance use without glamorization</li>
+                        <li className="list-disc">Consequences and health impacts shown</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-red-50 rounded-lg p-4 border border-red-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-red-600">21+</Badge>
+                      </div>
+                      <p className="text-sm text-red-900 font-medium mb-2">Unrestricted substance content</p>
+                      <ul className="text-sm text-red-800 space-y-1 ml-4">
+                        <li className="list-disc">Substance use without restrictions</li>
+                        <li className="list-disc">Detailed drug or alcohol scenes</li>
+                        <li className="list-disc">No content limitations</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Category 5: Sexual Content */}
+              <AccordionItem value="nmc-sexual" className="border-2 border-pink-200 rounded-xl bg-white overflow-hidden">
+                <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-pink-50 transition-colors">
+                  <div className="flex items-center gap-4 text-left w-full">
+                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-2xl">💕</span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-foreground">Sex & Nudity</h4>
+                      <p className="text-sm text-muted-foreground">Romantic and sexual content</p>
+                    </div>
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-4">
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-green-600">Safe (0+)</Badge>
+                      </div>
+                      <p className="text-sm text-green-900 font-medium mb-2">No sexual content or romance</p>
+                      <ul className="text-sm text-green-800 space-y-1 ml-4">
+                        <li className="list-disc">No romantic or sexual content</li>
+                        <li className="list-disc">No intimate physical contact</li>
+                        <li className="list-disc">Family-friendly relationships only</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-yellow-600">13+</Badge>
+                      </div>
+                      <p className="text-sm text-yellow-900 font-medium mb-2">Light romance permitted</p>
+                      <ul className="text-sm text-yellow-800 space-y-1 ml-4">
+                        <li className="list-disc">Hand-holding, blushing, innocent crushes</li>
+                        <li className="list-disc">Sweet, age-appropriate romantic feelings</li>
+                        <li className="list-disc">No physical intimacy beyond hand-holding</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-orange-50 rounded-lg p-4 border border-orange-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-orange-600">17+</Badge>
+                      </div>
+                      <p className="text-sm text-orange-900 font-medium mb-2">Non-explicit intimacy</p>
+                      <ul className="text-sm text-orange-800 space-y-1 ml-4">
+                        <li className="list-disc">Kissing and romantic affection</li>
+                        <li className="list-disc">Implied romance without explicit details</li>
+                        <li className="list-disc">Teen/young adult relationships</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-red-50 rounded-lg p-4 border border-red-300">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-red-600">21+</Badge>
+                      </div>
+                      <p className="text-sm text-red-900 font-medium mb-2">Explicit sexual content permitted</p>
+                      <ul className="text-sm text-red-800 space-y-1 ml-4">
+                        <li className="list-disc">Detailed sexual content allowed</li>
+                        <li className="list-disc">Explicit romantic scenes</li>
+                        <li className="list-disc">No content restrictions</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            {/* NMC Meta Rules */}
+            <div className="mt-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border-2 border-indigo-200">
+              <div className="flex items-start gap-4">
+                <Brain className="w-8 h-8 text-indigo-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="text-xl font-bold text-foreground mb-4">NMC Evaluation Meta-Rules</h4>
+                  <div className="space-y-3">
+                    <div className="bg-white rounded-lg p-4 border border-indigo-200">
+                      <h5 className="font-semibold text-indigo-900 mb-2">1. Highest Age Band Prevails</h5>
+                      <p className="text-sm text-muted-foreground">
+                        The final NMC rating is the <span className="font-semibold text-foreground">highest</span> (most restrictive) age band found across all 5 categories. If violence requires 13+ but all other categories are Safe, the book gets 13+.
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 border border-indigo-200">
+                      <h5 className="font-semibold text-indigo-900 mb-2">2. Context-Aware Leniency</h5>
+                      <p className="text-sm text-muted-foreground">
+                        Minor contextual references (e.g., historical wine mentions, background adult behavior) are evaluated with leniency. Only clearly inappropriate or glorified content triggers restrictions.
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 border border-indigo-200">
+                      <h5 className="font-semibold text-indigo-900 mb-2">3. Evidence-Based Detection</h5>
+                      <p className="text-sm text-muted-foreground">
+                        Each category requires <span className="font-semibold text-foreground">direct textual evidence</span> to trigger a detection. Vague or ambiguous content defaults to Safe rating.
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 border border-indigo-200">
+                      <h5 className="font-semibold text-indigo-900 mb-2">4. Safe by Default</h5>
+                      <p className="text-sm text-muted-foreground">
+                        Books with no violations across all 5 categories receive a <span className="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-xs font-medium text-white">Safe</span> rating, meaning they're appropriate for all ages.
+                      </p>
+                    </div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-12 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border-2 border-amber-200">
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-8 h-8 text-amber-600 flex-shrink-0 mt-1" />
               <div>
                 <h4 className="text-xl font-bold text-foreground mb-2">Integrated Evaluation Process</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  All four systems work together to provide a comprehensive assessment. Books must pass both red-line systems (Cultural Values & Child Safety) to be considered safe. Theme and Language Complexity systems then determine age appropriateness. The final verdict combines all factors to produce a <span className="font-semibold text-foreground">Whitelisted</span>, <span className="font-semibold text-foreground">Parent Guidance</span>, or <span className="font-semibold text-foreground">Not Whitelisted</span> recommendation.
+                  All four systems plus NMC standards work together to provide a comprehensive assessment. Books must pass both red-line systems (Cultural Values & Child Safety) to be considered safe. Theme and Language Complexity systems then determine age appropriateness. The final verdict combines all factors to produce a <span className="font-semibold text-foreground">Whitelisted</span>, <span className="font-semibold text-foreground">Parent Guidance</span>, or <span className="font-semibold text-foreground">Not Whitelisted</span> recommendation.
                 </p>
               </div>
             </div>
