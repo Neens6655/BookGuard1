@@ -559,16 +559,6 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     // Evaluate against NMC Standards (parallel system)
     const nmcAssessment = await evaluateNMCStandards(bookText);
     
-    // INTEGRATE NMC age recommendation with 4-system recommendation
-    const finalAgeRecommendation = combineAgeRecommendations(
-      result.recommended_minimum_age,
-      nmcAssessment.enabled ? nmcAssessment.finalAgeBand : null
-    );
-    
-    // Update result with combined age recommendation
-    result.recommended_minimum_age = finalAgeRecommendation.combined;
-    result.age_rationale = finalAgeRecommendation.rationale;
-    
     // Extract ISBN from book text for improved Amazon matching
     const isbn = extractISBN(bookText);
     if (isbn) {
@@ -602,8 +592,8 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
     if (!finalCoverImage && goodreadsData?.status === 'ok') {
       // Use Goodreads cover if confidence is reasonable (>50%)
       const goodreadsConfidence = goodreadsData.matchConfidence || 0;
-      if (goodreadsConfidence > 50 && goodreadsData.imageUrl) {
-        finalCoverImage = goodreadsData.imageUrl;
+      if (goodreadsConfidence > 50 && goodreadsData.coverImageUrl) {
+        finalCoverImage = goodreadsData.coverImageUrl;
         console.log(`Using Goodreads cover image (${goodreadsConfidence}% confidence)`);
       }
     }

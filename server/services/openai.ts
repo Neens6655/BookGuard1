@@ -508,15 +508,21 @@ Return complete JSON only.
       return currentPriority > highestPriority ? current : highest;
     }, "Safe");
     
+    // Convert "Safe" to "All Ages" for clearer age recommendation display
+    const displayAgeBand = finalAgeBand === "Safe" ? "All Ages" : finalAgeBand;
+    
+    // Convert category-level "Safe" to "All Ages" as well
+    const convertAgeBand = (band: string) => band === "Safe" ? "All Ages" : band;
+    
     return {
       enabled: true,
-      finalAgeBand,
+      finalAgeBand: displayAgeBand,
       categories: {
-        gambling: result.gambling,
-        language: result.language,
-        violence: result.violence,
-        substanceUse: result.substanceUse,
-        sexualContent: result.sexualContent
+        gambling: { ...result.gambling, ageBand: convertAgeBand(result.gambling.ageBand) },
+        language: { ...result.language, ageBand: convertAgeBand(result.language.ageBand) },
+        violence: { ...result.violence, ageBand: convertAgeBand(result.violence.ageBand) },
+        substanceUse: { ...result.substanceUse, ageBand: convertAgeBand(result.substanceUse.ageBand) },
+        sexualContent: { ...result.sexualContent, ageBand: convertAgeBand(result.sexualContent.ageBand) }
       }
     };
 
@@ -525,13 +531,13 @@ Return complete JSON only.
     // Return safe default on error
     return {
       enabled: false,
-      finalAgeBand: "Safe",
+      finalAgeBand: "All Ages",
       categories: {
-        gambling: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
-        language: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
-        violence: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
-        substanceUse: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" },
-        sexualContent: { detected: false, ageBand: "Safe", evidence: "Error during evaluation" }
+        gambling: { detected: false, ageBand: "All Ages", evidence: "Error during evaluation" },
+        language: { detected: false, ageBand: "All Ages", evidence: "Error during evaluation" },
+        violence: { detected: false, ageBand: "All Ages", evidence: "Error during evaluation" },
+        substanceUse: { detected: false, ageBand: "All Ages", evidence: "Error during evaluation" },
+        sexualContent: { detected: false, ageBand: "All Ages", evidence: "Error during evaluation" }
       }
     };
   }
