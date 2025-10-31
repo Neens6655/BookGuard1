@@ -72,10 +72,21 @@ export async function extractTextFromImage(
     }
 
     const data = await response.json() as any;
+    
+    // Debug: Log the full response structure
+    console.log('DeepInfra API Response:', JSON.stringify(data, null, 2));
+    
     const extractedText = data.choices?.[0]?.message?.content;
 
     if (!extractedText) {
+      console.error('API Response Structure:', data);
       throw new Error("No text extracted from OCR response");
+    }
+
+    // Check if the response is a data URL (PDF/image) instead of text
+    if (typeof extractedText === 'string' && extractedText.startsWith('data:')) {
+      console.error('API returned a data URL instead of text:', extractedText.substring(0, 100));
+      throw new Error("API returned a file instead of extracted text. Please check the API request format.");
     }
 
     console.log(`✓ OCR extraction completed: ${extractedText.length} characters extracted`);
