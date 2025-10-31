@@ -63,6 +63,22 @@ const ocrUpload = multer({
   },
 });
 
+/**
+ * Sanitize text for safe PostgreSQL storage
+ * Removes null bytes and other problematic characters that cause DB errors
+ */
+function sanitizeTextForDB(text: string): string {
+  if (!text) return text;
+  
+  return text
+    // Remove null bytes (0x00) - these cause PostgreSQL errors
+    .replace(/\x00/g, '')
+    // Remove other control characters that can cause issues (but keep newlines and tabs)
+    .replace(/[\x01-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    // Normalize unicode to prevent encoding issues
+    .normalize('NFC');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Upload and start evaluation
@@ -662,7 +678,7 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
       progress: 100, 
       status: "completed",
       result: result,
-      extractedText: bookText,
+      extractedText: sanitizeTextForDB(bookText),
       nmcAssessment: nmcAssessment,
       goodreadsData: goodreadsData,
       amazonData: amazonData,
@@ -794,7 +810,7 @@ async function processOCRFileAsync(evaluationId: string, filePath: string, filen
       progress: 100, 
       status: "completed",
       result: result,
-      extractedText: bookText,
+      extractedText: sanitizeTextForDB(bookText),
       nmcAssessment: nmcAssessment,
       goodreadsData: goodreadsData,
       amazonData: amazonData,
