@@ -76,7 +76,11 @@ export function UploadQueue({ files, onComplete, onCancel, className }: UploadQu
       const formData = new FormData();
       formData.append('file', currentFile.file);
 
-      const response = await apiRequest('POST', '/api/evaluate', formData);
+      // Check if this is an OCR file (marked by custom property)
+      const fileWithOCR = currentFile.file as File & { isOCR?: boolean };
+      const endpoint = fileWithOCR.isOCR ? '/api/evaluate-ocr' : '/api/evaluate';
+      
+      const response = await apiRequest('POST', endpoint, formData);
       const data = await response.json();
 
       // Start processing

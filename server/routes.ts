@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage, extractISBN } from "./services/fileProcessor";
+import { extractTextFromImage } from "./services/deepinfra";
 import { searchGoodreadsBook } from "./services/apify";
 import { searchAmazonBook } from "./services/amazon";
 import { fromError } from "zod-validation-error";
@@ -45,6 +46,23 @@ const imageUpload = multer({
   },
 });
 
+const ocrUpload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit for OCR files
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.pdf', '.gif', '.bmp'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (JPG, PNG, WEBP, PDF, GIF, BMP) are allowed for OCR'));
+    }
+  },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Upload and start evaluation
@@ -78,6 +96,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(500).json({ 
         error: error instanceof Error ? error.message : "Upload failed" 
+      });
+    }
+  });
+
+  // Upload and evaluate scanned book with OCR
+  app.post("/api/evaluate-ocr", ocrUpload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Create evaluation record
+      const evaluation = await storage.createEvaluation({
+        filename: req.file.originalname,
+        fileSize: req.file.size,
+        status: "processing",
+        progress: 0,
+        result: null,
+      });
+
+      res.json({ id: evaluation.id, status: "processing" });
+
+      // Process OCR file asynchronously
+      processOCRFileAsync(evaluation.id, req.file.path, req.file.originalname);
+
+    } catch (error) {
+      console.error("OCR upload error:", error);
+      
+      // Cleanup uploaded file on error
+      if (req.file?.path) {
+        await fs.unlink(req.file.path).catch(console.error);
+      }
+      
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "OCR upload failed" 
       });
     }
   });
@@ -636,6 +689,136 @@ async function processFileAsync(evaluationId: string, filePath: string, filename
         errorMessage = 'AI evaluation service temporarily unavailable. Please try again in a few moments.';
       } else if (error.message.includes('API') || error.message.includes('rate limit')) {
         errorMessage = 'Service temporarily busy. Please try again shortly.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    await storage.updateEvaluation(evaluationId, { 
+      status: "failed",
+      result: { error: errorMessage } 
+    });
+    
+    // Cleanup uploaded file
+    await fs.unlink(filePath).catch(console.error);
+  }
+}
+
+async function processOCRFileAsync(evaluationId: string, filePath: string, filename: string) {
+  try {
+    // Update progress: OCR Text Extraction
+    await storage.updateEvaluation(evaluationId, { progress: 10 });
+    
+    // Read the file as buffer
+    const fileBuffer = await fs.readFile(filePath);
+    
+    // Update progress: OCR Processing
+    await storage.updateEvaluation(evaluationId, { progress: 25 });
+    
+    // Extract text using DeepSeek OCR
+    const ocrResult = await extractTextFromImage(fileBuffer, filename);
+    const bookText = ocrResult.text;
+    
+    console.log(`✓ OCR completed: ${bookText.length} characters extracted from ${filename}`);
+    
+    // Update progress: Language Detection
+    await storage.updateEvaluation(evaluationId, { progress: 35 });
+    
+    // Simulate processing delay for UX
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Update progress: Content Analysis
+    await storage.updateEvaluation(evaluationId, { progress: 50 });
+    
+    // Simulate more processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Update progress: Cultural Assessment
+    await storage.updateEvaluation(evaluationId, { progress: 65 });
+    
+    // Call OpenAI for evaluation
+    const result = await evaluateBook(bookText);
+    
+    // Update progress: Safety Scoring
+    await storage.updateEvaluation(evaluationId, { progress: 80 });
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Evaluate against NMC Standards (parallel system)
+    const nmcAssessment = await evaluateNMCStandards(bookText);
+    
+    // Extract ISBN from book text for improved Amazon matching
+    const isbn = extractISBN(bookText);
+    if (isbn) {
+      console.log(`Extracted ISBN: ${isbn}`);
+    }
+    
+    // Fetch Goodreads data if available
+    const goodreadsData = await searchGoodreadsBook(
+      result.title || 'Unknown', 
+      result.author
+    );
+    
+    // Fetch Amazon age validation data (runs in parallel for UAE marketplace)
+    const amazonData = await searchAmazonBook(
+      result.title || 'Unknown',
+      result.author,
+      result.publisher,
+      isbn
+    );
+    
+    // Update progress: Age Recommendations
+    await storage.updateEvaluation(evaluationId, { progress: 95 });
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // For OCR files, prioritize external cover images since we can't extract from scanned images
+    let finalCoverImage = null;
+    
+    if (goodreadsData?.status === 'ok') {
+      const goodreadsConfidence = goodreadsData.matchConfidence || 0;
+      if (goodreadsConfidence > 50 && goodreadsData.coverImageUrl) {
+        finalCoverImage = goodreadsData.coverImageUrl;
+        console.log(`Using Goodreads cover image (${goodreadsConfidence}% confidence)`);
+      }
+    }
+    
+    if (!finalCoverImage && amazonData?.status === 'ok' && amazonData.coverImageUrl) {
+      finalCoverImage = amazonData.coverImageUrl;
+      console.log(`Using Amazon cover image as fallback`);
+    }
+    
+    // Update progress: Report Generation & Complete
+    await storage.updateEvaluation(evaluationId, { 
+      progress: 100, 
+      status: "completed",
+      result: result,
+      nmcAssessment: nmcAssessment,
+      goodreadsData: goodreadsData,
+      amazonData: amazonData,
+      coverImage: finalCoverImage 
+    });
+
+    // Cleanup uploaded file
+    await fs.unlink(filePath).catch(console.error);
+
+  } catch (error) {
+    console.error("OCR processing error:", error);
+    
+    // Determine user-friendly error message
+    let errorMessage = "OCR processing failed";
+    
+    if (error instanceof Error) {
+      if (error.message.includes('DEEPINFRA_API_KEY')) {
+        errorMessage = 'DeepInfra API key not configured. Please contact administrator.';
+      } else if (error.message.includes('OCR extraction failed')) {
+        errorMessage = 'Unable to extract text from image. The file may be corrupted or unreadable.';
+      } else if (error.message.includes('DeepInfra API error')) {
+        errorMessage = 'OCR service temporarily unavailable. Please try again in a few moments.';
+      } else if (error.message.includes('Insufficient text content')) {
+        errorMessage = 'The scanned image contains too little text to analyze (minimum 100 characters required).';
+      } else if (error.message.includes('OpenAI') || error.message.includes('evaluation failed')) {
+        errorMessage = 'AI evaluation service temporarily unavailable. Please try again in a few moments.';
       } else {
         errorMessage = error.message;
       }

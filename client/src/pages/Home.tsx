@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, BookPlus, Settings, BookOpen, Shield, Star, Book, Users, MessageCircle, Brain, CheckCircle, Languages, Target, Heart, FileDown, BarChart3 } from 'lucide-react';
 import { FileUpload } from '@/components/FileUpload';
+import { OCRFileUpload } from '@/components/OCRFileUpload';
 import { UploadQueue } from '@/components/UploadQueue';
 import { ProcessingView } from '@/components/ProcessingView';
 import { ResultsView } from '@/components/ResultsView';
@@ -9,6 +10,7 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -83,6 +85,20 @@ export default function Home() {
     if (files.length === 0) return;
     
     setQueueFiles(files);
+    changeView('queue');
+  };
+
+  const handleOCRFilesUpload = (files: File[]) => {
+    if (files.length === 0) return;
+    
+    // Mark files for OCR processing by adding a custom property
+    const ocrFiles = files.map(file => {
+      const newFile = file as File & { isOCR?: boolean };
+      newFile.isOCR = true;
+      return newFile;
+    });
+    
+    setQueueFiles(ocrFiles);
     changeView('queue');
   };
 
@@ -983,7 +999,39 @@ export default function Home() {
                 </p>
               </div>
 
-              <FileUpload onFilesUpload={handleFilesUpload} />
+              <Tabs defaultValue="regular" className="w-full">
+                <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+                  <TabsTrigger value="regular" data-testid="tab-regular-upload">
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Regular Upload
+                  </TabsTrigger>
+                  <TabsTrigger value="ocr" data-testid="tab-ocr-upload">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    OCR Upload
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="regular">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-muted-foreground">
+                      Upload digital books in PDF, Word, TXT, EPUB, or RTF format
+                    </p>
+                  </div>
+                  <FileUpload onFilesUpload={handleFilesUpload} />
+                </TabsContent>
+                
+                <TabsContent value="ocr">
+                  <div className="text-center mb-6">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Upload scanned books or images using AI-powered OCR
+                    </p>
+                    <Badge variant="outline" className="text-xs">
+                      Powered by DeepSeek OCR
+                    </Badge>
+                  </div>
+                  <OCRFileUpload onFilesUpload={handleOCRFilesUpload} />
+                </TabsContent>
+              </Tabs>
               
               <div className="text-center mt-6">
                 <Button variant="ghost" onClick={handleBackToHome} data-testid="button-back-home-upload">
