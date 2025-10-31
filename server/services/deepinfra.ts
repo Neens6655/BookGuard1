@@ -63,7 +63,7 @@ export async function extractTextFromImage(
       body: JSON.stringify({
         model: OCR_MODEL,
         messages,
-        max_tokens: 8192,
+        max_tokens: 4096,  // Reduced to leave room for input tokens
         temperature: 0
       })
     });
