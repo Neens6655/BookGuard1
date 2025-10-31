@@ -1,7 +1,7 @@
 # UAE BookGuard - Book Evaluation & Whitelist Report Generator
 
 ## Overview
-UAE BookGuard is a full-stack web application that evaluates children's and family books for content appropriateness, cultural alignment, and age suitability, specifically for the UAE Ministry of Education. It processes various book formats (PDF, Word, TXT, EPUB, RTF) and **scanned book images** (JPG, PNG, WEBP, GIF, BMP) using OpenAI's GPT API and DeepSeek OCR for comprehensive evaluation reports. These reports include domain-specific content assessments, age recommendations, and parent discussion guides, ensuring content adheres to Islamic, Arab, and UAE cultural ethics. The system features a sophisticated 4-system evaluation framework, AI deep assessment with evidence-based analysis, OCR-powered scanned book processing, and robust book catalog management.
+UAE BookGuard is a full-stack web application that evaluates children's and family books for content appropriateness, cultural alignment, and age suitability, specifically for the UAE Ministry of Education. It processes various book formats (PDF, Word, TXT, EPUB, RTF) and **scanned book images** (JPG, PNG, WEBP, GIF, BMP) using OpenAI's GPT-4 Vision for comprehensive evaluation reports. These reports include domain-specific content assessments, age recommendations, and parent discussion guides, ensuring content adheres to Islamic, Arab, and UAE cultural ethics. The system features a sophisticated 4-system evaluation framework, AI deep assessment with evidence-based analysis, OCR-powered scanned book processing, and robust book catalog management.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -28,8 +28,7 @@ Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessme
 
 ## External Dependencies
 
-*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis.
-*   **DeepInfra API**: Uses `DeepSeek-OCR` model for extracting text from scanned books and images. Provides OCR capabilities with OpenAI-compatible API for processing JPG, PNG, WEBP, PDF, GIF, and BMP files up to 50MB.
+*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis and **OCR text extraction from scanned books/images**. GPT-4 Vision processes JPG, PNG, WEBP, GIF, and BMP files for reliable text extraction from physical book pages.
 *   **Neon Database**: Serverless PostgreSQL for persistent storage.
 *   **Apify Goodreads Scraper**: Enriches book data with ratings, reviews, and cover images using `epctex/goodreads-scraper`.
 *   **Apify Amazon Scrapers**: Validates AI age recommendations using `pintostudio/amazon-search-products-scraper` for search and `logical_scrapers/amazon-product-scraper` for product details extraction from amazon.ae marketplace. Features ISBN-first matching, fuzzy search with Jaccard similarity, multiple edition comparison, format preferences, and confidence scoring (High/Medium/Low).

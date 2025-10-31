@@ -572,56 +572,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // TEST ENDPOINT: Test DeepInfra OCR API
-  app.get("/api/test-ocr", async (req, res) => {
-    try {
-      console.log("\n🧪 ============================================");
-      console.log("🧪 TESTING DEEPINFRA OCR API");
-      console.log("🧪 ============================================\n");
-
-      // Create a simple test image (1x1 white PNG)
-      const testImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
-      const testImageBuffer = Buffer.from(testImageBase64, 'base64');
-
-      console.log("📝 Testing with minimal 1x1 white PNG image");
-      console.log("Buffer size:", testImageBuffer.length, "bytes");
-      
-      const result = await extractTextFromImage(
-        testImageBuffer,
-        "test.png",
-        "<|grounding|>Extract any text from this image."
-      );
-
-      console.log("\n✅ ============================================");
-      console.log("✅ TEST SUCCESSFUL!");
-      console.log("✅ ============================================\n");
-      console.log("Extracted text:", result.text);
-      console.log("Text length:", result.text.length);
-
-      res.json({
-        success: true,
-        message: "OCR API test completed successfully",
-        result: {
-          text: result.text,
-          textLength: result.text.length,
-          format: result.format
-        }
-      });
-
-    } catch (error) {
-      console.error("\n❌ ============================================");
-      console.error("❌ TEST FAILED!");
-      console.error("❌ ============================================\n");
-      console.error("Error:", error);
-
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-        details: error instanceof Error ? error.stack : undefined
-      });
-    }
-  });
-
   const httpServer = createServer(app);
   return httpServer;
 }
