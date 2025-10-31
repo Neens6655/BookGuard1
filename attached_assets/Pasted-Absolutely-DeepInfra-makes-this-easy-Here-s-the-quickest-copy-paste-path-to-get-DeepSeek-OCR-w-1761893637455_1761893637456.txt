@@ -1,0 +1,104 @@
+Absolutely—DeepInfra makes this easy. Here’s the quickest, copy-paste path to get **DeepSeek-OCR** working from a **Replit** website.
+
+# 1) Test your API key (sanity check)
+
+```bash
+curl https://api.deepinfra.com/v1/openai/chat/completions \
+  -H "Authorization: Bearer $DEEPINFRA_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model":"deepseek-ai/DeepSeek-OCR",
+    "messages":[{"role":"user","content":"Hello!"}]
+  }'
+```
+
+If you get a JSON reply, your key works. (Endpoint and example are OpenAI-compatible.) ([deepinfra.com][1])
+
+# 2) Replit: minimal backend (FastAPI)
+
+1. Create a **Python + FastAPI** repl.
+2. Add a **Secret** named `DEEPINFRA_TOKEN` with your key.
+3. Add `fastapi`, `uvicorn`, `python-multipart`, `requests` to `requirements.txt`.
+4. Paste this `main.py`:
+
+```python
+from fastapi import FastAPI, UploadFile, File, Form
+import requests, base64, os
+
+app = FastAPI()
+DEEPINFRA_TOKEN = os.getenv("DEEPINFRA_TOKEN")
+API_URL = "https://api.deepinfra.com/v1/openai/chat/completions"
+MODEL = "deepseek-ai/DeepSeek-OCR"
+
+# Front page for quick testing
+@app.get("/")
+def home():
+    return {"ok": True, "try": "POST /ocr with file=image and prompt (optional)"}
+
+@app.post("/ocr")
+async def ocr(file: UploadFile = File(...), prompt: str = Form("<|grounding|>Convert the document to markdown.")):
+    # read and base64-encode the image
+    img_bytes = await file.read()
+    b64 = base64.b64encode(img_bytes).decode("utf-8")
+
+    messages = [{
+        "role": "user",
+        "content": [
+            {"type":"input_text","text":prompt},
+            {"type":"input_image","image_url": f"data:image/{file.filename.split('.')[-1]};base64,{b64}"}
+        ]
+    }]
+
+    resp = requests.post(
+        API_URL,
+        headers={"Authorization": f"Bearer {DEEPINFRA_TOKEN}", "Content-Type":"application/json"},
+        json={"model": MODEL, "messages": messages, "temperature": 0}
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    text = data["choices"][0]["message"]["content"]
+    return {"result": text}
+```
+
+* The default prompt converts documents to Markdown; you can switch to **“Free OCR.”** for plain text or **“<|grounding|>OCR this image.”** for general OCR. ([GitHub][2])
+
+Run the repl; it will expose a web URL. You can call `/ocr` with a form upload.
+
+# 3) Tiny HTML form (optional)
+
+Add `static/index.html` (or use any frontend) to let users upload:
+
+```html
+<form id="f" action="/ocr" method="post" enctype="multipart/form-data">
+  <input type="file" name="file" accept="image/*,application/pdf" required />
+  <select name="prompt">
+    <option>&lt;|grounding|&gt;Convert the document to markdown.</option>
+    <option>Free OCR.</option>
+    <option>&lt;|grounding|&gt;OCR this image.</option>
+  </select>
+  <button>Scan</button>
+</form>
+<pre id="out"></pre>
+<script>
+  const f = document.getElementById('f'), out = document.getElementById('out');
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(f);
+    const r = await fetch('/ocr', { method:'POST', body: fd });
+    const j = await r.json();
+    out.textContent = j.result || JSON.stringify(j, null, 2);
+  });
+</script>
+```
+
+# Notes & gotchas
+
+* **Why this works on Replit:** you’re not hosting the model—your server just forwards the image to DeepInfra’s **OpenAI-compatible** endpoint and returns the OCR text/Markdown. ([deepinfra.com][1])
+* **Prompts that work best:** from the official repo—Markdown conversion, general OCR, or layout-free “Free OCR.” ([GitHub][2])
+* **Self-hosting later:** if you ever want your own GPU server, run **vLLM’s OpenAI-compatible server** and keep the same client code. ([docs.vllm.ai][3])
+
+Want a Node/Express version too?
+
+[1]: https://deepinfra.com/docs/openai_api?utm_source=chatgpt.com "Use OpenAI API clients with LLaMas | ML Models | DeepInfra"
+[2]: https://github.com/deepseek-ai/DeepSeek-OCR?utm_source=chatgpt.com "deepseek-ai/DeepSeek-OCR: Contexts Optical Compression"
+[3]: https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html?utm_source=chatgpt.com "OpenAI-Compatible Server - vLLM"
