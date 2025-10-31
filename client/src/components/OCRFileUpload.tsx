@@ -17,8 +17,7 @@ const ACCEPTED_TYPES = {
   'image/png': ['.png'],
   'image/webp': ['.webp'],
   'image/gif': ['.gif'],
-  'image/bmp': ['.bmp'],
-  'application/pdf': ['.pdf']
+  'image/bmp': ['.bmp']
 };
 
 const MAX_SIZE = 50 * 1024 * 1024; // 50MB
@@ -35,7 +34,7 @@ export function OCRFileUpload({ onFilesUpload, className, maxFiles = 10 }: OCRFi
       if (rejection.errors?.some((e: any) => e.code === 'file-too-large')) {
         setError('One or more files exceed 50MB size limit');
       } else if (rejection.errors?.some((e: any) => e.code === 'file-invalid-type')) {
-        setError('Only image files (JPG, PNG, WEBP, PDF, GIF, BMP) are supported for OCR');
+        setError('Only image files (JPG, PNG, WEBP, GIF, BMP) are supported for OCR. For PDFs, use Regular Upload.');
       } else {
         setError('Some files are invalid. Please try again.');
       }
@@ -123,7 +122,11 @@ export function OCRFileUpload({ onFilesUpload, className, maxFiles = 10 }: OCRFi
             </span>
             <span className="px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full text-sm flex items-center gap-1">
               <Image className="w-3 h-3" />
-              PDF
+              GIF
+            </span>
+            <span className="px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full text-sm flex items-center gap-1">
+              <Image className="w-3 h-3" />
+              BMP
             </span>
           </div>
           <p className="text-xs text-muted-foreground">Maximum file size: 50MB</p>
