@@ -1,5 +1,6 @@
 const DEEPINFRA_API_KEY = process.env.DEEPINFRA_API_KEY;
-const API_URL = "https://api.deepinfra.com/v1/openai/chat/completions";
+// Use Chat Completions API for vision models
+const CHAT_API_URL = "https://api.deepinfra.com/v1/openai/chat/completions";
 const OCR_MODEL = "deepseek-ai/DeepSeek-OCR";
 
 export interface OCRResult {
@@ -50,9 +51,10 @@ export async function extractTextFromImage(
     }];
 
     console.log(`Starting OCR extraction for ${filename} (${extension})`);
+    console.log('Request payload:', JSON.stringify({ model: OCR_MODEL, messages }, null, 2));
     
-    // Call DeepInfra API
-    const response = await fetch(API_URL, {
+    // Call DeepInfra Chat Completions API for vision
+    const response = await fetch(CHAT_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${DEEPINFRA_API_KEY}`,
@@ -129,7 +131,7 @@ export async function testDeepInfraConnection(): Promise<boolean> {
   }
 
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(CHAT_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${DEEPINFRA_API_KEY}`,
