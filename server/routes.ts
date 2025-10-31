@@ -8,7 +8,7 @@ import { storage } from "./storage";
 import { insertEvaluationSchema, updateBookMetadataSchema, insertScoringConfigSchema } from "@shared/schema";
 import { evaluateBook, deepAnalyzeBook, evaluateNMCStandards } from "./services/openai";
 import { extractTextFromFile, extractCoverImage, extractISBN } from "./services/fileProcessor";
-import { extractTextFromImage } from "./services/deepinfra";
+import { extractTextWithDeepSeekOCR } from "./services/replicate";
 import { searchGoodreadsBook } from "./services/apify";
 import { searchAmazonBook } from "./services/amazon";
 import { fromError } from "zod-validation-error";
@@ -726,17 +726,13 @@ async function processOCRFileAsync(evaluationId: string, filePath: string, filen
     // Update progress: OCR Text Extraction
     await storage.updateEvaluation(evaluationId, { progress: 10 });
     
-    // Read the file as buffer
-    const fileBuffer = await fs.readFile(filePath);
-    
     // Update progress: OCR Processing
     await storage.updateEvaluation(evaluationId, { progress: 25 });
     
-    // Extract text using DeepSeek OCR
-    const ocrResult = await extractTextFromImage(fileBuffer, filename);
-    const bookText = ocrResult.text;
+    // Extract text using DeepSeek OCR via Replicate
+    const bookText = await extractTextWithDeepSeekOCR(filePath);
     
-    console.log(`✓ OCR completed: ${bookText.length} characters extracted from ${filename}`);
+    console.log(`✓ DeepSeek OCR completed: ${bookText.length} characters extracted from ${filename}`);
     
     // Update progress: Language Detection
     await storage.updateEvaluation(evaluationId, { progress: 35 });
@@ -827,8 +823,10 @@ async function processOCRFileAsync(evaluationId: string, filePath: string, filen
     let errorMessage = "OCR processing failed";
     
     if (error instanceof Error) {
-      if (error.message.includes('DEEPINFRA_API_KEY')) {
-        errorMessage = 'DeepInfra API key not configured. Please contact administrator.';
+      if (error.message.includes('REPLICATE_API_TOKEN')) {
+        errorMessage = 'Replicate API key not configured. Please contact administrator.';
+      } else if (error.message.includes('DeepSeek OCR')) {
+        errorMessage = 'OCR service temporarily unavailable. Please try again in a few moments.';
       } else if (error.message.includes('OCR extraction failed')) {
         errorMessage = 'Unable to extract text from image. The file may be corrupted or unreadable.';
       } else if (error.message.includes('DeepInfra API error')) {
