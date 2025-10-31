@@ -1,0 +1,134 @@
+HTTP/cURL API
+This is an advanced and more complex API. We strongly recommend that you use OpenAI Chat Completions instead.
+
+Simple prompt
+To query this model you need to provide a properly formatted input string.
+
+curl "https://api.deepinfra.com/v1/inference/deepseek-ai/DeepSeek-OCR" \
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer fCvTnzBHqmRiUCZHw5YrXB3o2bFJYArK" \
+   -d '{
+     "input": "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nHello!<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+     "stop": []
+   }'
+copy
+That will respond with
+
+{
+    "request_id": "RWZDRhS5kdoM1XWwXLEshynO",
+    "inference_status": {
+        "status": "succeeded",
+        "runtime_ms": 243,
+        "cost": 0.0000436,
+        "tokens_input": 12,
+        "tokens_generated": 25
+    },
+    "results": [
+        {
+            "generated_text": "Hello! It's nice to meet you. Is there something I can help you with or would you like to chat for a bit?"
+        }
+    ],
+    "num_tokens": 25,
+    "num_input_tokens":12
+}
+copy
+Conversations
+The OpenAI Chat Completions API is better suited for chat-like conversations, use it instead.
+
+To query this model you need to provide a properly formatted input string.
+
+However, you can still do it if you really need to. You have to add each response and each of the user prompts to every request. You need a properly formatted input string to make it understand the current context. See the example below for some of them. You can tweak it even further by providing a system message.
+
+curl "https://api.deepinfra.com/v1/inference/deepseek-ai/DeepSeek-OCR" \
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer fCvTnzBHqmRiUCZHw5YrXB3o2bFJYArK" \
+   -d '{
+     "input": "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nRespond like a michelin starred chef.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nCan you name at least two different techniques to cook lamb?<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\nBonjour! Let me tell you, my friend, cooking lamb is an art form, and I'"'"'m more than happy to share with you not two, but three of my favorite techniques to coax out the rich, unctuous flavors and tender textures of this majestic protein. First, we have the classic \"Sous Vide\" method. Next, we have the ancient art of \"Sous le Sable\". And finally, we have the more modern technique of \"Hot Smoking.\"<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nTell me more about the second method.<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+     "stop": []
+   }'
+copy
+The conversation above might return something like the following
+
+{
+    "request_id": "RWZDRhS5kdoM1XWwXLEshynO",
+    "inference_status": {
+        "status": "succeeded",
+        "runtime_ms": 243,
+        "cost": 0.000436,
+        "tokens_input": 149,
+        "tokens_generated": 338
+    },
+    "results": [
+        {
+            "generated_text": "Sous le Sable, my friend! It's an ancient technique that's been used for centuries in the Middle East and North Africa. The name itself..."
+        }
+    ],
+    "num_tokens": 338,
+    "num_input_tokens": 149
+}
+copy
+The longer the conversation gets, the more time it takes the model to generate the response. The conversation is limited by the context size of a model. Larger models also usually take more time to respond.
+
+
+Streaming
+To do a streaming request, just pass "stream": true:
+
+curl "https://api.deepinfra.com/v1/inference/deepseek-ai/DeepSeek-OCR" \
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer fCvTnzBHqmRiUCZHw5YrXB3o2bFJYArK" \
+   -d '{
+     "input": "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nHello!<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+     "stop": [],
+     "stream": true
+   }'
+copy
+which outputs:
+
+data: {"token": {"id": null, "text": "Hello", "logprob": 0.0, "special": false}, "generated_text": "", "details": null, "estimated_cost": null}
+
+data: {"token": {"id": null, "text": "!", "logprob": 0.0, "special": false}, "generated_text": "", "details": null, "estimated_cost": null}
+
+data: {"token": {"id": null, "text": " It", "logprob": 0.0, "special": false}, "generated_text": "", "details": null, "estimated_cost": null}
+
+data: {"token": {"id": null, "text": "'s", "logprob": 0.0, "special": false}, "generated_text": "", "details": null, "estimated_cost": null}
+
+....
+
+data: {"token": {"id": null, "text": "", "logprob": 0.0, "special": false}, "generated_text": null, "details": {"finish_reason": "stop"}, "num_output_tokens": 25, "num_input_tokens": 12, "estimated_cost": 0.0000386}
+copy
+Input format
+You can see below the basic format of the input. Bear in mind that newlines often matter.
+
+<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Hello!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+copy
+Conversation prompts contain the history of the exchanged prompts and responses.
+
+<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+First question<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+First answer<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Second question<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Second answer<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Final question<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+copy
+If you want to add system prompt, it is done like this
+
+<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+System prompt<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+First question<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+First answer<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Second question<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Second answer<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Final question<|eot_id|><|start_header_id|>assistant<|end_header_id|>

@@ -32,14 +32,19 @@ export async function extractTextFromImage(
     const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
     const mimeType = getMimeType(extension);
     
-    // Construct messages for DeepSeek-OCR
+    // Construct messages for DeepSeek-OCR with correct format
     const messages = [{
       role: "user",
       content: [
-        { type: "input_text", text: prompt },
         { 
-          type: "input_image", 
-          image_url: `data:${mimeType};base64,${base64Image}` 
+          type: "text", 
+          text: `<image>\n${prompt}` 
+        },
+        { 
+          type: "image_url", 
+          image_url: {
+            url: `data:${mimeType};base64,${base64Image}`
+          }
         }
       ]
     }];
@@ -56,6 +61,7 @@ export async function extractTextFromImage(
       body: JSON.stringify({
         model: OCR_MODEL,
         messages,
+        max_tokens: 8192,
         temperature: 0
       })
     });
