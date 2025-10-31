@@ -75,20 +75,34 @@ export async function extractTextFromImage(
 
     const data = await response.json() as any;
     
-    // Debug: Log the full response structure
-    console.log('DeepInfra API Response:', JSON.stringify(data, null, 2));
+    // ENHANCED DEBUGGING
+    console.log('─────────────────────────────────────');
+    console.log('📥 API RESPONSE RECEIVED');
+    console.log('Response keys:', Object.keys(data));
+    console.log('Choices count:', data.choices?.length);
+    
+    if (data.choices?.[0]) {
+      console.log('Choice[0] keys:', Object.keys(data.choices[0]));
+      console.log('Message keys:', Object.keys(data.choices[0].message || {}));
+      console.log('Content type:', typeof data.choices[0].message?.content);
+      console.log('Content preview (first 200 chars):', 
+        String(data.choices[0].message?.content).substring(0, 200));
+    }
+    console.log('─────────────────────────────────────');
     
     const extractedText = data.choices?.[0]?.message?.content;
 
     if (!extractedText) {
-      console.error('API Response Structure:', data);
+      console.error('❌ No content in response. Full structure:', JSON.stringify(data, null, 2));
       throw new Error("No text extracted from OCR response");
     }
 
     // Check if the response is a data URL (PDF/image) instead of text
     if (typeof extractedText === 'string' && extractedText.startsWith('data:')) {
-      console.error('API returned a data URL instead of text:', extractedText.substring(0, 100));
-      throw new Error("API returned a file instead of extracted text. Please check the API request format.");
+      console.error('❌ API returned base64 data instead of text');
+      console.error('Data URL prefix:', extractedText.substring(0, 50));
+      console.error('This suggests the API is echoing the input instead of extracting text');
+      throw new Error("API returned a file instead of extracted text. The OCR model may not be processing the image correctly.");
     }
 
     console.log(`✓ OCR extraction completed: ${extractedText.length} characters extracted`);
