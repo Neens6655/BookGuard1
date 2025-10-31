@@ -28,7 +28,8 @@ Automatic rejection occurs if System 1 or 2 rates "Severe". An "AI Deep Assessme
 
 ## External Dependencies
 
-*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis and **OCR text extraction from scanned books/images**. GPT-4 Vision processes JPG, PNG, WEBP, GIF, and BMP files for reliable text extraction from physical book pages.
+*   **OpenAI API**: Utilizes `GPT-4o` for book content analysis. GPT-4 Vision is available for PDF OCR if needed via the dedicated GPT-4 Vision service.
+*   **Replicate API**: Powers **DeepSeek OCR** for high-accuracy text extraction from scanned book images (JPG, PNG, WEBP, GIF, BMP). Uses `lucataco/deepseek-ocr` model optimized for document OCR with "Free OCR" task type and "Gundam" resolution for best speed/accuracy balance.
 *   **Neon Database**: Serverless PostgreSQL for persistent storage.
 *   **Apify Goodreads Scraper**: Enriches book data with ratings, reviews, and cover images using `epctex/goodreads-scraper`.
 *   **Apify Amazon Scrapers**: Validates AI age recommendations using `pintostudio/amazon-search-products-scraper` for search and `logical_scrapers/amazon-product-scraper` for product details extraction from amazon.ae marketplace. Features ISBN-first matching, fuzzy search with Jaccard similarity, multiple edition comparison, format preferences, and confidence scoring (High/Medium/Low).

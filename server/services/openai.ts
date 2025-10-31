@@ -692,3 +692,85 @@ Return complete JSON output only.
     throw new Error(`Deep analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+/**
+ * Extract text from images/PDFs using GPT-4 Vision
+ * Supports: PDFs and image files
+ */
+export async function extractTextWithGPT4Vision(filePath: string): Promise<string> {
+  const fs = await import('fs/promises');
+  
+  try {
+    console.log(`Starting GPT-4 Vision OCR extraction for: ${filePath}`);
+    
+    // Read the file and convert to base64
+    const fileBuffer = await fs.readFile(filePath);
+    const base64File = fileBuffer.toString('base64');
+    const mimeType = getFileMimeType(filePath);
+    const dataUri = `data:${mimeType};base64,${base64File}`;
+    
+    const response = await retryWithBackoff(
+      async () => {
+        return await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: "Extract all text from this document/image. Return ONLY the extracted text, preserving structure and formatting. Do not add any commentary or description.",
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: dataUri,
+                  },
+                },
+              ],
+            },
+          ],
+          max_tokens: 4096,
+        });
+      },
+      3,
+      1000,
+      'GPT-4 Vision OCR'
+    );
+    
+    const extractedText = response.choices[0]?.message?.content?.trim() || '';
+    
+    console.log(`✓ GPT-4 Vision OCR completed: ${extractedText.length} characters extracted`);
+    
+    if (extractedText.length < 10) {
+      throw new Error('GPT-4 Vision extracted very little text. The file may not contain readable text.');
+    }
+    
+    return extractedText;
+    
+  } catch (error) {
+    console.error('GPT-4 Vision OCR error:', error);
+    
+    if (error instanceof Error) {
+      throw new Error(`GPT-4 Vision OCR failed: ${error.message}`);
+    }
+    
+    throw new Error('GPT-4 Vision OCR failed with unknown error');
+  }
+}
+
+function getFileMimeType(filePath: string): string {
+  const ext = filePath.toLowerCase().split('.').pop();
+  
+  const mimeTypes: Record<string, string> = {
+    'pdf': 'application/pdf',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'webp': 'image/webp',
+    'gif': 'image/gif',
+    'bmp': 'image/bmp',
+  };
+  
+  return mimeTypes[ext || ''] || 'image/jpeg';
+}

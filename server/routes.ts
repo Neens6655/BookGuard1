@@ -52,13 +52,13 @@ const ocrUpload = multer({
     fileSize: 50 * 1024 * 1024, // 50MB limit for OCR files
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.pdf', '.gif', '.bmp'];
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp'];
     const ext = path.extname(file.originalname).toLowerCase();
     
     if (allowedTypes.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files (JPG, PNG, WEBP, PDF, GIF, BMP) are allowed for OCR'));
+      cb(new Error('Only image files (JPG, PNG, WEBP, GIF, BMP) are allowed for OCR. For PDFs, use the regular upload.'));
     }
   },
 });
@@ -729,7 +729,8 @@ async function processOCRFileAsync(evaluationId: string, filePath: string, filen
     // Update progress: OCR Processing
     await storage.updateEvaluation(evaluationId, { progress: 25 });
     
-    // Extract text using DeepSeek OCR via Replicate
+    // Extract text using DeepSeek OCR via Replicate (optimized for images)
+    console.log(`Using DeepSeek OCR for image: ${filename}`);
     const bookText = await extractTextWithDeepSeekOCR(filePath);
     
     console.log(`✓ DeepSeek OCR completed: ${bookText.length} characters extracted from ${filename}`);
