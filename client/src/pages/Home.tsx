@@ -1068,6 +1068,7 @@ export default function Home() {
             result={evaluation.result as EvaluationResult}
             filename={evaluation.filename}
             coverImage={evaluation.coverImage}
+            extractedText={evaluation.extractedText}
             nmcAssessment={evaluation.nmcAssessment}
             goodreadsData={evaluation.goodreadsData}
             amazonData={evaluation.amazonData}

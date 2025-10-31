@@ -163,6 +163,7 @@ export interface Evaluation {
   status: "processing" | "completed" | "failed";
   progress: number;
   result: EvaluationResult | null;
+  extractedText?: string | null;
   nmcAssessment?: NMCAssessment | null;
   goodreadsData?: GoodreadsData | null;
   amazonData?: AmazonData | null;

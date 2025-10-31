@@ -10,6 +10,7 @@ export const evaluations = pgTable("evaluations", {
   status: text("status", { enum: ["processing", "completed", "failed"] }).notNull().default("processing"),
   progress: integer("progress").notNull().default(0),
   result: jsonb("result"),
+  extractedText: text("extracted_text"),
   nmcAssessment: jsonb("nmc_assessment").$type<{
     enabled: boolean;
     finalAgeBand: string;

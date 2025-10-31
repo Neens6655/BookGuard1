@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Download, Share2, Star, Shield, BookOpen, BookAudio, Lightbulb, Users, MessageCircle, GraduationCap, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, Globe, ArrowLeft, ExternalLink, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ interface ResultsViewProps {
   result: EvaluationResult;
   filename: string;
   coverImage?: string | null;
+  extractedText?: string | null;
   nmcAssessment?: NMCAssessment | null;
   goodreadsData?: GoodreadsData | null;
   amazonData?: AmazonData | null;
@@ -19,7 +20,7 @@ interface ResultsViewProps {
   onDownload: (format: 'json' | 'txt' | 'pdf') => void;
 }
 
-export function ResultsView({ result, filename, coverImage, nmcAssessment, goodreadsData, amazonData, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
+export function ResultsView({ result, filename, coverImage, extractedText, nmcAssessment, goodreadsData, amazonData, onNewAssessment, onBackToLibrary, onDownload }: ResultsViewProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Map score to risk level label
@@ -311,6 +312,16 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                 >
                   <Star className="w-4 h-4 mr-2" />
                   Community
+                </TabsTrigger>
+              )}
+              {extractedText && (
+                <TabsTrigger 
+                  value="qa" 
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+                  data-testid="tab-qa"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Quality Assurance
                 </TabsTrigger>
               )}
             </TabsList>
@@ -1758,6 +1769,94 @@ export function ResultsView({ result, filename, coverImage, nmcAssessment, goodr
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              </TabsContent>
+            )}
+
+            {/* Quality Assurance Tab */}
+            {extractedText && (
+              <TabsContent value="qa" className="mt-6">
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl p-6 border-2 border-slate-200">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-500 to-gray-600 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-2xl font-bold text-foreground mb-2">
+                          Extracted Text Analysis
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Quality assurance: This is the raw text that was extracted from your uploaded book and used for evaluation. Review this to understand what content the AI analyzed.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Text Statistics */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                        <div className="text-sm text-muted-foreground mb-1">Characters</div>
+                        <div className="text-2xl font-bold text-slate-700">
+                          {extractedText.length.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                        <div className="text-sm text-muted-foreground mb-1">Words</div>
+                        <div className="text-2xl font-bold text-slate-700">
+                          {extractedText.split(/\s+/).filter(Boolean).length.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                        <div className="text-sm text-muted-foreground mb-1">Lines</div>
+                        <div className="text-2xl font-bold text-slate-700">
+                          {extractedText.split('\n').length.toLocaleString()}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                        <div className="text-sm text-muted-foreground mb-1">Filename</div>
+                        <div className="text-sm font-semibold text-slate-700 truncate" title={filename}>
+                          {filename}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Extracted Text Display */}
+                    <div className="bg-white rounded-lg border-2 border-slate-300 p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-semibold text-foreground">Raw Extracted Text</h5>
+                        <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-300">
+                          {extractedText.length > 10000 ? 'Long Text' : 'Full Text'}
+                        </Badge>
+                      </div>
+                      <div className="bg-slate-50 rounded-md p-4 max-h-96 overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-wrap break-words border border-slate-200">
+                        {/* Show first 50,000 characters for performance */}
+                        {extractedText.length > 50000 ? (
+                          <>
+                            {extractedText.slice(0, 50000)}
+                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                              ⚠️ Text truncated at 50,000 characters for performance. Full text: {extractedText.length.toLocaleString()} characters.
+                            </div>
+                          </>
+                        ) : (
+                          extractedText
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quality Notes */}
+                    <div className="mt-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-start gap-3">
+                        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="text-sm text-blue-900">
+                          <p className="font-semibold mb-1">Quality Assurance Note:</p>
+                          <p>
+                            This text was {filename.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? 'extracted using OCR (Optical Character Recognition) from the scanned image' : 'directly extracted from the document file'}. 
+                            The AI evaluation is based on this exact content. If you notice any missing or incorrect text, please re-upload the file or use a clearer scan.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             )}
